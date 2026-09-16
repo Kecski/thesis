@@ -33,8 +33,13 @@ def initialize_sample_population(name: str, value: int=0) -> str:
 
 
 # Reaction helper function
-def create_reaction(rate: float, left_side: str="X", right_side: str="2X") -> str:
-    return f'<reaction spec="Reaction" rate="{rate}"> {left_side} -> {right_side} </reaction>'
+def create_reaction(rate: list[float], left_side: str="X", right_side: str="2X", change_times: list[float] | None=None) -> str:
+    rate_str = " ".join([str(r) for r in rate])
+    if change_times is not None:
+        change_times_str = " ".join([str(t) for t in change_times])
+        return f'<reaction spec="Reaction" rate="{rate_str}" changeTimes="{change_times_str}"> {left_side} -> {right_side} </reaction>'
+    else:
+        return f'<reaction spec="Reaction" rate="{rate_str}"> {left_side} -> {right_side} </reaction>'
 
 # Trajectory helper function
 def create_trajectory(populations: list, 
@@ -84,18 +89,24 @@ def create_loggers(basefile_name: str, traj_id: str, tree_id: str, samp_name: st
 # Write full XML file
 def write_single_tree_xml(file_path: str, 
                           n_sims: int, 
-                          birth_rate: float, 
-                          death_rate: float,
-                          max_time: float=10.0,
-                          sampling_rate: float=1, 
+                          birth_rate: list[float], 
+                          death_rate: list[float],
+                          change_times_birth: list[float] | None=None,
+                          change_times_death: list[float] | None=None,
+                          change_times_sampling: list[float] | None=None,
+                          max_time: float=10.,
+                          sampling_rate: list[float]=[1.], 
                           loggers_base="simulation",
                           traj_type: str="StochasticTrajectory",
                           init_pop: int=1,
                           ends_when: str | None=None,
                           must_have: str | None=None
                           ) -> None:
-    populations = [initialize_population("X", init_pop), initialize_sample_population("S", 0)]
-    reactions = [create_reaction(birth_rate, "X", "2X"), create_reaction(death_rate, "X", "0"), create_reaction(sampling_rate, "X", "S")]
+    populations = [initialize_population("X", init_pop), 
+                   initialize_sample_population("S", 0)]
+    reactions = [create_reaction(birth_rate, "X", "2X", change_times_birth), 
+                 create_reaction(death_rate, "X", "0", change_times_death), 
+                 create_reaction(sampling_rate, "X", "S", change_times_sampling)]
     
     with open(file_path, "w") as f:
         f.write('<beast version="2.0" namespace="beast.base.inference:beast.base.inference.parameter:remaster">\n')
@@ -108,24 +119,25 @@ def write_single_tree_xml(file_path: str,
 
 
 # Only for testing purposes
-def main():
-    file_path = "./test.xml"
-    n_sims = 1
-    birth_rate = 1.4
-    death_rate = 0.5
-    sample_rate = 0.5
-    write_single_tree_xml(file_path, n_sims, birth_rate, death_rate, max_time=10.0, sampling_rate=sample_rate, loggers_base="simulation", traj_type="StochasticTrajectory", init_pop=1)
+# def main():
+#     file_path = "./test.xml"
+#     n_sims = 1
+#     birth_rate = [1.4, 1.2, 1.0]
+#     death_rate = [0.5, 0.4, 0.3]
+#     sampling_rate = [0.5, 0.4, 0.3]   
+#     change_times = [2.0, 5.7]
+#     write_single_tree_xml(file_path, n_sims, birth_rate, death_rate, change_times=change_times, max_time=10.0, sampling_rate=sampling_rate, loggers_base="simulation", traj_type="StochasticTrajectory", init_pop=1)
     
-    # populations = [initialize_population("X"), initialize_sample_population("S")]
-    # reactions = [create_reaction(birth_rate, "X", "2X"), create_reaction(death_rate, "X", "0"), create_reaction(sample_rate, "X", "S")]
-    # trajectory = create_trajectory(populations, reactions, max_time=10, indent=1)
-    # simulated_tree = create_tree_simulation(trajectory)
-    # loggers = create_loggers("simulation", "trajectory", "tree", "S", indent=0)
+#     # populations = [initialize_population("X"), initialize_sample_population("S")]
+#     # reactions = [create_reaction(birth_rate, "X", "2X"), create_reaction(death_rate, "X", "0"), create_reaction(sampling_rate, "X", "S")]
+#     # trajectory = create_trajectory(populations, reactions, max_time=10, indent=1)
+#     # simulated_tree = create_tree_simulation(trajectory)
+#     # loggers = create_loggers("simulation", "trajectory", "tree", "S", indent=0)
     
-    # with open("test.xml", "w") as f:
-    #     f.write(simulated_tree)
-    #     f.write("\n")
-    #     f.write(loggers)
+#     # with open("test.xml", "w") as f:
+#     #     f.write(simulated_tree)
+#     #     f.write("\n")
+#     #     f.write(loggers)
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
