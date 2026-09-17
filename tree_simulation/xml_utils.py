@@ -8,10 +8,12 @@ Example XML structure (single tree):
         <simulate id="tree" spec="SimulatedTree">
             <trajectory id="trajectory" spec="StochasticTrajectory", maxTime="T">
                 <population       id="X" spec="RealParameter" value="init_pop"/>
-                <samplePopulation id="X" spec="RealParameter" value="0"/>
+                <samplePopulation id="S" spec="RealParameter" value="0"/>
+                <samplePopulation id="removed" spec="RealParameter" value="0"/>
+                
                 <reaction spec="Reaction" rate="lambda"> X -> 2X </reaction>
-                <reaction spec="Reaction" rate="mu"> X -> 0 </reaction>
-                <reaction spec="Reaction" rate="psi"> X -> S </reaction>
+                <reaction spec="Reaction" rate="mu"> X -> removed </reaction>
+                <reaction spec="Reaction" rate="psi"> X -> S + removed </reaction>
             </trajectory>
         </simulate>
         <logger fileName="base.traj"> <log idfer="trajectory"/> </logger>
@@ -77,9 +79,18 @@ def create_tree_simulation(trajectory: str, tree_id: str="tree", indent: int=0) 
     return simulation
 
 # Logger elements helper function
-def create_loggers(basefile_name: str, traj_id: str, tree_id: str, samp_name: str="S", indent: int=0) -> str:
+def create_loggers(basefile_name: str,
+                   traj_id: str,
+                   tree_id: str,
+                   samp_name: str="S",
+                   removed_name: str="removed",
+                   indent: int=0) -> str:
     logger_trajectory = f'{indent_n_tabs(indent)}<logger fileName="{basefile_name}.traj"> <log idref="{traj_id}"/> </logger>'
-    logger_full_tree = f'{indent_n_tabs(indent)}<logger fileName="{basefile_name}.full.trees"> <log idref="{tree_id}"/> </logger>'
+    
+    logger_full_tree = f'{indent_n_tabs(indent)}<logger fileName="{basefile_name}.full.trees" mode="tree">\n'
+    logger_full_tree += f'{indent_n_tabs(indent+1)}<log spec="TypedTreeLogger"> <tree spec="PrunedTree" samplePops="{removed_name}" simulatedTree="@{tree_id}"/> </log>\n'
+    logger_full_tree += f'{indent_n_tabs(indent)}</logger>'
+    
     logger_sampled_tree = f'{indent_n_tabs(indent)}<logger fileName="{basefile_name}.sampled.trees" mode="tree">\n'
     logger_sampled_tree += f'{indent_n_tabs(indent+1)}<log spec="TypedTreeLogger"> <tree spec="PrunedTree" samplePops="{samp_name}" simulatedTree="@{tree_id}"/> </log>\n'
     logger_sampled_tree += f'{indent_n_tabs(indent)}</logger>'
@@ -103,16 +114,17 @@ def write_single_tree_xml(file_path: str,
                           must_have: str | None=None
                           ) -> None:
     populations = [initialize_population("X", init_pop), 
-                   initialize_sample_population("S", 0)]
+                   initialize_sample_population("S", 0),
+                   initialize_sample_population("removed", 0)]
     reactions = [create_reaction(birth_rate, "X", "2X", change_times_birth), 
-                 create_reaction(death_rate, "X", "0", change_times_death), 
-                 create_reaction(sampling_rate, "X", "S", change_times_sampling)]
+                 create_reaction(death_rate, "X", "removed", change_times_death), 
+                 create_reaction(sampling_rate, "X", "S + removed", change_times_sampling)]
     
     with open(file_path, "w") as f:
         f.write('<beast version="2.0" namespace="beast.base.inference:beast.base.inference.parameter:remaster">\n')
         f.write(f'\t<run spec="Simulator" nSims="{n_sims}">\n')
         f.write(create_tree_simulation(create_trajectory(populations, reactions, max_time=max_time, spec=traj_type, ends_when=ends_when, must_have=must_have, indent=3), indent=2) + "\n")
-        f.write(create_loggers(loggers_base, "trajectory", "tree", "S", indent=2) + "\n")
+        f.write(create_loggers(loggers_base, "trajectory", "tree", "S", "removed", indent=2) + "\n")
         f.write('\t</run>\n')
         f.write('</beast>\n')
 

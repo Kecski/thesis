@@ -1,8 +1,8 @@
-birth_rate: [1.4, 1.2]
+birth_rate: [1.6, 1.4]
 change_times_birth: [3.7]
-death_rate: [1.0, 0.8]
+death_rate: [0.5, 0.6]
 change_times_death: [3.7]
-sampling_rate: [1.0]
+sampling_rate: [0.5]
 change_times_sampling: None
 n_sims: 1
 max_time: 10.0
