@@ -1,13 +1,35 @@
+"""
+Command-line entry point for simulating stochastic birth-death trees with
+BEAST2 + ReMASTER.
+ 
+This script parses command-line arguments describing a birth-death-sampling
+process (rates, optional piecewise rate-change times, population/tree
+stopping conditions, etc.), validates them, writes a ReMASTER XML
+configuration file via `write_single_tree_xml` (from `xml_utils`), and logs
+the chosen parameters to a text file alongside the generated XML.
+ 
+Run directly, e.g.:
+    python run_remaster_sim.py --birth_rate 1.4 --death_rate 0.5 --max_time 10
+"""
+
 import argparse
 import random
-import re
-import shutil
-import subprocess
-import sys
 from pathlib import Path
 from xml_utils import write_single_tree_xml
 
 def parse_args():
+    """
+    Define and parse the command-line arguments for the simulation script.
+ 
+    Builds an `argparse.ArgumentParser` describing all required and
+    optional parameters for a ReMASTER birth-death simulation (rates,
+    piecewise rate-change times, replicate count, output locations,
+    stopping conditions, BEAST2 invocation command, and random seed), then
+    parses and returns the arguments supplied on the command line.
+ 
+    Returns:
+        argparse.Namespace: The parsed command-line arguments.
+    """
     p = argparse.ArgumentParser(
         description="Simulate stochastic birth-death trees with BEAST2 + ReMASTER."
     )
@@ -96,6 +118,18 @@ def validate_args(args, parser):
         
 
 def main():
+    """
+    Script entry point.
+ 
+    Parses and validates command-line arguments, optionally seeds the
+    random number generator, prints the chosen simulation parameters,
+    creates the output/log directories, writes a parameter-record text
+    file, and generates the ReMASTER XML configuration file via
+    `write_single_tree_xml`.
+ 
+    Returns:
+        None
+    """
     args = parse_args()
     validate_args(args, parser=argparse.ArgumentParser())
     
@@ -125,8 +159,8 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # Create simulation log directory if it doesn't exist
-    sim_logs_dir = output_dir / "sim_logs"
-    sim_logs_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir = output_dir / "logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
     
     # Write parameters to txt file for record-keeping
     param_log = output_dir / f"{args.output_name}_parameters.txt"
@@ -160,30 +194,30 @@ def main():
         change_times_sampling=args.change_times_sampling,
         max_time=args.max_time,
         sampling_rate=args.sampling_rate,
-        loggers_base=str("sim_logs" / Path(args.output_name)),
+        loggers_base=str("logs" / Path(args.output_name)),
         traj_type=args.traj_type,
         init_pop=args.init_pop,
-        ends_when=f"populationSize >= {args.max_pop}" if args.max_pop is not None else None,
-        must_have=f"sampledTips >= {args.min_tips}" if args.min_tips is not None else None
+        ends_when=f"X>={args.max_pop}" if args.max_pop is not None else None,
+        must_have=f"S>={args.min_tips}" if args.min_tips is not None else None
     )
     
-    deterministic_file_path = output_dir / f"{args.output_name}_deterministic.xml"
-    write_single_tree_xml(
-        file_path=str(deterministic_file_path),
-        n_sims=1,
-        birth_rate=args.birth_rate,
-        death_rate=args.death_rate,
-        change_times_birth=args.change_times_birth,
-        change_times_death=args.change_times_death,
-        change_times_sampling=args.change_times_sampling,
-        max_time=args.max_time,
-        sampling_rate=args.sampling_rate,
-        loggers_base=args.output_name,
-        traj_type="DeterministicTrajectory",
-        init_pop=args.init_pop,
-        ends_when=f"populationSize >= {args.max_pop}" if args.max_pop is not None else None,
-        must_have=f"sampledTips >= {args.min_tips}" if args.min_tips is not None else None
-    )
+    # deterministic_file_path = output_dir / f"{args.output_name}_deterministic.xml"
+    # write_single_tree_xml(
+    #     file_path=str(deterministic_file_path),
+    #     n_sims=1,
+    #     birth_rate=args.birth_rate,
+    #     death_rate=args.death_rate,
+    #     change_times_birth=args.change_times_birth,
+    #     change_times_death=args.change_times_death,
+    #     change_times_sampling=args.change_times_sampling,
+    #     max_time=args.max_time,
+    #     sampling_rate=args.sampling_rate,
+    #     loggers_base=args.output_name,
+    #     traj_type="DeterministicTrajectory",
+    #     init_pop=args.init_pop,
+    #     ends_when=f"populationSize >= {args.max_pop}" if args.max_pop is not None else None,
+    #     must_have=f"sampledTips >= {args.min_tips}" if args.min_tips is not None else None
+    # )
 
 if __name__ == "__main__":
     main()
