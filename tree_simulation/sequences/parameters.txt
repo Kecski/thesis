@@ -1,7 +1,7 @@
 Tree file: ./remaster_sims/logs/sim.sampled.trees
 Root sequence file: focal_sequences_strain.fasta
-Transition rates: {'AC': 1.0, 'AG': 1.0, 'AT': 1.0, 'CG': 1.0, 'CT': 1.0, 'GT': 1.0}
-Equilibrium frequences: [0.25, 0.25, 0.25, 0.25]
+Transition rates: {'AC': 0.5, 'AG': 3.0, 'AT': 0.5, 'CG': 0.5, 'CT': 6.0, 'GT': 1.0}
+Equilibrium frequences: [0.3, 0.18, 0.2, 0.32]
 Clock rate: 1.0
 Gamma site model: {'alpha': 0.5, 'num_categories': 4}
 Root date: 2002.0

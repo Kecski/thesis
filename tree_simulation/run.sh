@@ -1,66 +1,76 @@
 #!/bin/zsh
-
-# PARAMETRIZATION:
-# 
-# Re = effective reproduction number
-# delta = become uninfectious rate (rate at with each individual is removed from the infectious pool)
-# s = sampling proportion (the probability with which infected individuals are sampled through time)
-# 
-# lambda = birth rate (per individual per unit time)
-# mu = death rate
-# psi = sampling rate
 #
-# 
-# FORMULAS FOR CONVERSION
-# 
-# psi = s * delta
-# mu = delta - s * delta
-# lambda = Re * (delta)
+# ==============================================================================
+# Pipeline: Epidemiological Trajectory, Tree & Sequence Mutation Simulator
+# ==============================================================================
+# Workflow Description:
+#   1. Parameter Conversion: Translates high-level epidemiological parameters 
+#      (Re, delta, s) into birth, death, and sampling rates (lambda, mu, psi).
+#   2. Trajectory Simulation: Runs `simulation.py` to generate a stochastic
+#      birth-death-sampling trajectory.
+#   3. Tree Synthesis: Executes BEAST (`beast sim.xml`) inside `remaster_sims/`
+#      to build phylogenetic trees from the simulated trajectory.
+#   4. Sequence Mutation: Runs `sequence_mutation.py` to evolve nucleotide 
+#      sequences down the generated phylogenetic tree.
 #
-# Re = lambda/(mu + psi)
-# delta = (mu + psi)
-# s = psi / (mu + psi)
-
-# PARAMETERS FOR FIRST PART
-RE=1.2
-DELTA=$(echo "365 / 7" | bc -l)
-S=$(echo "5e-3" | bc -l)
-
-MAX_TIME=0.5
-
-PSI=$(echo "$S * $DELTA" | bc -l)
-MU=$(echo "$DELTA - ($S * $DELTA)" | bc -l)
-LAMBDA=$(echo "$RE * $DELTA" | bc -l)
+# Dependencies:
+#   - zsh shell
+#   - bc (command-line calculator)
+#   - uv (Python project & tool runner)
+#   - BEAST (Phylogenetic tree simulator)
+# ==============================================================================
 
 
-# PARAMETERS FOR SECOND PART
+# ------------------------------------------------------------------------------
+# 1. EPIDEMIOLOGICAL PARAMETER CONVERSION
+# ------------------------------------------------------------------------------
+# Biological Definitions:
+#   Re    = Effective reproduction number
+#   delta = Becoming uninfectious rate (1 / duration of infectiousness)
+#   s     = Sampling proportion (probability an infected individual is sampled)
+#
+# Conversion Formulas:
+#   psi    = s * delta           (sampling rate)
+#   mu     = delta - (s * delta) (un-sampled clearance/death rate)
+#   lambda = Re * delta          (transmission/birth rate)
+# ------------------------------------------------------------------------------
+
+# Input Biological Parameters
+RE=1.2                                 # Target effective reproduction number
+DELTA=$(echo "365 / 7" | bc -l)        # Removal rate (~52.14/year = 7-day infectious period)
+S=$(echo "5e-2" | bc -l)               # Sampling proportion (5% sampled)
+
+MAX_TIME=0.5                           # Maximum simulation duration (0.5 time units / years)
+MIN_SAMPLED=50                         # Minimum number of sampled genomes
+
+# Derived Rate Calculations (evaluating floating-point arithmetic via 'bc')
+PSI=$(echo "$S * $DELTA" | bc -l)      # Sampling rate (psi)
+MU=$(echo "$DELTA - ($S * $DELTA)" | bc -l) # Death/un-sampled removal rate (mu)
+LAMBDA=$(echo "$RE * $DELTA" | bc -l)  # Birth/transmission rate (lambda)
+
+
+# ------------------------------------------------------------------------------
+# 2. SEQUENCE & EVOLUTIONARY SIMULATION PARAMETERS
+# ------------------------------------------------------------------------------
 TREE_FILE=./remaster_sims/logs/sim.sampled.trees
-ROOT_SEQUENCE_FILE=test_root_sequence.txt
-ROOT_FILE_TYPE=txt
-TRANSITION_RATES=(1 1 1 1 1 1)
-FREQUENCIES=(0.25 0.25 0.25 0.25)
-CLOCK_RATE=1.0
-GAMMA_SHAPE=0.5
-GAMMA_CATEGORIES=4
-ROOT_DATE=2002
+ROOT_SEQUENCE_FILE=focal_sequences_strain.fasta
+ROOT_FILE_TYPE=fasta
 OUTPUT_DIR=sequences
 
+# Evolutionary & Substitution Model Settings
+TRANSITION_RATES=(0.5 3 0.5 0.5 6 1)   # Relative exchangeability rates: [AC, AG, AT, CG, CT, GT]
+FREQUENCIES=(0.30 0.18 0.20 0.32)      # Base equilibrium frequencies: [A, C, G, T]
+CLOCK_RATE=1e-3                        # Molecular clock rate (substitutions/site/unit time)
+GAMMA_SHAPE=0.5                        # Shape parameter (alpha) for gamma site rate variation
+GAMMA_CATEGORIES=4                     # Number of discrete rate categories
+ROOT_DATE=2002                         # Temporal calendar date assigned to root node
 
-# python3 simulation.py \
-#     --output_name sim \
-#     --birth_rate 1.6 1.4 \
-#     --change_times_birth 3 \
-#     --death_rate 1 0.8 \
-#     --change_times_death 3 \
-#     --sampling_rate 0.1 \
-#     --max_time 10 \
-#     --init_pop 1 \
-#     --traj_type StochasticTrajectory \
-#     --n_sims 1 \
-#     --min_tips 1
+# ------------------------------------------------------------------------------
+# 3. PIPELINE EXECUTION
+# ------------------------------------------------------------------------------
 
-# echo "Valameddig eljut"
-
+# --- Step 3.1: Generate Epidemiological Trajectory ---
+# Simulates stochastic population dynamics using calculated birth, death, and sampling rates.
 uv run simulation.py \
     --output_name sim \
     --birth_rate "$LAMBDA" \
@@ -70,11 +80,15 @@ uv run simulation.py \
     --init_pop 1 \
     --traj_type StochasticTrajectory \
     --n_sims 1 \
-    --min_tips 2
+    --min_tips 50
 
+# --- Step 3.2: Simulate Phylogenetic Tree with BEAST ---
+# Navigates to working subfolder to run the XML tree simulation script.
 cd remaster_sims
 beast sim.xml
 
+# --- Step 3.3: Simulate Nucleotide Mutations along the Tree ---
+# Returns to root directory and mutates root sequence down the tree leaves.
 cd ..
 uv run sequence_mutation.py \
     --tree_file $TREE_FILE \

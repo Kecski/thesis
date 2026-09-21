@@ -1,2 +1,5 @@
 Partition_Index	Model_Name	Rate_Category	Rate_Probability	Rate_Factor
-1	None	1	1.0	1.0
+1	nucleotide	1	0.25	0.03338775338359955
+1	nucleotide	2	0.25	0.25191591759343734
+1	nucleotide	3	0.25	0.8202684819736505
+1	nucleotide	4	0.25	2.8944278470493128
