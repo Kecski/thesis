@@ -1,3 +1,31 @@
+# ==========================================
+# BEAST 2 & REMASTER Output Files
+# ==========================================
+# Log files (MCMC parameter samples & trajectory logs)
+*.log
+*_traj.log
+*_traj.txt
+*.traj
+
+# Tree output files (NEXUS and Newick formats)
+*.trees
+*.tree
+*.typed.tree
+*.typed.trees
+*.typed.node.trees
+*.typed.node.tree
+*.nexus
+*.fasta
+*.nwk
+*.newick
+*parameters.txt
+
+# BEAST 2 Checkpoints & Operator statistics
+*.state
+beast.state
+*.ops
+*.xml.state
+
 # --- Python ---
 __pycache__/
 *.py[cod]
