@@ -36,18 +36,22 @@
 # ------------------------------------------------------------------------------
 
 # Input Biological Parameters
-RE=1.2                                 # Target effective reproduction number
+RE=(2 1.5 1.1 0.9 0.7 1.2 1)            # Target effective reproduction number
+CHANGE_TIMES_BIRTH=(0.03 0.08 0.15 0.2 0.24 0.27)
 DELTA=$(echo "365 / 7" | bc -l)        # Removal rate (~52.14/year = 7-day infectious period)
 S=$(echo "5e-2" | bc -l)               # Sampling proportion (5% sampled)
 
-MAX_TIME=0.5                           # Maximum simulation duration (0.5 time units / years)
+MAX_TIME=0.3                           # Maximum simulation duration (0.5 time units / years)
 MIN_SAMPLED=50                         # Minimum number of sampled genomes
 
 # Derived Rate Calculations (evaluating floating-point arithmetic via 'bc')
 PSI=$(echo "$S * $DELTA" | bc -l)      # Sampling rate (psi)
 MU=$(echo "$DELTA - ($S * $DELTA)" | bc -l) # Death/un-sampled removal rate (mu)
-LAMBDA=$(echo "$RE * $DELTA" | bc -l)  # Birth/transmission rate (lambda)
-
+LAMBDA=()
+for n in "${RE[@]}"; do
+    LAMBDA+=("$(echo "$n * $DELTA" | bc -l)")
+done
+#LAMBDA=$(echo "$RE * $DELTA" | bc -l)  # Birth/transmission rate (lambda)
 
 # ------------------------------------------------------------------------------
 # 2. SEQUENCE & EVOLUTIONARY SIMULATION PARAMETERS
@@ -71,16 +75,17 @@ ROOT_DATE=2002                         # Temporal calendar date assigned to root
 
 # --- Step 3.1: Generate Epidemiological Trajectory ---
 # Simulates stochastic population dynamics using calculated birth, death, and sampling rates.
-uv run simulation.py \
+uv run create_xml.py \
     --output_name sim \
-    --birth_rate "$LAMBDA" \
+    --birth_rate "${LAMBDA[@]}" \
+    --change_times_birth "${CHANGE_TIMES_BIRTH[@]}" \
     --death_rate "$MU" \
     --sampling_rate "$PSI" \
     --max_time "$MAX_TIME" \
     --init_pop 1 \
     --traj_type StochasticTrajectory \
     --n_sims 1 \
-    --min_tips 50
+    --min_tips 10
 
 # --- Step 3.2: Simulate Phylogenetic Tree with BEAST ---
 # Navigates to working subfolder to run the XML tree simulation script.
