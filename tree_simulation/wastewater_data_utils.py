@@ -224,7 +224,7 @@ class WastewaterParams:
     flow_mean: float = 1e8
     flow_cv: float = 0.10
     meas_cv: float = 0.3
-    n_replicates: int = 2
+    n_replicates: int = 1
     lod: float = 1.0
     sample_days_every: int = 1
 

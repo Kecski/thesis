@@ -42,7 +42,7 @@ DELTA=$(echo "365 / 7" | bc -l)        # Removal rate (~52.14/year = 7-day infec
 S=$(echo "5e-2" | bc -l)               # Sampling proportion (5% sampled)
 
 MAX_TIME=0.3                           # Maximum simulation duration (0.5 time units / years)
-MIN_SAMPLED=50                         # Minimum number of sampled genomes
+MIN_SAMPLED=10                         # Minimum number of sampled genomes
 
 # Derived Rate Calculations (evaluating floating-point arithmetic via 'bc')
 PSI=$(echo "$S * $DELTA" | bc -l)      # Sampling rate (psi)
@@ -70,7 +70,29 @@ GAMMA_CATEGORIES=4                     # Number of discrete rate categories
 ROOT_DATE=2002                         # Temporal calendar date assigned to root node
 
 # ------------------------------------------------------------------------------
-# 3. PIPELINE EXECUTION
+# 3. WASTEWATER SIMULATION PARAMETERS
+# ------------------------------------------------------------------------------
+N_DAYS=$(echo "$MAX_TIME * 365.25" | bc -l)
+N_DAYS=${N_DAYS%.*}
+echo $N_DAYS
+WW_DATA_DIR="test"
+SEED=42
+
+# Shedding Parameters
+TOTAL_LOAD_PER_INFECTION=1e9
+SHED_MAX_DAYS=21
+SHED_MEAN=4
+SHED_SD=3
+TRANSPORT_MEAN=7
+TRANSPORT_SD=2
+FLOW_MEAN=1e8
+MEAS_CV=0.3
+LOD=1
+
+
+
+# ------------------------------------------------------------------------------
+# 4. PIPELINE EXECUTION
 # ------------------------------------------------------------------------------
 
 # --- Step 3.1: Generate Epidemiological Trajectory ---
@@ -85,7 +107,7 @@ uv run create_xml.py \
     --init_pop 1 \
     --traj_type StochasticTrajectory \
     --n_sims 1 \
-    --min_tips 10
+    --min_tips $MIN_SAMPLED
 
 # --- Step 3.2: Simulate Phylogenetic Tree with BEAST ---
 # Navigates to working subfolder to run the XML tree simulation script.
@@ -106,3 +128,27 @@ uv run sequence_mutation.py \
     --gamma_categories $GAMMA_CATEGORIES \
     --root_date $ROOT_DATE \
     --output_dir $OUTPUT_DIR
+
+
+
+uv run wastewater_data.py remaster_sims/logs/sim.full.trees \
+    --n-days $N_DAYS \
+    --output_dir "episewer/$WW_DATA_DIR" \
+    --total-load-per-infection $TOTAL_LOAD_PER_INFECTION \
+    --shed-max-days $SHED_MAX_DAYS \
+    --shed-mean $SHED_MEAN \
+    --shed-sd $SHED_SD \
+    --transport-mean $TRANSPORT_MEAN \
+    --transport-sd $TRANSPORT_SD \
+    --flow-mean $FLOW_MEAN \
+    --meas-cv $MEAS_CV \
+    --lod $LOD \
+    --seed $SEED
+
+
+cd episewer
+
+Rscript simulate_wastewater_metrics.R \
+    --data-dir $WW_DATA_DIR \
+    --seed $SEED
+

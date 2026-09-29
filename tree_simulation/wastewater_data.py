@@ -51,7 +51,7 @@ def build_parser() -> argparse.ArgumentParser:
                          "(newick, nexus, phyloxml, ...).")
     io.add_argument("--output_dir", default="episewer",
                     help="Path to output directory.")
-    io.add_argument("--episewer-prefix", default=None,
+    io.add_argument("--episewer-prefix", default="episewer",
                     help="If given, also write <prefix>_measurements.csv and "
                          "<prefix>_flows.csv for EpiSewer.")
 
