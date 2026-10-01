@@ -21,18 +21,25 @@
 # Become uninfectious (delta) = (mu + psi)
 # Sampling proportion (s) = psi / (mu + psi)
 
-RE=1.1
-DELTA=$(echo "365 / 7" | bc -l)
-S=$(echo "1e-4" | bc -l)
+RE=(1.5 1 0.8)            # Target effective reproduction number
+CHANGE_TIMES_BIRTH=(0.1 0.2)
+DELTA=$(echo "365 / 7" | bc -l)        # Removal rate (~52.14/year = 7-day infectious period)
+S=$(echo "5e-2" | bc -l)               # Sampling proportion (5% sampled)
 
-MAX_TIME=0.2
+MAX_TIME=0.3                           # Maximum simulation duration (0.5 time units / years)
+MIN_SAMPLED=10                         # Minimum number of sampled genomes
+OUTPUT_DIR="data/remaster_trees"
+TREE_NAME="sim"
+N_SIMS=2
 
-PSI=$(echo "$S * $DELTA" | bc -l)
-MU=$(echo "$DELTA - ($S * $DELTA)" | bc -l)
-LAMBDA=$(echo "$RE * $DELTA" | bc -l)
-echo "psi = $PSI"
-echo "mu = $MU"
-echo "lambda = $LAMBDA"
+# Derived Rate Calculations (evaluating floating-point arithmetic via 'bc')
+PSI=$(echo "$S * $DELTA" | bc -l)      # Sampling rate (psi)
+MU=$(echo "$DELTA - ($S * $DELTA)" | bc -l) # Death/un-sampled removal rate (mu)
+LAMBDA=()
+for n in "${RE[@]}"; do
+    LAMBDA+=("$(echo "$n * $DELTA" | bc -l)")
+done
+#LAMBDA
 
 
 # python3 simulation.py \
@@ -51,16 +58,19 @@ echo "lambda = $LAMBDA"
 # echo "Valameddig eljut"
 
 
-uv run simulation.py \
-    --output_name sim \
-    --birth_rate "$LAMBDA" \
+uv run create_xml.py \
+    --output_dir $OUTPUT_DIR \
+    --output_name $TREE_NAME \
+    --birth_rate "${LAMBDA[@]}" \
+    --change_times_birth "${CHANGE_TIMES_BIRTH[@]}" \
     --death_rate "$MU" \
     --sampling_rate "$PSI" \
     --max_time "$MAX_TIME" \
     --init_pop 1 \
     --traj_type StochasticTrajectory \
-    --n_sims 1 \
-    --min_tips 1
+    --n_sims $N_SIMS \
+    --min_tips $MIN_SAMPLED
 
-cd remaster_sims
-beast sim.xml
+cd data/remaster_trees
+beast $TREE_NAME.xml
+cd -

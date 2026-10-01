@@ -15,7 +15,11 @@ import argparse
 import dataclasses
 import math
 import sys
+import pandas as pd
 from pathlib import Path
+from io import StringIO
+from Bio import Phylo
+import dendropy
 
 import wastewater_data_utils as wu
 
@@ -45,7 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     io = ap.add_argument_group("input / output")
-    io.add_argument("tree", help="Path to the time-scaled tree file.")
+    io.add_argument("--tree", help="Path to the time-scaled tree file.")
     io.add_argument("--tree-format", default="nexus",
                     help="Tree format understood by Bio.Phylo "
                          "(newick, nexus, phyloxml, ...).")
@@ -71,8 +75,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     tm = ap.add_argument_group("time axis")
     tm.add_argument("--start-date", default="2002-01-01",
-                    help="Calendar date of simulation day 0 (the tree root "
-                         "if --root-day 0), e.g. 2020-03-01.")
+                    help="Calendar date of simulation day 0. This is the date of the start of the simulation. As the simulation represents the sequencing samples, the wastewater data might start earlier than this depending on the sequencing_delay parameter.")
+    tm.add_argument("--sequencing-delay", type=int, default=0,
+                    help="Delay of the sequencing data in days. (Default: 0)")
     tm.add_argument("--n-days", type=int, default=None,
                     help="Length of the simulation in days. Default: tree "
                          "span + shed_max_days + 10, so the shedding tail "
@@ -97,33 +102,45 @@ def main(argv=None) -> int:
                                     for f in dataclasses.fields(
                                         wu.WastewaterParams)})
 
-    times = wu.infection_times_from_tree(
-        args.tree,
-        root_day=args.root_day,
-        mode=args.mode,
-        include_index_case=args.include_index_case,
-        fmt=args.tree_format,
-        branch_length_unit_days=args.branch_length_unit_days,
-    )
+    trees = dendropy.TreeList.get(path=args.tree, schema="nexus")
+    
+    for i, tree in enumerate(trees):
+        phylo_tree = Phylo.read(StringIO(tree.as_string(schema="newick")), "newick")
+        
+        times = wu.infection_times_from_tree(
+            phylo_tree,
+            root_day=args.root_day,
+            mode=args.mode,
+            include_index_case=args.include_index_case,
+            fmt=args.tree_format,
+            branch_length_unit_days=args.branch_length_unit_days,
+        )
 
-    n_days = args.n_days or (math.ceil(times.max()) + params.shed_max_days + 10)
-    inc = wu.daily_incidence(times, n_days, start_day=0)
+        n_days = args.n_days or (math.ceil(times.max()) + params.shed_max_days + 10)
+        inc = wu.daily_incidence(times, n_days, start_day=0)
 
-    if inc.sum() < len(times):
-        print(f"Warning: {int(len(times) - inc.sum())} of {len(times)} "
-              f"infections fall outside the {n_days}-day window and were "
-              f"dropped (increase --n-days or check --root-day).",
-              file=sys.stderr)
+        if inc.sum() < len(times):
+            print(f"Warning: {int(len(times) - inc.sum())} of {len(times)} "
+                f"infections fall outside the {n_days}-day window and were "
+                f"dropped (increase --n-days or check --root-day).",
+                file=sys.stderr)
 
-    df = wu.simulate_wastewater(inc, start_date=args.start_date,
-                                p=params, seed=args.seed)
-    df.to_csv(output_dir / "full_data.csv", index=False)
-    print(f"{len(times)} infections over {n_days} days -> "
-          f"{len(df)} sampling days written to {args.output_dir}/full_data.csv")
+        start_date_minus_delay = pd.Timestamp(args.start_date) - pd.Timedelta(days=args.sequencing_delay)
+        df = wu.simulate_wastewater(inc,  
+                                    start_date=start_date_minus_delay, 
+                                    p=params, 
+                                    seed=args.seed)
+        
+        tree_output_dir = output_dir / f"tree_{i}"
+        tree_output_dir.mkdir(parents=True, exist_ok=True)
+        
+        df.to_csv(tree_output_dir / "full_data.csv", index=False)
+        print(f"{len(times)} infections over {n_days} days -> "
+            f"{len(df)} sampling days written to {args.output_dir}/tree_{i}/full_data.csv")
 
-    if args.episewer_prefix:
-        wu.export_for_episewer(df, args.output_dir, args.episewer_prefix)
-        print(f"EpiSewer files written with prefix '{args.episewer_prefix}'")
+        wu.export_for_episewer(df, tree_output_dir)
+        print(f"Files for wastewater analysis written to {args.output_dir}/tree_{i}")
+            
     return 0
 
 

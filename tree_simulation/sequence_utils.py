@@ -4,6 +4,7 @@ import numpy as np
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
+from pathlib import Path
 # def remove_coma_in_nexus_file(input_file: str, output_file: str) -> None:
 #     with open(input_file, "r") as f:
 #         content = f.read()
@@ -106,9 +107,12 @@ def simulate_sequences_on_tree(tree_file: str,
         evolver = pyvolve.Evolver(partitions=partitions, tree=tree)
         
         # Output files for each tree
-        fasta_file = f"{output_dir}/sequences_{i}.fasta"
-        info_file = f"{output_dir}/sequences_{i}_info.txt"
-        rates_file = f"{output_dir}/sequences_{i}_rates.txt"
+        tree_dir = Path(output_dir) / f"tree{i}"
+        tree_dir.mkdir(parents=True, exist_ok=True)
+        
+        fasta_file = tree_dir / "sequences.fasta"
+        info_file = tree_dir / "sequences_info.txt"
+        rates_file = tree_dir / "sequences_rates.txt"
 
         evolver(seqfile=None, infofile=None, ratefile=None)
         raw_seqs = evolver.get_sequences()

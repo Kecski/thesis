@@ -1,28 +1,35 @@
 #!/bin/zsh
 
-N_DAYS=110
-SAMPLE_DAYS_EVERY=1
-N_REPLICATES=1
-OUTPUT_DIR="episewer/test"
-EPISEWER_PREFIX="episewer"
+TREE_NAME="sim"
+MAX_TIME=0.3
+N_SIMS=2
 
+
+
+WW_OUTPUT_DIR=./data/wastewater
+TREE_FILE=./data/remaster_trees/logs/$TREE_NAME.full.trees
+
+N_DAYS=$(echo "$MAX_TIME * 365.25" | bc -l)
+N_DAYS=${N_DAYS%.*}
+WW_DATA_DIR="data"
+SEED=42
+SEQUENCING_DELAY=14
+
+# Shedding Parameters
 TOTAL_LOAD_PER_INFECTION=1e9
 SHED_MAX_DAYS=21
 SHED_MEAN=4
 SHED_SD=3
-TRANSPORT_MEAN=7
-TRANSPORT_SD=2
+TRANSPORT_MEAN=0.5
+TRANSPORT_SD=0.5
 FLOW_MEAN=1e8
 MEAS_CV=0.3
 LOD=1
-SEED=42
 
-uv run wastewater_data.py remaster_sims/logs/sim.full.trees \
+uv run wastewater_data.py \
+    --tree $TREE_FILE \
     --n-days $N_DAYS \
-    --sample-days-every $SAMPLE_DAYS_EVERY \
-    --n-replicates $N_REPLICATES \
-    --output_dir $OUTPUT_DIR \
-    --episewer-prefix $EPISEWER_PREFIX \
+    --output_dir $WW_OUTPUT_DIR \
     --total-load-per-infection $TOTAL_LOAD_PER_INFECTION \
     --shed-max-days $SHED_MAX_DAYS \
     --shed-mean $SHED_MEAN \
@@ -32,9 +39,11 @@ uv run wastewater_data.py remaster_sims/logs/sim.full.trees \
     --flow-mean $FLOW_MEAN \
     --meas-cv $MEAS_CV \
     --lod $LOD \
+    --sequencing-delay $SEQUENCING_DELAY \
     --seed $SEED
 
 
-cd episewer
-
-Rscript simulate_wastewater_metrics.R
+# Rscript episewer.R \
+#     --data-dir $WW_OUTPUT_DIR \
+#     --n-sims $N_SIMS \
+#     --seed $SEED

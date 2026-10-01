@@ -36,13 +36,16 @@
 # ------------------------------------------------------------------------------
 
 # Input Biological Parameters
-RE=(2 1.5 1.1 0.9 0.7 1.2 1)            # Target effective reproduction number
-CHANGE_TIMES_BIRTH=(0.03 0.08 0.15 0.2 0.24 0.27)
+RE=(1.5 1 0.8)            # Target effective reproduction number
+CHANGE_TIMES_BIRTH=(0.1 0.2)
 DELTA=$(echo "365 / 7" | bc -l)        # Removal rate (~52.14/year = 7-day infectious period)
 S=$(echo "5e-2" | bc -l)               # Sampling proportion (5% sampled)
 
 MAX_TIME=0.3                           # Maximum simulation duration (0.5 time units / years)
 MIN_SAMPLED=10                         # Minimum number of sampled genomes
+REMASTER_OUTPUT_DIR=data/remaster_trees
+TREE_NAME=sim
+N_SIMS=2
 
 # Derived Rate Calculations (evaluating floating-point arithmetic via 'bc')
 PSI=$(echo "$S * $DELTA" | bc -l)      # Sampling rate (psi)
@@ -51,15 +54,16 @@ LAMBDA=()
 for n in "${RE[@]}"; do
     LAMBDA+=("$(echo "$n * $DELTA" | bc -l)")
 done
+#LAMBDA
 #LAMBDA=$(echo "$RE * $DELTA" | bc -l)  # Birth/transmission rate (lambda)
 
 # ------------------------------------------------------------------------------
 # 2. SEQUENCE & EVOLUTIONARY SIMULATION PARAMETERS
 # ------------------------------------------------------------------------------
-TREE_FILE=./remaster_sims/logs/sim.sampled.trees
-ROOT_SEQUENCE_FILE=focal_sequences_strain.fasta
-ROOT_FILE_TYPE=fasta
-OUTPUT_DIR=sequences
+TREE_FILE=./data/remaster_trees/logs/$TREE_NAME.sampled.trees
+ROOT_SEQUENCE_FILE=./data/root_sequences/test_root_sequence.txt
+ROOT_FILE_TYPE=txt
+SEQ_OUTPUT_DIR=./data/simulated_sequences
 
 # Evolutionary & Substitution Model Settings
 TRANSITION_RATES=(0.5 3 0.5 0.5 6 1)   # Relative exchangeability rates: [AC, AG, AT, CG, CT, GT]
@@ -72,10 +76,12 @@ ROOT_DATE=2002                         # Temporal calendar date assigned to root
 # ------------------------------------------------------------------------------
 # 3. WASTEWATER SIMULATION PARAMETERS
 # ------------------------------------------------------------------------------
+WW_OUTPUT_DIR=./data/wastewater
+TREE_FILE=./data/remaster_trees/logs/$TREE_NAME.full.trees
+
 N_DAYS=$(echo "$MAX_TIME * 365.25" | bc -l)
 N_DAYS=${N_DAYS%.*}
-echo $N_DAYS
-WW_DATA_DIR="test"
+WW_DATA_DIR="data"
 SEED=42
 
 # Shedding Parameters
@@ -83,8 +89,8 @@ TOTAL_LOAD_PER_INFECTION=1e9
 SHED_MAX_DAYS=21
 SHED_MEAN=4
 SHED_SD=3
-TRANSPORT_MEAN=7
-TRANSPORT_SD=2
+TRANSPORT_MEAN=0.5
+TRANSPORT_SD=0.5
 FLOW_MEAN=1e8
 MEAS_CV=0.3
 LOD=1
@@ -98,7 +104,8 @@ LOD=1
 # --- Step 3.1: Generate Epidemiological Trajectory ---
 # Simulates stochastic population dynamics using calculated birth, death, and sampling rates.
 uv run create_xml.py \
-    --output_name sim \
+    --output_dir $REMASTER_OUTPUT_DIR \
+    --output_name $TREE_NAME \
     --birth_rate "${LAMBDA[@]}" \
     --change_times_birth "${CHANGE_TIMES_BIRTH[@]}" \
     --death_rate "$MU" \
@@ -106,17 +113,17 @@ uv run create_xml.py \
     --max_time "$MAX_TIME" \
     --init_pop 1 \
     --traj_type StochasticTrajectory \
-    --n_sims 1 \
+    --n_sims $N_SIMS \
     --min_tips $MIN_SAMPLED
 
 # --- Step 3.2: Simulate Phylogenetic Tree with BEAST ---
 # Navigates to working subfolder to run the XML tree simulation script.
-cd remaster_sims
-beast sim.xml
+cd data/remaster_trees
+beast $TREE_NAME.xml
+cd -
 
 # --- Step 3.3: Simulate Nucleotide Mutations along the Tree ---
 # Returns to root directory and mutates root sequence down the tree leaves.
-cd ..
 uv run sequence_mutation.py \
     --tree_file $TREE_FILE \
     --root_sequence_file $ROOT_SEQUENCE_FILE \
@@ -127,13 +134,13 @@ uv run sequence_mutation.py \
     --gamma_shape $GAMMA_SHAPE \
     --gamma_categories $GAMMA_CATEGORIES \
     --root_date $ROOT_DATE \
-    --output_dir $OUTPUT_DIR
+    --output_dir $SEQ_OUTPUT_DIR
 
 
-
-uv run wastewater_data.py remaster_sims/logs/sim.full.trees \
+uv run wastewater_data.py \
+    --tree $TREE_FILE \
     --n-days $N_DAYS \
-    --output_dir "episewer/$WW_DATA_DIR" \
+    --output_dir $WW_OUTPUT_DIR \
     --total-load-per-infection $TOTAL_LOAD_PER_INFECTION \
     --shed-max-days $SHED_MAX_DAYS \
     --shed-mean $SHED_MEAN \
@@ -146,9 +153,8 @@ uv run wastewater_data.py remaster_sims/logs/sim.full.trees \
     --seed $SEED
 
 
-cd episewer
-
-Rscript simulate_wastewater_metrics.R \
-    --data-dir $WW_DATA_DIR \
+Rscript episewer.R \
+    --data-dir $WW_OUTPUT_DIR \
+    --n-sims $N_SIMS \
     --seed $SEED
 

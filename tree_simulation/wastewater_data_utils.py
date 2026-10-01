@@ -22,6 +22,7 @@ from typing import Dict, Optional, Union
 import numpy as np
 import pandas as pd
 from scipy import stats
+from Bio import Phylo
 
 
 # --------------------------------------------------------------------------
@@ -74,8 +75,6 @@ def infection_times_from_tree(tree: Union[str, "Bio.Phylo.BaseTree.Tree"],
         Infection times in days, one entry per infection (may be
         fractional).
     """
-    from Bio import Phylo
-
     if isinstance(tree, str):
         tree = Phylo.read(tree, fmt)
 
@@ -273,6 +272,7 @@ def expected_load(incidence: np.ndarray, p: WastewaterParams,
 
 def simulate_wastewater(incidence: np.ndarray,
                         start_date: Union[str, pd.Timestamp],
+                        sequencing_delay: int=0,
                         p: Optional[WastewaterParams] = None,
                         seed: Optional[int] = None) -> pd.DataFrame:
     """
@@ -330,7 +330,7 @@ def simulate_wastewater(incidence: np.ndarray,
 # --------------------------------------------------------------------------
 # 3. Export for EpiSewer (R)
 # --------------------------------------------------------------------------
-def export_for_episewer(df: pd.DataFrame, output_dir: str="./", prefix: str="episewer") -> None:
+def export_for_episewer(df: pd.DataFrame, output_dir: str="./") -> None:
     """
     Write EpiSewer-ready CSV files from the output of `simulate_wastewater`.
 
@@ -353,5 +353,5 @@ def export_for_episewer(df: pd.DataFrame, output_dir: str="./", prefix: str="epi
     flows = df[["date", "flow"]].copy()
     flows["flow"] *= 1000              # L/day -> mL/day
 
-    meas.to_csv(f"{output_dir}/{prefix}_measurements.csv", index=False)
-    flows.to_csv(f"{output_dir}/{prefix}_flows.csv", index=False)
+    meas.to_csv(f"{output_dir}/measurements.csv", index=False)
+    flows.to_csv(f"{output_dir}/flows.csv", index=False)
