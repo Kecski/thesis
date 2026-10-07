@@ -15,7 +15,7 @@ Run directly, e.g.:
 import argparse
 import random
 from pathlib import Path
-from xml_utils import write_single_tree_xml
+from xml_utils import write_single_tree_xml, write_single_tree_for_wastewater_xml
 
 def parse_args():
     """
@@ -184,7 +184,7 @@ def main():
 
     # Generate XML file for simulation
     xml_file_path = output_dir / f"{args.output_name}.xml"
-    write_single_tree_xml(
+    write_single_tree_for_wastewater_xml(
         file_path=str(xml_file_path),
         n_sims=args.n_sims,
         birth_rate=args.birth_rate,

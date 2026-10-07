@@ -27,7 +27,8 @@ suppressPackageStartupMessages({
 defaults <- list(data_dir = "data/wastewater", n_sims = 2,
                  shed_mean = 8, shed_sd = 5, gen_mean = 3, gen_sd = 2.4,
                  iter_warmup = 500, iter_sampling = 500, chains = 4,
-                 cores = 4, seed = 42, breakpoints = "2002-01-01,2002-02-01,2002-03-01,2002-04-01,2002-05-01")
+                 cores = 4, seed = 42, num_segments = 1,
+                 breakpoints = "") # format for breakpoints: "YYYY-MM-DD,YYYY-MM-DD,..." 
 
 parse_cli <- function(defaults) {
     args <- commandArgs(trailingOnly = TRUE)
@@ -56,6 +57,15 @@ for(i in 0:(opt$n_sims-1)){
     measurements[, date := as.Date(date)]
     measurements_sparse <- measurements[seq(3, nrow(measurements), by = 3), ]
     flows[, date := as.Date(date)]
+    
+    if(opt$breakpoints == ""){
+        break_list <- seq(min(flows$date), max(flows$date), length.out = opt$num_segments+1)
+        breakpoints <- paste(break_list, collapse = ",")
+    }
+    else{
+        breakpoints <- opt$breakpoints
+    }
+    
     
     ww_data <- sewer_data(measurements = measurements, flows = flows)
     
@@ -159,27 +169,25 @@ for(i in 0:(opt$n_sims-1)){
              summary = rbindlist(summary_list, fill = TRUE))
     }
     
-    if (nzchar(opt$breakpoints)) {
-        breakpoints <- strsplit(opt$breakpoints, ",")[[1]]
-        if (length(breakpoints) < 2)
-            stop("--breakpoints needs at least 2 dates to define 1 section.")
-        
-        samples <- ww_result$summary$samples
-        
-        results <- lapply(c("R", "growth_rate"), function(v)
-            summarise_sections(samples, v, breakpoints, section_labels = NULL))
-        names(results) <- c("R", "growth_rate")
-        
-        all_summary <- rbindlist(lapply(results, `[[`, "summary"), fill = TRUE)
-        all_draws   <- rbindlist(lapply(results, `[[`, "draws"), fill = TRUE)
-        
-        fwrite(all_summary, file.path(tree_dir, "episewer_summary.csv"))
-        # fwrite(all_draws, file.path(tree_dir, "episewer_section_posterior_draws.csv"))
-        message("Section-level summary written to episewer_section_summary.csv")
-        # message("Full per-draw distributions written to episewer_section_posterior_draws.csv")
-    } else {
-        message("No --breakpoints given: skipping per-section distribution summary.")
-    }
+    breakpoints <- strsplit(breakpoints, ",")[[1]]
+    if (length(breakpoints) < 2)
+        stop("--breakpoints needs at least 2 dates to define 1 section.")
+    
+    samples <- ww_result$summary$samples
+    
+    results <- lapply(c("R", "growth_rate"), function(v)
+        summarise_sections(samples, v, breakpoints, section_labels = NULL))
+    names(results) <- c("R", "growth_rate")
+    
+    all_summary <- rbindlist(lapply(results, `[[`, "summary"), fill = TRUE)
+    all_draws   <- rbindlist(lapply(results, `[[`, "draws"), fill = TRUE)
+    
+    fwrite(all_summary, file.path(tree_dir, "episewer_summary.csv"))
+    # fwrite(all_draws, file.path(tree_dir, "episewer_section_posterior_draws.csv"))
+    message("Section-level summary written to episewer_section_summary.csv")
+    # message("Full per-draw distributions written to episewer_section_posterior_draws.csv")
 }
 
 message("EpiSewer finished. Results in: ", opt$data_dir)
+
+

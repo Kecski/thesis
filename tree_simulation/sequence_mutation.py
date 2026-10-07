@@ -53,10 +53,14 @@ def parse_args():
                    help="Path to the file containig the sequence of the root of the phylogeny.")
     
     # Optional arguments
-    p.add_argument("--root_file_type", type=str, default="txt",
-                   help="Extension of the root sequence file.")
-    p.add_argument("--transition_rates", nargs=6, type=float, default=[1, 1, 1, 1, 1, 1],
-                   help="Relative transition probabilities between the nucleotides. Provide the values in the following order: AC, AG, AT, CG, CT, GT.")
+    # p.add_argument("--root_file_type", type=str, default="txt",
+    #                help="Extension of the root sequence file.")
+    p.add_argument("--sub_model", type=str, default="HKY",
+                   help="Type of substitution model used for the simulation. The possible options are HKY and GTR.")
+    p.add_argument("--kappa", type=float, default=2.0,
+                   help="Ti/Tv rate for HKY substitution model.")
+    p.add_argument("--transition_rates", nargs=6, type=float, default=None,
+                   help="Relative transition probabilities between the nucleotides for GTR model. Provide the values in the following order: AC, AG, AT, CG, CT, GT.")
     p.add_argument("--frequencies", nargs=4, type=float, default=[0.25, 0.25, 0.25, 0.25],
                    help="Equilibrium frequencies of the nucleotides. Provide the values in the following order: A, C, G, T.")
     p.add_argument("--clock_rate", type=float, default=1.0,
@@ -84,6 +88,8 @@ def validate_args(args, parser):
     Raises:
         SystemExit: If nucleotide equilibrium frequencies do not sum to 1.0.
     """
+    if args.sub_model not in ["HKY", "GTR"]:
+        parser.error("The substitution model provided for --sub_model has to be either HKY or GTR.")
     if sum(args.frequencies) != 1:
         parser.error("The values provided to --frequencies has to add up to 1.")
     
@@ -99,21 +105,28 @@ def main():
     if args.seed is not None:
         random.seed(args.seed)
     
-    custom_mu = {"AC":args.transition_rates[0], 
-                 "AG":args.transition_rates[1], 
-                 "AT":args.transition_rates[2],
-                 "CG":args.transition_rates[3],
-                 "CT":args.transition_rates[4],
-                 "GT":args.transition_rates[5]}
+    if args.transition_rates:
+        custom_mu = {"AC":args.transition_rates[0], 
+                    "AG":args.transition_rates[1], 
+                    "AT":args.transition_rates[2],
+                    "CG":args.transition_rates[3],
+                    "CT":args.transition_rates[4],
+                    "GT":args.transition_rates[5]}
+    else:
+        custom_mu = None
+        
     gamma_dist = {"alpha": args.gamma_shape, "num_categories": args.gamma_categories}
     
-    if args.root_file_type == "txt":
+    root_file_type = args.root_sequence_file.split(".")[-1]
+    if root_file_type == "txt":
         with open(args.root_sequence_file, "r") as f:
             root_sequence = f.read().replace("\n", "").replace("\r", "").strip()
-    else:
+    elif root_file_type == "fasta":
         root_sequence = next(SeqIO.parse(args.root_sequence_file, args.root_file_type)).seq
         root_sequence = root_sequence.replace("N", "")
         root_sequence = str(root_sequence.replace("-", ""))
+    else:
+        raise ValueError(f"Sequence root file has to be either txt or fasta. Not {root_file_type}")
     
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -121,6 +134,8 @@ def main():
     print("Simulating sequence mutations along phylogeny:")
     print(f"\tTree file: {args.tree_file}")
     print(f"\tRoot sequence file: {args.root_sequence_file}")
+    print(f"\tSubstitution model: {args.sub_model}")
+    print(f"\tKappa: {args.kappa}")
     print(f"\tTransition rates: {custom_mu}")
     print(f"\tEquilibrium frequences: {args.frequencies}")
     print(f"\tClock rate: {args.clock_rate}")
@@ -133,6 +148,8 @@ def main():
     with open(param_log, "w") as f:
         f.write(f"Tree file: {args.tree_file}\n")
         f.write(f"Root sequence file: {args.root_sequence_file}\n")
+        f.write(f"Substitution model: {args.sub_model}\n")
+        f.write(f"Kappa: {args.kappa}")
         f.write(f"Transition rates: {custom_mu}\n")
         f.write(f"Equilibrium frequences: {args.frequencies}\n")
         f.write(f"Clock rate: {args.clock_rate}\n")
@@ -154,8 +171,10 @@ def main():
     
     simulate_sequences_on_tree(tree_file=args.tree_file,
                                root_sequence=root_sequence,
+                               sub_model=args.sub_model,
                                clock_rate=args.clock_rate,
                                frequencies=args.frequencies,
+                               kappa=args.kappa,
                                mutation_rates=custom_mu,
                                gamma_dist=gamma_dist,
                                output_dir=args.output_dir,

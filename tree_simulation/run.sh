@@ -36,16 +36,16 @@
 # ------------------------------------------------------------------------------
 
 # Input Biological Parameters
-RE=(1.5 1 0.8)            # Target effective reproduction number
-CHANGE_TIMES_BIRTH=(0.1 0.2)
-DELTA=$(echo "365 / 7" | bc -l)        # Removal rate (~52.14/year = 7-day infectious period)
-S=$(echo "5e-2" | bc -l)               # Sampling proportion (5% sampled)
+RE=(2.7 1.8 0.7 1.3)            # Target effective reproduction number
+CHANGE_TIMES_BIRTH=(0.1 0.2 0.3)
+DELTA=$(echo "365 / 12" | bc -l)         # Removal rate (~30.42/year = 7-day infectious period)
+S=$(echo "2.6e-2" | bc -l)               # Sampling proportion (5% sampled)
 
-MAX_TIME=0.3                           # Maximum simulation duration (0.5 time units / years)
+MAX_TIME=0.4                           # Maximum duration of the sampling. The simulation will run an extra 0.1 years without sampling to gather wastewater data
 MIN_SAMPLED=10                         # Minimum number of sampled genomes
 REMASTER_OUTPUT_DIR=data/remaster_trees
 TREE_NAME=sim
-N_SIMS=2
+N_SIMS=1
 
 # Derived Rate Calculations (evaluating floating-point arithmetic via 'bc')
 PSI=$(echo "$S * $DELTA" | bc -l)      # Sampling rate (psi)
@@ -60,42 +60,46 @@ done
 # ------------------------------------------------------------------------------
 # 2. SEQUENCE & EVOLUTIONARY SIMULATION PARAMETERS
 # ------------------------------------------------------------------------------
-TREE_FILE=./data/remaster_trees/logs/$TREE_NAME.sampled.trees
-ROOT_SEQUENCE_FILE=./data/root_sequences/test_root_sequence.txt
-ROOT_FILE_TYPE=txt
+SAMPLED_TREE_FILE=./data/remaster_trees/logs/$TREE_NAME.sampled.trees
+ROOT_SEQUENCE_FILE=./data/root_sequences/test_root_sequence_1000.txt
+# ROOT_FILE_TYPE=txt
 SEQ_OUTPUT_DIR=./data/simulated_sequences
 
 # Evolutionary & Substitution Model Settings
-TRANSITION_RATES=(0.5 3 0.5 0.5 6 1)   # Relative exchangeability rates: [AC, AG, AT, CG, CT, GT]
+# TRANSITION_RATES=(0.5 3 0.5 0.5 6 1)   # Relative exchangeability rates: [AC, AG, AT, CG, CT, GT]
+SUB_MODEL="HKY"
+KAPPA=3.77
 FREQUENCIES=(0.30 0.18 0.20 0.32)      # Base equilibrium frequencies: [A, C, G, T]
-CLOCK_RATE=1e-3                        # Molecular clock rate (substitutions/site/unit time)
+CLOCK_RATE=1.12e-3                        # Molecular clock rate (substitutions/site/unit time)
 GAMMA_SHAPE=0.5                        # Shape parameter (alpha) for gamma site rate variation
-GAMMA_CATEGORIES=4                     # Number of discrete rate categories
+GAMMA_CATEGORIES=6                     # Number of discrete rate categories
 ROOT_DATE=2002                         # Temporal calendar date assigned to root node
 
 # ------------------------------------------------------------------------------
 # 3. WASTEWATER SIMULATION PARAMETERS
 # ------------------------------------------------------------------------------
 WW_OUTPUT_DIR=./data/wastewater
-TREE_FILE=./data/remaster_trees/logs/$TREE_NAME.full.trees
+FULL_TREE_FILE=./data/remaster_trees/logs/$TREE_NAME.full.trees
 
 N_DAYS=$(echo "$MAX_TIME * 365.25" | bc -l)
 N_DAYS=${N_DAYS%.*}
 WW_DATA_DIR="data"
 SEED=42
+SEQUENCING_DELAY=14
 
 # Shedding Parameters
-TOTAL_LOAD_PER_INFECTION=1e9
-SHED_MAX_DAYS=21
+TOTAL_LOAD_PER_INFECTION=1.44e12
+SHED_MAX_DAYS=12
 SHED_MEAN=4
-SHED_SD=3
+SHED_SD=2
 TRANSPORT_MEAN=0.5
 TRANSPORT_SD=0.5
 FLOW_MEAN=1e8
 MEAS_CV=0.3
 LOD=1
 
-
+# Episewer params
+NUM_SEGMENTS=4
 
 # ------------------------------------------------------------------------------
 # 4. PIPELINE EXECUTION
@@ -125,11 +129,11 @@ cd -
 # --- Step 3.3: Simulate Nucleotide Mutations along the Tree ---
 # Returns to root directory and mutates root sequence down the tree leaves.
 uv run sequence_mutation.py \
-    --tree_file $TREE_FILE \
+    --tree_file $SAMPLED_TREE_FILE \
     --root_sequence_file $ROOT_SEQUENCE_FILE \
-    --root_file_type $ROOT_FILE_TYPE \
-    --transition_rates $TRANSITION_RATES \
+    --sub_model $SUB_MODEL\
     --frequencies $FREQUENCIES \
+    --kappa $KAPPA \
     --clock_rate $CLOCK_RATE \
     --gamma_shape $GAMMA_SHAPE \
     --gamma_categories $GAMMA_CATEGORIES \
@@ -138,7 +142,7 @@ uv run sequence_mutation.py \
 
 
 uv run wastewater_data.py \
-    --tree $TREE_FILE \
+    --tree $FULL_TREE_FILE \
     --n-days $N_DAYS \
     --output_dir $WW_OUTPUT_DIR \
     --total-load-per-infection $TOTAL_LOAD_PER_INFECTION \
@@ -150,11 +154,13 @@ uv run wastewater_data.py \
     --flow-mean $FLOW_MEAN \
     --meas-cv $MEAS_CV \
     --lod $LOD \
+    --sequencing-delay $SEQUENCING_DELAY \
     --seed $SEED
 
 
 Rscript episewer.R \
     --data-dir $WW_OUTPUT_DIR \
     --n-sims $N_SIMS \
+    --num-segments $NUM_SEGMENTS \
     --seed $SEED
 

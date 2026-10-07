@@ -1,0 +1,24 @@
+<beast version="2.0" namespace="beast.base.inference:beast.base.inference.parameter:remaster">
+	<run spec="Simulator" nSims="1">
+		<simulate id="tree" spec="SimulatedTree">
+			<trajectory id="trajectory" spec="StochasticTrajectory" maxTime="0.4" mustHave="S>=10">
+				<population id="X" spec="RealParameter" value="1"/>
+				<samplePopulation id="S" spec="RealParameter" value="0"/>
+				<samplePopulation id="removed" spec="RealParameter" value="0"/>
+
+				<reaction spec="Reaction" rate="63 54.75 21.291666666666668 39.541666666666664" changeTimes="0.1 0.2 0.3"> X -> 2X </reaction>
+				<reaction spec="Reaction" rate="29.625833333333333"> X -> removed </reaction>
+				<reaction spec="Reaction" rate="0.7908333333333334"> X -> S + removed </reaction>
+                <reaction spec="PunctualReaction" p="1" times="0.4"> X -> removed </reaction>
+			</trajectory>
+		</simulate>
+
+		<logger fileName="logs/sim.traj"> <log idref="trajectory"/> </logger>
+		<logger fileName="logs/sim.full.trees" mode="tree">
+			<log spec="TypedTreeLogger"> <tree spec="PrunedTree" samplePops="removed" simulatedTree="@tree"/> </log>
+		</logger>
+		<logger fileName="logs/sim.sampled.trees" mode="tree">
+			<log spec="TypedTreeLogger"> <tree spec="PrunedTree" samplePops="S" simulatedTree="@tree"/> </log>
+		</logger>
+	</run>
+</beast>

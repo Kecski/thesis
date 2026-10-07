@@ -272,7 +272,6 @@ def expected_load(incidence: np.ndarray, p: WastewaterParams,
 
 def simulate_wastewater(incidence: np.ndarray,
                         start_date: Union[str, pd.Timestamp],
-                        sequencing_delay: int=0,
                         p: Optional[WastewaterParams] = None,
                         seed: Optional[int] = None) -> pd.DataFrame:
     """

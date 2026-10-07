@@ -5,6 +5,7 @@ from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
 from pathlib import Path
+from typing import Optional
 # def remove_coma_in_nexus_file(input_file: str, output_file: str) -> None:
 #     with open(input_file, "r") as f:
 #         content = f.read()
@@ -50,9 +51,11 @@ def add_dates(tree, input_fasta: str, root_date: float=2002.0) -> None:
 
 def simulate_sequences_on_tree(tree_file: str,
                                root_sequence: str,
-                               clock_rate: float=1.,
+                               sub_model: str="HKY",
+                               clock_rate: float=1.0,
                                frequencies: list[float]=[0.25, 0.25, 0.25, 0.25],
-                               mutation_rates: dict={"AC":1.0, "AG":1.0, "AT":1.0, "CG":1.0, "CT":1.0, "GT":1.0},
+                               kappa: Optional[float]=2.0,
+                               mutation_rates: Optional[dict]=None,
                                gamma_dist: dict={"alpha": 0.5, "num_categories": 4},
                                output_dir: str="./",
                                root_date: float=2002.0
@@ -75,10 +78,18 @@ def simulate_sequences_on_tree(tree_file: str,
     """
     n_sites = len(root_sequence)
     
-    model = pyvolve.Model("nucleotide", 
-                          {"mu": mutation_rates, "state_freqs": frequencies},
-                          alpha=gamma_dist["alpha"],
-                          num_categories=gamma_dist["num_categories"])
+    if sub_model == "HKY":
+        model = pyvolve.Model("nucleotide",
+                              {"kappa": kappa, "state_frequs": frequencies},
+                              alpha=gamma_dist["alpha"],
+                              num_categories=gamma_dist["num_categories"])
+    elif sub_model == "GTR":
+        model = pyvolve.Model("nucleotide", 
+                            {"mu": mutation_rates, "state_freqs": frequencies},
+                            alpha=gamma_dist["alpha"],
+                            num_categories=gamma_dist["num_categories"])
+    else:
+        raise ValueError("The sub_model parameter has to be either HKY or GTR")
     
     rate_factors = model.rate_factors
     rate_probs = model.rate_probs

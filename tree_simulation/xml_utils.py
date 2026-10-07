@@ -98,9 +98,16 @@ def create_reaction(rate: list[float], left_side: str="X", right_side: str="2X",
     else:
         return f'<reaction spec="Reaction" rate="{rate_str}"> {left_side} -> {right_side} </reaction>'
 
+def create_punctual_reaction(probabilities: list[float], times: list[float], left_side: str="X", right_side: str="removed") -> str:
+    probabilities_str = " ".join([str(p) for p in probabilities])
+    times_str = " ".join([str(t) for t in times])
+    
+    return f'<reaction spec="PunctualReaction" p="{probabilities_str}" times="{times_str}"> {left_side} -> {right_side} </reaction>'
+
 # Trajectory helper function
 def create_trajectory(populations: list, 
                       reactions: list,
+                      punctual_reactions: list | None=None,
                       id: str="trajectory", 
                       spec: str="StochasticTrajectory", 
                       max_time: float=10.0,
@@ -151,7 +158,14 @@ def create_trajectory(populations: list,
     
     for react in reactions:
         trajectory += indent_n_tabs(indent+1) + react + "\n"
+    
+    if punctual_reactions is not None:
+        for punctual_react in punctual_reactions:
+            trajectory += indent_n_tabs(indent+1) + punctual_react + "\n"
+            
     trajectory += indent_n_tabs(indent) + '</trajectory>'
+    
+    
     
     return trajectory
 
@@ -287,11 +301,107 @@ def write_single_tree_xml(file_path: str,
     reactions = [create_reaction(birth_rate, "X", "2X", change_times_birth), 
                  create_reaction(death_rate, "X", "removed", change_times_death), 
                  create_reaction(sampling_rate, "X", "S + removed", change_times_sampling)]
+    punctual_reactions = [create_punctual_reaction([1.0], max_time, "X", "removed")]
     
     with open(file_path, "w") as f:
         f.write('<beast version="2.0" namespace="beast.base.inference:beast.base.inference.parameter:remaster">\n')
         f.write(f'\t<run spec="Simulator" nSims="{n_sims}">\n')
-        f.write(create_tree_simulation(create_trajectory(populations, reactions, max_time=max_time, spec=traj_type, ends_when=ends_when, must_have=must_have, indent=3), indent=2) + "\n")
+        f.write(create_tree_simulation(create_trajectory(populations, 
+                                                         reactions,
+                                                         punctual_reactions, 
+                                                         max_time=max_time, 
+                                                         spec=traj_type, 
+                                                         ends_when=ends_when, 
+                                                         must_have=must_have, 
+                                                         indent=3), indent=2) + "\n")
+        f.write(create_loggers(loggers_base, "trajectory", "tree", "S", "removed", indent=2) + "\n")
+        f.write('\t</run>\n')
+        f.write('</beast>\n')
+        
+# Write full XML file
+def write_single_tree_for_wastewater_xml(file_path: str, 
+                                         n_sims: int, 
+                                         birth_rate: list[float], 
+                                         death_rate: list[float],
+                                         change_times_birth: list[float] | None=None,
+                                         change_times_death: list[float] | None=None,
+                                         change_times_sampling: list[float] | None=None,
+                                         max_time: float=10.,
+                                         sampling_rate: list[float]=[1.], 
+                                         loggers_base="simulation",
+                                         traj_type: str="StochasticTrajectory",
+                                         init_pop: int=1,
+                                         ends_when: str | None=None,
+                                         must_have: str | None="S>=1"
+                                         ) -> None:
+    """
+    Build a complete, ready-to-run ReMaster BEAST2 XML file for simulating
+    a single birth-death tree, and write it to disk.
+
+    Internally this initializes three populations (X: living, S: sampled,
+    removed: unsampled removals), builds birth/death/sampling reactions,
+    wraps them in a trajectory and tree simulation, attaches the standard
+    trajectory/full-tree/sampled-tree loggers, and writes the resulting
+    <beast>...</beast> document to `file_path`.
+
+    Args:
+        file_path (str): Output path for the generated .xml file. Any
+            existing file at this path is overwritten.
+        n_sims (int): Number of simulation replicates (`nSims` attribute).
+        birth_rate (list[float]): Birth rate(s); a single-element list for
+            a constant rate, or multiple values for a piecewise-constant
+            rate schedule paired with `change_times_birth`.
+        death_rate (list[float]): Death rate(s); same convention as
+            `birth_rate`, paired with `change_times_death`.
+        change_times_birth (list[float] | None, optional): Time points at
+            which the birth rate changes. Defaults to None.
+        change_times_death (list[float] | None, optional): Time points at
+            which the death rate changes. Defaults to None.
+        change_times_sampling (list[float] | None, optional): Time points
+            at which the sampling rate changes. Defaults to None.
+        max_time (float, optional): Maximum simulated time. Defaults to 10.
+        sampling_rate (list[float], optional): Sampling rate(s); same
+            convention as `birth_rate`, paired with `change_times_sampling`.
+            Defaults to [1.].
+        loggers_base (str, optional): Base name used for the three output
+            log files. Defaults to "simulation".
+        traj_type (str, optional): ReMaster trajectory `spec` class to use.
+            Defaults to "StochasticTrajectory".
+        init_pop (int, optional): Initial size of population X. Defaults to 1.
+        ends_when (str | None, optional): Optional simulation-ending
+            condition expression. Defaults to None.
+        must_have (str | None, optional): Condition the simulation must
+            satisfy; defaults to "S>=1" (at least one sample).
+
+    Returns:
+        None: Writes the XML file to `file_path` as a side effect.
+    """
+    end_of_simulation = max_time + 0.1
+    sampling_rate.append(0)
+    if change_times_sampling is not None:
+        change_times_sampling.append(max_time)
+    else:
+        change_times_sampling = [max_time]
+    
+    populations = [initialize_population("X", init_pop), 
+                   initialize_sample_population("S", 0),
+                   initialize_sample_population("removed", 0)]
+    reactions = [create_reaction(birth_rate, "X", "2X", change_times_birth), 
+                 create_reaction(death_rate, "X", "removed", change_times_death), 
+                 create_reaction(sampling_rate, "X", "S + removed", change_times_sampling)]
+    punctual_reactions = [create_punctual_reaction([1.0], [end_of_simulation], "X", "removed")]
+    
+    with open(file_path, "w") as f:
+        f.write('<beast version="2.0" namespace="beast.base.inference:beast.base.inference.parameter:remaster">\n')
+        f.write(f'\t<run spec="Simulator" nSims="{n_sims}">\n')
+        f.write(create_tree_simulation(create_trajectory(populations, 
+                                                         reactions,
+                                                         punctual_reactions, 
+                                                         max_time=end_of_simulation, 
+                                                         spec=traj_type, 
+                                                         ends_when=ends_when, 
+                                                         must_have=must_have, 
+                                                         indent=3), indent=2) + "\n")
         f.write(create_loggers(loggers_base, "trajectory", "tree", "S", "removed", indent=2) + "\n")
         f.write('\t</run>\n')
         f.write('</beast>\n')
