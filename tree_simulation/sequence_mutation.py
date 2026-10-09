@@ -149,7 +149,7 @@ def main():
         f.write(f"Tree file: {args.tree_file}\n")
         f.write(f"Root sequence file: {args.root_sequence_file}\n")
         f.write(f"Substitution model: {args.sub_model}\n")
-        f.write(f"Kappa: {args.kappa}")
+        f.write(f"Kappa: {args.kappa}\n")
         f.write(f"Transition rates: {custom_mu}\n")
         f.write(f"Equilibrium frequences: {args.frequencies}\n")
         f.write(f"Clock rate: {args.clock_rate}\n")

@@ -78,7 +78,7 @@ def build_parser() -> argparse.ArgumentParser:
                     help="Calendar date of simulation day 0. This is the date of the start of the simulation. As the simulation represents the sequencing samples, the wastewater data might start earlier than this depending on the sequencing_delay parameter.")
     tm.add_argument("--sequencing-delay", type=int, default=0,
                     help="Delay of the sequencing data in days. (Default: 0)")
-    tm.add_argument("--n-days", type=int, default=None,
+    tm.add_argument("--n-days", type=int, default=0,
                     help="Length of the simulation in days. Default: tree "
                          "span + shed_max_days + 10, so the shedding tail "
                          "is fully covered.")
@@ -116,7 +116,7 @@ def main(argv=None) -> int:
             branch_length_unit_days=args.branch_length_unit_days,
         )
 
-        n_days = args.n_days or (math.ceil(times.max()) + params.shed_max_days + 10)
+        n_days = args.n_days + args.sequencing_delay
         inc = wu.daily_incidence(times, n_days, start_day=0)
 
         if inc.sum() < len(times):

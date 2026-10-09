@@ -36,13 +36,14 @@
 # ------------------------------------------------------------------------------
 
 # Input Biological Parameters
-RE=(2.7 1.8 0.7 1.3)            # Target effective reproduction number
-CHANGE_TIMES_BIRTH=(0.1 0.2 0.3)
+RE=(1.4)            # Target effective reproduction number
+CHANGE_TIMES_BIRTH=(0.1 0.2 0.3) # Not used rn
 DELTA=$(echo "365 / 12" | bc -l)         # Removal rate (~30.42/year = 7-day infectious period)
 S=$(echo "2.6e-2" | bc -l)               # Sampling proportion (5% sampled)
 
 MAX_TIME=0.4                           # Maximum duration of the sampling. The simulation will run an extra 0.1 years without sampling to gather wastewater data
 MIN_SAMPLED=10                         # Minimum number of sampled genomes
+SEQUENCING_DELAY=14
 REMASTER_OUTPUT_DIR=data/remaster_trees
 TREE_NAME=sim
 N_SIMS=1
@@ -85,7 +86,6 @@ N_DAYS=$(echo "$MAX_TIME * 365.25" | bc -l)
 N_DAYS=${N_DAYS%.*}
 WW_DATA_DIR="data"
 SEED=42
-SEQUENCING_DELAY=14
 
 # Shedding Parameters
 TOTAL_LOAD_PER_INFECTION=1.44e12
@@ -107,14 +107,15 @@ NUM_SEGMENTS=4
 
 # --- Step 3.1: Generate Epidemiological Trajectory ---
 # Simulates stochastic population dynamics using calculated birth, death, and sampling rates.
+# --change_times_birth "${CHANGE_TIMES_BIRTH[@]}" \
 uv run create_xml.py \
     --output_dir $REMASTER_OUTPUT_DIR \
     --output_name $TREE_NAME \
     --birth_rate "${LAMBDA[@]}" \
-    --change_times_birth "${CHANGE_TIMES_BIRTH[@]}" \
     --death_rate "$MU" \
     --sampling_rate "$PSI" \
     --max_time "$MAX_TIME" \
+    --sequencing_delay $SEQUENCING_DELAY \
     --init_pop 1 \
     --traj_type StochasticTrajectory \
     --n_sims $N_SIMS \
@@ -162,5 +163,6 @@ Rscript episewer.R \
     --data-dir $WW_OUTPUT_DIR \
     --n-sims $N_SIMS \
     --num-segments $NUM_SEGMENTS \
+    --sequencing-delay $SEQUENCING_DELAY \
     --seed $SEED
 

@@ -42,6 +42,8 @@ def parse_args():
                    help="Maximum simulation time.")
 
     # Optional arguments
+    p.add_argument("--sequencing_delay", type=float, default=0,
+                   help="Delay of the clinical sequencing in DAYS. This information is used to extend the simulation after max_time has been reached for wastewater simulation (as the infections do not stop after our last sampling).")
     p.add_argument("--sampling_rate", nargs="+", type=float, default=[1.0],
                    help="Per-lineage sampling rate (psi) for the birth-death process. If multiple values are provided, they will be applied sequentially at the specified change times.")
     p.add_argument("--change_times_birth", nargs="*", type=float, default=None,
@@ -85,6 +87,8 @@ def validate_args(args, parser):
             parser.error("--sampling_rate must be >= 0.")
     if args.max_time <= 0:
         parser.error("--max_time must be > 0.")
+    if args.sequencing_delay < 0:
+        parser.error("--sequencing_delay must be >= 0.")
     if args.n_sims < 1:
         parser.error("--n_sims must be >= 1.")
     if args.init_pop < 1:
@@ -147,6 +151,7 @@ def main():
     print("\tchange_times_sampling:", args.change_times_sampling)
     print("\tn_sims:", args.n_sims)
     print("\tmax_time:", args.max_time)
+    print("\sequencing_delay:", args.sequencing_delay)
     print("\tinit_pop:", args.init_pop)
     print("\ttraj_type:", args.traj_type)
     print("\toutput_dir:", args.output_dir)
@@ -173,6 +178,7 @@ def main():
         f.write(f"change_times_sampling: {args.change_times_sampling}\n")
         f.write(f"n_sims: {args.n_sims}\n")
         f.write(f"max_time: {args.max_time}\n")
+        f.write(f"sequencing_delay: {args.sequencing_delay}\n")
         f.write(f"init_pop: {args.init_pop}\n")
         f.write(f"traj_type: {args.traj_type}\n")
         f.write(f"output_dir: {args.output_dir}\n")
@@ -193,6 +199,7 @@ def main():
         change_times_death=args.change_times_death,
         change_times_sampling=args.change_times_sampling,
         max_time=args.max_time,
+        sequencing_delay=args.sequencing_delay,
         sampling_rate=args.sampling_rate,
         loggers_base=str("logs" / Path(args.output_name)),
         traj_type=args.traj_type,

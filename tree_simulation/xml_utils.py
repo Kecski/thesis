@@ -327,6 +327,7 @@ def write_single_tree_for_wastewater_xml(file_path: str,
                                          change_times_death: list[float] | None=None,
                                          change_times_sampling: list[float] | None=None,
                                          max_time: float=10.,
+                                         sequencing_delay: float=0.,
                                          sampling_rate: list[float]=[1.], 
                                          loggers_base="simulation",
                                          traj_type: str="StochasticTrajectory",
@@ -376,7 +377,8 @@ def write_single_tree_for_wastewater_xml(file_path: str,
     Returns:
         None: Writes the XML file to `file_path` as a side effect.
     """
-    end_of_simulation = max_time + 0.1
+    sequencing_delay_in_years = sequencing_delay / 365.25
+    end_of_simulation = max_time + sequencing_delay_in_years
     sampling_rate.append(0)
     if change_times_sampling is not None:
         change_times_sampling.append(max_time)

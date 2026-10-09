@@ -1,0 +1,79 @@
+# ---------------------------------------------------------------
+# Config for make_beast_xml.py
+# Relative paths are relative to this file.
+# ---------------------------------------------------------------
+template = "template.xml"
+output   = "analysis.xml"
+
+# Optional: add e.g. "10.0.0" to append "feast v10.0.0" to the <beast required=...> attribute
+# (use the version you have installed). Leave commented out to skip.
+# feast_version = "10.0.0"
+
+[data]
+fasta = "sequences.fasta"
+# Tip dates are read from the tip name with this regular expression (group 1 = decimal year).
+# Default matches names ending in _2002.2012
+date_regex = '_(\d{4}(?:\.\d+)?)$'
+# ...or give a CSV (header row; column 1 = tip name, column 2 = decimal-year date) instead:
+# dates_csv = "dates.csv"
+
+[mcmc]
+chain_length = 20000000
+store_every  = 5000
+log_every    = 1000
+
+[model]
+# Rate of becoming uninfectious, per YEAR (30.42 = 365/12 -> 12-day infectious period)
+become_uninfectious_rate = 30.42
+# Must be larger than the sampling time span and than the last Re change time (units: years)
+origin_initial = 5.0
+re_upper = 10.0
+# Re change times as AGES (years back from the most recent sample), strictly increasing.
+# n intervals need n-1 change times.
+re_change_times = [0.1, 0.2, 0.3]
+
+# One block per Re interval, in the order of the skyline vector (index 0 first).
+# Verify once that index 0 is the interval you intend (see README).
+# distribution = "LogNormal": `mean` is the mean of Re in real space, `sigma` the SD on log scale
+# distribution = "Normal":    `mean` and `sigma` are on the Re scale
+# `initial` is the MCMC starting value (defaults to `mean`).
+[[re_interval]]
+distribution = "LogNormal"
+mean = 1
+sigma = 1.25
+initial = 1
+
+[[re_interval]]
+distribution = "LogNormal"
+mean = 1
+sigma = 1.25
+initial = 1
+
+[[re_interval]]
+distribution = "LogNormal"
+mean = 1
+sigma = 1.25
+initial = 1
+
+[[re_interval]]
+distribution = "LogNormal"
+mean = 1
+sigma = 1.25
+initial = 1
+
+[sampling]
+initial = 0.1
+# LogNormal prior on the sampling proportion (M on log scale, S = SD on log scale)
+prior_m = 1.0
+prior_s = 1.25
+
+[clock]
+initial = 1.0
+# LogNormal prior, mean in real space
+prior_mean  = 0.001
+prior_sigma = 1.25
+
+[substitution]
+kappa = 3.77
+gamma_shape = 0.5
+gamma_categories = 6

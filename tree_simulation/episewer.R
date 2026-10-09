@@ -27,7 +27,7 @@ suppressPackageStartupMessages({
 defaults <- list(data_dir = "data/wastewater", n_sims = 2,
                  shed_mean = 8, shed_sd = 5, gen_mean = 3, gen_sd = 2.4,
                  iter_warmup = 500, iter_sampling = 500, chains = 4,
-                 cores = 4, seed = 42, num_segments = 1,
+                 cores = 4, seed = 42, num_segments = 1, sequencing_delay = 0,
                  breakpoints = "") # format for breakpoints: "YYYY-MM-DD,YYYY-MM-DD,..." 
 
 parse_cli <- function(defaults) {
@@ -59,7 +59,7 @@ for(i in 0:(opt$n_sims-1)){
     flows[, date := as.Date(date)]
     
     if(opt$breakpoints == ""){
-        break_list <- seq(min(flows$date), max(flows$date), length.out = opt$num_segments+1)
+        break_list <- seq(min(flows$date) + opt$sequencing_delay, max(flows$date), length.out = opt$num_segments+1)
         breakpoints <- paste(break_list, collapse = ",")
     }
     else{
