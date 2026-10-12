@@ -1,0 +1,32 @@
+# File and Output Paths
+# tree = "./data/remaster_trees/logs/sim.full.trees"
+# tree_format = "nexus"
+# output_dir = "./data/wastewater"
+
+# Tree -> Infection Settings
+mode = "transmission_nodes"
+include_index_case = true
+branch_length_unit_days = 365.25
+root_day = 0.0     # Keep it as 0 since we will set the date to start_date anyways
+
+# Time Axis & Execution
+start_date = "2002-01-01"
+# sequencing_delay = 14
+# n_days = 146
+seed = 42
+
+# Wastewater Shedding & Flow Parameters
+total_load_per_infection = 1.44e12
+shed_mean = 4.0
+shed_sd = 2.0
+shed_max_days = 14
+indiv_shape = 1.0
+decay_fraction = 0.5
+transport_mean = 0.5
+transport_sd = 0.5
+flow_mean = 1.0e8
+flow_cv = 0.10
+meas_cv = 0.3
+n_replicates = 1
+lod = 1.0
+sample_days_every = 1

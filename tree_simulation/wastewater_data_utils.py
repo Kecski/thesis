@@ -218,8 +218,8 @@ class WastewaterParams:
     shed_max_days: int = 21
     indiv_shape: float = 1.0
     decay_fraction: float = 0.5
-    transport_mean: float = 7
-    transport_sd: float = 2
+    transport_mean: float = 0.5
+    transport_sd: float = 0.5
     flow_mean: float = 1e8
     flow_cv: float = 0.10
     meas_cv: float = 0.3

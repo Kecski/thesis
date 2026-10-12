@@ -1,8 +1,8 @@
 #!/bin/zsh
 
 TREE_NAME="sim"
-MAX_TIME=0.3
-N_SIMS=2
+MAX_TIME=0.4
+N_SIMS=1
 
 
 

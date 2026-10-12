@@ -108,3 +108,12 @@ Thumbs.db
 .env.local
 secrets.yaml
 data/raw/
+
+
+# snakemake
+.snakemake/
+.snakemake_timestamp
+
+# episewer outputs
+*.csv
+*.png

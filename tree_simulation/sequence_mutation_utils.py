@@ -118,7 +118,7 @@ def simulate_sequences_on_tree(tree_file: str,
         evolver = pyvolve.Evolver(partitions=partitions, tree=tree)
         
         # Output files for each tree
-        tree_dir = Path(output_dir) / f"tree{i}"
+        tree_dir = Path(output_dir) / f"tree_{i}"
         tree_dir.mkdir(parents=True, exist_ok=True)
         
         fasta_file = tree_dir / "sequences.fasta"

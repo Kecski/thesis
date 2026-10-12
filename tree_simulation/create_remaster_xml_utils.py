@@ -92,7 +92,7 @@ def create_reaction(rate: list[float], left_side: str="X", right_side: str="2X",
         str: A single-line `<reaction .../>` XML tag.
     """
     rate_str = " ".join([str(r) for r in rate])
-    if change_times is not None:
+    if (change_times is not None) and (change_times != []):
         change_times_str = " ".join([str(t) for t in change_times])
         return f'<reaction spec="Reaction" rate="{rate_str}" changeTimes="{change_times_str}"> {left_side} -> {right_side} </reaction>'
     else:

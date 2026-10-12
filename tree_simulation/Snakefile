@@ -1,0 +1,154 @@
+import sys
+from pathlib import Path
+import tomllib
+
+# GENERAL FILE INPUT/OUTPUT PARAMETERS
+remaster_output_dir = "data/remaster_trees"
+remaster_output_name = "sim"
+
+sequence_mutation_output_dir = "data/simulated_sequences"
+sequence_mutation_root_sequence_file = "data/root_sequences/test_root_sequence_500.txt"
+sequence_mutation_tree_file = f"{remaster_output_dir}/logs/{remaster_output_name}.sampled.trees"
+
+wastewater_tree_file = f"{remaster_output_dir}/logs/{remaster_output_name}.full.trees"
+wastewater_tree_format = "nexus"
+wastewater_output_dir = "data/wastewater"
+
+# OTHER GENERAL PARAMETERS
+seed = 42
+n_sims = 1
+simulation_length = 0.4 # years
+n_days = int(simulation_length * 365.25)
+sequencing_delay = 14 # days
+num_segments = 3 # number of segments for episewer analysis
+
+
+# DERIVED PATHS FROM GENERAL PARAMETERS
+sampled_trees_file = f"{remaster_output_dir}/logs/{remaster_output_name}.sampled.trees"
+full_trees_file = f"{remaster_output_dir}/logs/{remaster_output_name}.full.trees"
+
+
+# REMASTER_CONFIG_PATH = Path("config_remaster_xml.toml")
+# SEQUENCE_MUTATION_CONFIG_PATH = Path("config_sequence_mutation.toml")
+# WASTEWATER_DATA_CONFIG_PATH = Path("config_wastewater_data.toml")
+
+# with open(REMASTER_CONFIG_PATH, "rb") as f:
+#     cfg = tomllib.load(f)
+
+# n_sims = cfg.get("n_sims", 1)
+# remaster_output_dir = cfg.get("output_dir", "./remaster_sims")
+# remaster_output_name = cfg.get("output_name", "sim")
+
+# with open(SEQUENCE_MUTATION_CONFIG_PATH, "rb") as f:
+#     cfg= tomllib.load(f)
+
+# sequence_mutation_output_dir = cfg.get("output_dir", "./simulated_sequences")
+# root_sequence_file = cfg.get("root_sequence_file", "./data/root_sequences/test_root_sequence_500.txt")
+# sequence_sampled_tree_file = cfg.get("tree_file", "./data/remaster_trees/logs/sim.sampled.trees")
+
+# with open(WASTEWATER_DATA_CONFIG_PATH, "rb") as f:
+#     cfg = tomllib.load(f)
+
+# wastewater_tree_file = cfg.get("tree", "./data/remaster_trees/logs/sim.full.trees")
+# wastewater_output_dir = cfg.get("output_dir", "./data/wastewater")
+
+
+
+rule all:
+    input: 
+        f"{sequence_mutation_output_dir}/tree_0/sequences.fasta",
+        f"{wastewater_output_dir}/tree_0/measurements.csv",
+        f"{wastewater_output_dir}/tree_0/episewer_summary.csv"
+
+# Create the xml file for the remaster simulation
+rule create_remaster_xml:
+    input:
+        script = "create_remaster_xml.py",
+        config = "config_remaster_xml.toml"
+    output:
+        xml = f"{remaster_output_dir}/{remaster_output_name}.xml",
+        params = f"{remaster_output_dir}/parameters.txt"
+    shell:
+        """
+        uv run {input.script} \
+            -c {input.config} \
+            --output_dir {remaster_output_dir} \
+            --output_name {remaster_output_name} \
+            --n_sims {n_sims} \
+            --max_time {simulation_length} \
+            --sequencing_delay {sequencing_delay}
+        """
+
+# Run the remaster simulation with beast
+rule run_remaster:
+    input:
+        xml = f"{remaster_output_dir}/{remaster_output_name}.xml"
+    output:
+        full_trees = full_trees_file,
+        sampled_trees = sampled_trees_file,
+        traj = f"{remaster_output_dir}/logs/{remaster_output_name}.traj"
+    shell:
+        """
+        cd {remaster_output_dir}
+        beast -overwrite {remaster_output_name}.xml
+        cd -
+        """
+
+# Simulate sequences along the sampled remaster trees
+rule mutate_sequences:
+    input:
+        script = "sequence_mutation.py",
+        config = "config_sequence_mutation.toml",
+        tree_file = sampled_trees_file,
+        root_sequence_file = sequence_mutation_root_sequence_file
+    output:
+        seq_info = f"{sequence_mutation_output_dir}/{{tree_id}}/sequences_info.txt",
+        seq_rates = f"{sequence_mutation_output_dir}/{{tree_id}}/sequences_rates.txt",
+        seq_fasta = f"{sequence_mutation_output_dir}/{{tree_id}}/sequences.fasta"
+    shell:
+        """
+        uv run {input.script} \
+            -c {input.config} \
+            --output_dir {sequence_mutation_output_dir} \
+            --tree_file {input.tree_file} \
+            --root_sequence_file {input.root_sequence_file} \
+        """
+    
+# Simulate wastewater data from the full remaster trees
+checkpoint simulate_wastewater_data:
+    input:
+        script = "wastewater_data_copy.py",
+        config = "config_wastewater_data.toml",
+        tree_file = full_trees_file
+    output:
+        measurements = f"{wastewater_output_dir}/{{tree_id}}/measurements.csv",
+        flows = f"{wastewater_output_dir}/{{tree_id}}/flows.csv",
+        full_data = f"{wastewater_output_dir}/{{tree_id}}/full_data.csv"
+    shell:
+        """
+        uv run {input.script} \
+            -c {input.config} \
+            --output_dir {wastewater_output_dir} \
+            --tree {input.tree_file} \
+            --tree_format {wastewater_tree_format} \
+            --sequencing_delay {sequencing_delay} \
+            --n_days {n_days}
+        """
+
+rule run_episewer:
+    input:
+        script = "episewer.R",
+        wastewater_measurements = f"{wastewater_output_dir}/{{tree_id}}/measurements.csv",
+        wastewater_flows = f"{wastewater_output_dir}/{{tree_id}}/flows.csv"
+    output:
+        summary = f"{wastewater_output_dir}/{{tree_id}}/episewer_summary.csv"
+    shell:
+        """
+        Rscript {input.script} \
+            --data-dir {wastewater_output_dir} \
+            --n-sims {n_sims} \
+            --sequencing-delay {sequencing_delay} \
+            --seed {seed} \
+            --num-segments {num_segments}
+        """
+

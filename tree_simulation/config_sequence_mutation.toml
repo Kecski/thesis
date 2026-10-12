@@ -1,0 +1,17 @@
+# File and Output Paths
+# tree_file = "./data/remaster_trees/logs/sim.sampled.trees"
+# root_sequence_file = "./data/root_sequences/test_root_sequence_500.txt"
+# output_dir = "./data/simulated_sequences"
+
+# Evolutionary & Substitution Model Settings
+sub_model = "HKY"
+kappa = 3.77
+frequencies = [0.30, 0.18, 0.20, 0.32]   # [A, C, G, T]
+clock_rate = 1.12e-3                       # Substitutions/site/unit time
+gamma_shape = 0.5                          # Alpha parameter for site heterogeneity
+gamma_categories = 6                       # Discrete gamma categories
+root_date = 2002.0                         # Root calendar year
+
+# Optional Settings
+# transition_rates = [0.5, 3.0, 0.5, 0.5, 6.0, 1.0] # AC, AG, AT, CG, CT, GT (used when sub_model = "GTR")
+# seed = 42

@@ -1,0 +1,26 @@
+# Biological & Rate Parameters
+birth_rate = [42.58, 32]
+death_rate = [29.63]
+sampling_rate = [0.79]
+
+# Optional rate change times (leave empty or omit if not used)
+change_times_birth = [0.2]
+change_times_death = []
+change_times_sampling = []
+
+# Simulation Settings
+# max_time = 0.4
+# sequencing_delay = 14.0
+# n_sims = 1
+init_pop = 1
+traj_type = "StochasticTrajectory"
+
+# File Output & Naming
+# output_dir = "data/remaster_trees"
+# output_name = "sim"
+
+# Optional Constraints & Execution
+min_tips = 10
+# max_pop = 1000
+# seed = 42
+# beast_cmd = "beast"
