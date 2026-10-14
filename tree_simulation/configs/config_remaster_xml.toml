@@ -1,10 +1,10 @@
 # Biological & Rate Parameters
-birth_rate = [42.58, 32]
+birth_rate = [52]
 death_rate = [29.63]
-sampling_rate = [0.79]
+sampling_rate = [0.79] # Target sampling proportion: 0.025
 
 # Optional rate change times (leave empty or omit if not used)
-change_times_birth = [0.2]
+change_times_birth = []
 change_times_death = []
 change_times_sampling = []
 

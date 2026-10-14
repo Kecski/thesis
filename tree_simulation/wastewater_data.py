@@ -1,146 +1,207 @@
 #!/usr/bin/env python3
 """
 Command-line interface: simulate wastewater measurements from a full,
-time-scaled phylogeny using the functions in `wastewater_utils.py`.
+time-scaled phylogeny using parameters loaded from a TOML configuration file.
 
 Example
 -------
-python run_simulation.py tree.nwk --start-date 2020-03-01 \
-    --branch-length-unit-days 365.25 --sample-days-every 2 \
-    --n-replicates 2 --seed 42 --output sim.csv --episewer-prefix sim_ep
-
-Run `python wastewater_data.py -h` for all options.
+python wastewater_data.py --config config_wastewater.toml
 """
+
 import argparse
 import dataclasses
 import math
+from io import StringIO
+from pathlib import Path
 import sys
 import pandas as pd
-from pathlib import Path
-from io import StringIO
 from Bio import Phylo
 import dendropy
-
+import tomllib
+from general_utils import log_and_save_parameters
 import wastewater_data_utils as wu
 
-# help texts for the model parameters (defaults are appended automatically)
-PARAM_HELP = {
-    "total_load_per_infection": "Total gene copies shed per infected person.",
-    "shed_mean": "Mean (days) of the gamma shedding profile since infection.",
-    "shed_sd": "SD (days) of the gamma shedding profile.",
-    "shed_max_days": "Max days after infection that shedding is modelled.",
-    "indiv_shape": "Gamma shape of per-person load multiplier (mean 1); "
-                   "'inf' = no between-person variability.",
-    "decay_fraction": "Fraction of shed load surviving to the sampler (0-1).",
-    "transport_mean": "Mean (days) of the sewer transport delay.",
-    "transport_sd": "SD (days) of the sewer transport delay.",
-    "flow_mean": "Mean wastewater flow (litres/day).",
-    "flow_cv": "Coefficient of variation of daily flow (0 = constant).",
-    "meas_cv": "CV of multiplicative lognormal lab noise (0 = none).",
-    "n_replicates": "Number of technical replicates per sampling day.",
-    "lod": "Limit of detection (copies/litre); lower values -> NaN.",
-    "sample_days_every": "Sampling interval in days (1 = daily).",
-}
+
+def parse_args():
+    p = argparse.ArgumentParser(
+        description="Simulate wastewater measurements from a full phylogeny using a TOML configuration file."
+    )
+    p.add_argument(
+        "--config",
+        "-c",
+        type=str,
+        default="config_wastewater.toml",
+        help="Path to the TOML configuration file (default: config_wastewater.toml).",
+    )
+    p.add_argument(
+        "--output_dir",
+        "-o",
+        type=str,
+        default="data/episewer",
+        help="Output directory for the generated wastewater data and logs (default: 'data/episewer').",
+    )
+    p.add_argument(
+        "--tree",
+        "-t",
+        type=str,
+        required=True,
+        help="Path to the simulated phylogeny file (Newick or Nexus format)",
+    )
+    p.add_argument(
+        "--tree_format",
+        "-f",
+        type=str,
+        default="nexus",
+        help="Format of the input tree file (default: 'nexus'). Options: 'newick', 'nexus'"
+    )
+    p.add_argument(
+        "--sequencing_delay",
+        "-s",
+        type=int,
+        default=0,
+        help="Delay in the reporting of the clinically sequenced cases (in days) (default: 0)."
+    )
+    p.add_argument(
+        "--n_days",
+        "-n",
+        type=int,
+        default=0,
+        help="Number of days to simulate wastewater measurements (default: 0). If 0, the simulation will run for the full duration of the phylogeny.",
+    )
+    return p.parse_args()
 
 
-def build_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(
-        description="Simulate wastewater measurements from a full phylogeny.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+def load_config(config_path: Path) -> dict:
+    if not config_path.exists():
+        sys.exit(f"Error: Configuration file not found at '{config_path}'.")
 
-    io = ap.add_argument_group("input / output")
-    io.add_argument("--tree", help="Path to the time-scaled tree file.")
-    io.add_argument("--tree-format", default="nexus",
-                    help="Tree format understood by Bio.Phylo "
-                         "(newick, nexus, phyloxml, ...).")
-    io.add_argument("--output_dir", default="episewer",
-                    help="Path to output directory.")
-    io.add_argument("--episewer-prefix", default="episewer",
-                    help="If given, also write <prefix>_measurements.csv and "
-                         "<prefix>_flows.csv for EpiSewer.")
+    with open(config_path, "rb") as f:
+        raw_cfg = tomllib.load(f)
 
-    tr = ap.add_argument_group("tree -> infections")
-    tr.add_argument("--mode", choices=["transmission_nodes", "tip_parent"],
-                    default="transmission_nodes",
-                    help="How infections are read from the tree.")
-    tr.add_argument("--no-index-case", dest="include_index_case",
-                    action="store_false",
-                    help="Do not add an index-case infection at the root "
-                         "(transmission_nodes mode only).")
-    tr.add_argument("--branch-length-unit-days", type=float, default=365.25,
-                    help="Days per branch-length unit (365.25 = years, "
-                         "30.44 = months, 7 = weeks, 1 = days).")
-    tr.add_argument("--root-day", type=float, default=0.0,
-                    help="Simulation day assigned to the tree root.")
+    # if "tree" not in raw_cfg:
+    #     sys.exit(f"Error: Missing required key 'tree' in '{config_path}'.")
 
-    tm = ap.add_argument_group("time axis")
-    tm.add_argument("--start-date", default="2002-01-01",
-                    help="Calendar date of simulation day 0. This is the date of the start of the simulation. As the simulation represents the sequencing samples, the wastewater data might start earlier than this depending on the sequencing_delay parameter.")
-    tm.add_argument("--sequencing-delay", type=int, default=0,
-                    help="Delay of the sequencing data in days. (Default: 0)")
-    tm.add_argument("--n-days", type=int, default=0,
-                    help="Length of the simulation in days. Default: tree "
-                         "span + shed_max_days + 10, so the shedding tail "
-                         "is fully covered.")
-    tm.add_argument("--seed", type=int, default=None,
-                    help="Random seed for reproducibility.")
+    # Target default types from WastewaterParams dataclass
+    dataclass_types = {f.name: f.type for f in dataclasses.fields(wu.WastewaterParams)}
 
-    g = ap.add_argument_group("wastewater model parameters")
+    cfg = {
+        "mode": str(raw_cfg.get("mode", "transmission_nodes")),
+        "include_index_case": bool(raw_cfg.get("include_index_case", True)),
+        "branch_length_unit_days": float(raw_cfg.get("branch_length_unit_days", 365.25)),
+        "root_day": float(raw_cfg.get("root_day", 0.0)),
+        "start_date": str(raw_cfg.get("start_date", "2002-01-01")),
+        "seed": raw_cfg.get("seed"),
+    }
+
+    # Load and cast model parameters expected by wu.WastewaterParams
     for f in dataclasses.fields(wu.WastewaterParams):
-        g.add_argument(f"--{f.name.replace('_', '-')}", type=f.type,
-                       default=f.default, help=PARAM_HELP.get(f.name, ""))
-    return ap
+        if f.name in raw_cfg:
+            val = raw_cfg[f.name]
+            
+            # Special case for handling indiv_shape which accepts "inf" or math.inf
+            if f.name == "indiv_shape":
+                if str(val).lower() == "inf":
+                    val = math.inf
+                else:
+                    val = float(val)
+            # Handle float conversions from TOML numbers
+            if f.type == float and val is not None:
+                val = float(val)
+            elif f.type == int and val is not None:
+                val = int(val)
+            cfg[f.name] = val
+        else:
+            cfg[f.name] = f.default
+
+    return cfg
+
+
+def validate_config(cfg: dict):
+    errors = []
+
+    if cfg["mode"] not in ["transmission_nodes", "tip_parent"]:
+        errors.append("'mode' must be either 'transmission_nodes' or 'tip_parent'.")
+
+    if cfg["branch_length_unit_days"] <= 0:
+        errors.append("'branch_length_unit_days' must be > 0.")
+
+    if cfg["sequencing_delay"] < 0:
+        errors.append("'sequencing_delay' must be >= 0.")
+
+    if cfg["n_days"] < 0:
+        errors.append("'n_days' must be >= 0.")
+
+    if errors:
+        sys.exit("Validation Error(s) in configuration:\n  - " + "\n  - ".join(errors))
 
 
 def main(argv=None) -> int:
-    args = build_parser().parse_args(argv)
+    args = parse_args()
+    config_path = Path(args.config)
+
+    cfg = load_config(config_path)
+    cfg["output_dir"] = args.output_dir
+    cfg["tree"] = args.tree
+    cfg["tree_format"] = args.tree_format
+    cfg["sequencing_delay"] = args.sequencing_delay
+    cfg["n_days"] = args.n_days
     
-    output_dir = Path(args.output_dir)
+    validate_config(cfg)
+
+    output_dir = Path(cfg["output_dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    params = wu.WastewaterParams(**{f.name: getattr(args, f.name)
-                                    for f in dataclasses.fields(
-                                        wu.WastewaterParams)})
+    # Initialize model parameter dataclass directly from parsed configuration
+    param_kwargs = {f.name: cfg[f.name] for f in dataclasses.fields(wu.WastewaterParams)}
+    params = wu.WastewaterParams(**param_kwargs)
 
-    trees = dendropy.TreeList.get(path=args.tree, schema="nexus")
-    
+    trees = dendropy.TreeList.get(path=cfg["tree"], schema=cfg["tree_format"])
+
+    print(f"Loaded config from: {config_path}")
+    log_and_save_parameters(cfg, output_dir, filename="parameters.txt")
+
     for i, tree in enumerate(trees):
         phylo_tree = Phylo.read(StringIO(tree.as_string(schema="newick")), "newick")
-        
+
         times = wu.infection_times_from_tree(
             phylo_tree,
-            root_day=args.root_day,
-            mode=args.mode,
-            include_index_case=args.include_index_case,
-            fmt=args.tree_format,
-            branch_length_unit_days=args.branch_length_unit_days,
+            root_day=cfg["root_day"],
+            mode=cfg["mode"],
+            include_index_case=cfg["include_index_case"],
+            fmt=cfg["tree_format"],
+            branch_length_unit_days=cfg["branch_length_unit_days"],
         )
 
-        n_days = args.n_days + args.sequencing_delay
+        n_days = cfg["n_days"] + cfg["sequencing_delay"]
         inc = wu.daily_incidence(times, n_days, start_day=0)
 
         if inc.sum() < len(times):
-            print(f"Warning: {int(len(times) - inc.sum())} of {len(times)} "
+            print(
+                f"Warning: {int(len(times) - inc.sum())} of {len(times)} "
                 f"infections fall outside the {n_days}-day window and were "
-                f"dropped (increase --n-days or check --root-day).",
-                file=sys.stderr)
+                f"dropped (increase n_days or check root_day).",
+                file=sys.stderr,
+            )
 
-        start_date_minus_delay = pd.Timestamp(args.start_date) - pd.Timedelta(days=args.sequencing_delay)
-        df = wu.simulate_wastewater(inc,  
-                                    start_date=start_date_minus_delay, 
-                                    p=params, 
-                                    seed=args.seed)
-        
+        start_date_minus_delay = pd.Timestamp(cfg["start_date"]) - pd.Timedelta(
+            days=cfg["sequencing_delay"]
+        )
+        df = wu.simulate_wastewater(
+            inc, start_date=start_date_minus_delay, p=params, seed=cfg["seed"]
+        )
+
         tree_output_dir = output_dir / f"tree_{i}"
         tree_output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         df.to_csv(tree_output_dir / "full_data.csv", index=False)
-        print(f"{len(times)} infections over {n_days} days -> "
-            f"{len(df)} sampling days written to {args.output_dir}/tree_{i}/full_data.csv")
+        print(
+            f"{len(times)} infections over {n_days} days -> "
+            f"{len(df)} sampling days written to {tree_output_dir / 'full_data.csv'}"
+        )
 
         wu.export_for_episewer(df, tree_output_dir)
-        print(f"Files for wastewater analysis written to {args.output_dir}/tree_{i}")
-            
+        print(f"Files for wastewater analysis written to {tree_output_dir}")
+
     return 0
 
 

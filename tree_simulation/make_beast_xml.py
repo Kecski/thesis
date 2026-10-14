@@ -286,6 +286,7 @@ def main():
     if not fasta:
         sys.exit("ERROR: no FASTA file given (config [data] fasta, or --fasta)")
     template = Path(args.template) if args.template else path(cfg.get("template", "template.xml"))
+    print(str(template).split("/"))
     for label, f in (("FASTA", fasta), ("template", template)):
         if not Path(f).is_file():
             sys.exit(f"ERROR: {label} file not found: {f}")

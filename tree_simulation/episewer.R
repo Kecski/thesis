@@ -121,7 +121,8 @@ for(i in 0:(opt$n_sims-1)){
     # column names below (search for "ADAPT HERE") instead of getting silently
     # wrong results.
     summarise_sections <- function(samples, variable_name, breakpoints,
-                                   section_labels = NULL, only_estimate = TRUE) {
+                                   section_labels = NULL, only_estimate = TRUE,
+                                   add_whole_period = TRUE) {
         if (!variable_name %in% names(samples))
             stop("Column '", variable_name, "' not found in ww_result$summary$samples. ",
                  "Available columns: ", paste(names(samples), collapse = ", "))
@@ -136,34 +137,43 @@ for(i in 0:(opt$n_sims-1)){
         if (is.null(section_labels))
             section_labels <- paste0("section_", seq_len(n_sections))
         
-        draws_list <- vector("list", n_sections)
-        summary_list <- vector("list", n_sections)
-        for (i in seq_len(n_sections)) {
-            sec <- s[date >= bp[i] & date < bp[i + 1] & !is.na(value)]
+        # intervals to summarise: every section, plus (optionally) the whole period
+        # from the first breakpoint to the last breakpoint
+        starts <- bp[-length(bp)]
+        ends   <- bp[-1]
+        labels <- section_labels
+        if (add_whole_period) {
+            starts <- c(starts, bp[1])
+            ends   <- c(ends,   bp[length(bp)])
+            labels <- c(labels, "whole_period")
+        }
+        n_intervals <- length(labels)
+        
+        draws_list <- vector("list", n_intervals)
+        summary_list <- vector("list", n_intervals)
+        for (i in seq_len(n_intervals)) {
+            sec <- s[date >= starts[i] & date < ends[i] & !is.na(value)]
             if (nrow(sec) == 0) {
-                warning("No non-NA draws found for '", variable_name, "' in section '",
-                        section_labels[i], "' (", bp[i], " to ", bp[i + 1],
+                warning("No non-NA draws found for '", variable_name, "' in '",
+                        labels[i], "' (", starts[i], " to ", ends[i],
                         "). This date range may fall entirely in the seeding period ",
                         "or outside the data. Skipping.")
                 next
             }
-            # one value per posterior draw: mean over the days in this section
+            # one value per posterior draw: mean over the days in this interval
             per_draw <- sec[, .(value = mean(value)), by = .draw]
-            per_draw[, `:=`(section = section_labels[i], variable = variable_name,
-                            start_date = bp[i], end_date = bp[i + 1])]
+            per_draw[, `:=`(section = labels[i], variable = variable_name,
+                            start_date = starts[i], end_date = ends[i])]
             draws_list[[i]] <- per_draw
             
             q <- quantile(per_draw$value, c(0.025, 0.25, 0.5, 0.75, 0.975), na.rm = TRUE)
             summary_list[[i]] <- data.table(
-                section = section_labels[i], variable = variable_name,
-                start_date = bp[i], end_date = bp[i + 1],
+                section = labels[i], variable = variable_name,
+                start_date = starts[i], end_date = ends[i],
                 mean = mean(per_draw$value), sd = sd(per_draw$value),
                 q2.5 = q[1], q25 = q[2], median = q[3], q75 = q[4], q97.5 = q[5],
                 n_draws = nrow(per_draw)
-                # prob_above_1 = if (variable_name == "R") mean(per_draw$value > 1)
-                # else if (variable_name == "growth_rate") mean(per_draw$value > 0)
-                # else NA_real_
-                )
+            )
         }
         list(draws = rbindlist(draws_list, fill = TRUE),
              summary = rbindlist(summary_list, fill = TRUE))
