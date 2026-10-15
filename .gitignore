@@ -78,7 +78,8 @@ htmlcov/
 .Rhistory
 .RData
 .Ruserdata
-*.Rproj
+*.Rcheck/
+.httr-oauth
 
 # R package build artifacts
 *.tar.gz
