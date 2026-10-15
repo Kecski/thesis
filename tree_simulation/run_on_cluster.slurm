@@ -10,10 +10,14 @@
 set -euo pipefail
 
 module purge
-module load stack/2024-06 gcc/12.2.0 openjdk beast2 libbeagle
-module load r/4.4.0
+module load stack/2024-06 gcc/12.2.0 openjdk beast2 libbeagle # Loading beast with java
 packagemanager -add bdmm-prime
 packagemanager -add feast
+packagemanager -add SA -version 2.1.1
+
+module load r/4.4.0 # Loading R
+Rscript -e 'install.packages("renv", repos="https://cloud.r-project.org")'
+Rscript -e 'renv::restore()'
 
 export UV_NO_CONFIG=1
 uv sync --frozen
