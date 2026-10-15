@@ -8,7 +8,7 @@ remaster_output_dir = "data/remaster_trees"
 remaster_output_name = "sim"
 
 sequence_mutation_output_dir = "data/simulated_sequences"
-sequence_mutation_root_sequence_file = "data/root_sequences/test_root_sequence_500.txt"
+sequence_mutation_root_sequence_file = "templates/root_sequences/test_root_sequence_500.txt"
 sequence_mutation_tree_file = f"{remaster_output_dir}/logs/{remaster_output_name}.sampled.trees"
 
 wastewater_tree_file = f"{remaster_output_dir}/logs/{remaster_output_name}.full.trees"
@@ -251,7 +251,7 @@ rule make_beast_xml:
         script = "make_beast_xml.py",
         sequences = f"{sequence_mutation_output_dir}/{{tree_id}}/sequences.fasta",
         configs = "configs/{tree_id}/config_beast_xml_{config_type}.toml",
-        template = f"{beast_dir}/template.xml"
+        template = "templates/beast_xmls/template.xml"
         # config_base = "configs/config_beast_xml_template.toml",
         # config_sections = "configs/{tree_id}/config_beast_xml_sections.toml",
         # config_whole = "configs/{tree_id}/config_beast_xml_whole_period.toml"
