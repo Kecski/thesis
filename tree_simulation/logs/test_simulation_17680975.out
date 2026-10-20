@@ -1,0 +1,1526 @@
+Generating single-tree XML file using config: configs/config_remaster_xml.toml
+	birth_rate: [47.0]
+	death_rate: [29.63]
+	sampling_rate: [0.79]
+	change_times_birth: []
+	change_times_death: []
+	change_times_sampling: []
+	n_sims: 2
+	init_pop: 1
+	traj_type: StochasticTrajectory
+	max_pop: None
+	min_tips: 10
+	beast_cmd: beast
+	seed: None
+	output_dir: data/remaster_trees
+	output_name: sim
+	max_time: 0.4
+	sequencing_delay: 14
+
+==================================================
+ SIMULATION PARAMETERS (remaster_trees)
+==================================================
+  birth_rate               : [47.0]
+  death_rate               : [29.63]
+  sampling_rate            : [0.79]
+  change_times_birth       : []
+  change_times_death       : []
+  change_times_sampling    : []
+  n_sims                   : 2
+  init_pop                 : 1
+  traj_type                : StochasticTrajectory
+  max_pop                  : None
+  min_tips                 : 10
+  beast_cmd                : beast
+  seed                     : None
+  output_dir               : data/remaster_trees
+  output_name              : sim
+  max_time                 : 0.4
+  sequencing_delay         : 14
+==================================================
+
+Saved parameter record to: data/remaster_trees/parameters.txt
+
+                        BEAST v2.7.8, 2002-2025
+             Bayesian Evolutionary Analysis Sampling Trees
+                       Designed and developed by
+ Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut & Marc A. Suchard
+                                    
+                   Centre for Computational Evolution
+                         University of Auckland
+                       r.bouckaert@auckland.ac.nz
+                        alexei@cs.auckland.ac.nz
+                                    
+                   Institute of Evolutionary Biology
+                        University of Edinburgh
+                           a.rambaut@ed.ac.uk
+                                    
+                    David Geffen School of Medicine
+                 University of California, Los Angeles
+                           msuchard@ucla.edu
+                                    
+                      Downloads, Help & Resources:
+                           http://beast2.org/
+                                    
+  Source code distributed under the GNU Lesser General Public License:
+                   http://github.com/CompEvol/beast2
+                                    
+                           BEAST developers:
+   Alex Alekseyenko, Trevor Bedford, Erik Bloomquist, Joseph Heled, 
+ Sebastian Hoehna, Denise Kuehnert, Philippe Lemey, Wai Lok Sibon Li, 
+Gerton Lunter, Sidney Markowitz, Vladimir Minin, Michael Defoin Platel, 
+          Oliver Pybus, Tim Vaughan, Chieh-Hsi Wu, Walter Xie
+                                    
+                               Thanks to:
+          Roald Forsberg, Beth Shapiro and Korbinian Strimmer
+
+Random number seed: 1792508408402
+
+Trajectory acceptance condition not met: S>=10
+Trajectory simulation rejected: retrying
+Trajectory acceptance condition not met: S>=10
+Trajectory simulation rejected: retrying
+Trajectory acceptance condition not met: S>=10
+Trajectory simulation rejected: retrying
+Starting ReMASTER simulation.
+Trajectory acceptance condition not met: S>=10
+Trajectory simulation rejected: retrying
+Trajectory acceptance condition not met: S>=10
+Trajectory simulation rejected: retrying
+ReMASTER simulation complete.
+Done!
+/cluster/scratch/aimolay/thesis/tree_simulation
+
+==================================================
+ SIMULATION PARAMETERS (simulated_sequences)
+==================================================
+  sub_model                : HKY
+  kappa                    : 3.77
+  transition_rates         : None
+  frequencies              : [0.3, 0.18, 0.2, 0.32]
+  clock_rate               : 0.00112
+  gamma_shape              : 0.5
+  gamma_categories         : 6
+  root_date                : 2002.0
+  seed                     : None
+  output_dir               : data/simulated_sequences
+  root_sequence_file       : templates/root_sequences/test_root_sequence_500.txt
+  tree_file                : data/remaster_trees/logs/sim.sampled.trees
+==================================================
+
+Saved parameter record to: data/simulated_sequences/parameters.txt
+
+==================================================
+ SIMULATION PARAMETERS (simulated_sequences)
+==================================================
+  sub_model                : HKY
+  kappa                    : 3.77
+  transition_rates         : None
+  frequencies              : [0.3, 0.18, 0.2, 0.32]
+  clock_rate               : 0.00112
+  gamma_shape              : 0.5
+  gamma_categories         : 6
+  root_date                : 2002.0
+  seed                     : None
+  output_dir               : data/simulated_sequences
+  root_sequence_file       : templates/root_sequences/test_root_sequence_500.txt
+  tree_file                : data/remaster_trees/logs/sim.sampled.trees
+==================================================
+
+Saved parameter record to: data/simulated_sequences/parameters.txt
+Loaded config from: configs/config_wastewater_data.toml
+
+==================================================
+ SIMULATION PARAMETERS (wastewater)
+==================================================
+  mode                     : transmission_nodes
+  include_index_case       : True
+  branch_length_unit_days  : 365.25
+  root_day                 : 0.0
+  start_date               : 2002-01-01
+  seed                     : 42
+  total_load_per_infection : 1440000000000.0
+  shed_mean                : 4.0
+  shed_sd                  : 2.0
+  shed_max_days            : 14
+  indiv_shape              : 1.0
+  decay_fraction           : 0.5
+  transport_mean           : 0.5
+  transport_sd             : 0.5
+  flow_mean                : 100000000.0
+  flow_cv                  : 0.1
+  meas_cv                  : 0.3
+  n_replicates             : 1
+  lod                      : 1.0
+  sample_days_every        : 1
+  output_dir               : data/wastewater
+  tree                     : data/remaster_trees/logs/sim.full.trees
+  tree_format              : nexus
+  sequencing_delay         : 14
+  n_days                   : 146
+==================================================
+
+Saved parameter record to: data/wastewater/parameters.txt
+28361 infections over 160 days -> 160 sampling days written to data/wastewater/tree_0/full_data.csv
+Files for wastewater analysis written to data/wastewater/tree_0
+9584 infections over 160 days -> 160 sampling days written to data/wastewater/tree_1/full_data.csv
+Files for wastewater analysis written to data/wastewater/tree_1
+Loaded config from: configs/config_wastewater_data.toml
+
+==================================================
+ SIMULATION PARAMETERS (wastewater)
+==================================================
+  mode                     : transmission_nodes
+  include_index_case       : True
+  branch_length_unit_days  : 365.25
+  root_day                 : 0.0
+  start_date               : 2002-01-01
+  seed                     : 42
+  total_load_per_infection : 1440000000000.0
+  shed_mean                : 4.0
+  shed_sd                  : 2.0
+  shed_max_days            : 14
+  indiv_shape              : 1.0
+  decay_fraction           : 0.5
+  transport_mean           : 0.5
+  transport_sd             : 0.5
+  flow_mean                : 100000000.0
+  flow_cv                  : 0.1
+  meas_cv                  : 0.3
+  n_replicates             : 1
+  lod                      : 1.0
+  sample_days_every        : 1
+  output_dir               : data/wastewater
+  tree                     : data/remaster_trees/logs/sim.full.trees
+  tree_format              : nexus
+  sequencing_delay         : 14
+  n_days                   : 146
+==================================================
+
+Saved parameter record to: data/wastewater/parameters.txt
+28361 infections over 160 days -> 160 sampling days written to data/wastewater/tree_0/full_data.csv
+Files for wastewater analysis written to data/wastewater/tree_0
+9584 infections over 160 days -> 160 sampling days written to data/wastewater/tree_1/full_data.csv
+Files for wastewater analysis written to data/wastewater/tree_1
+- The project is out-of-sync -- use `renv::status()` for details.
+- The project is out-of-sync -- use `renv::status()` for details.
+Initializing chains via pathfinder...
+Initializing chains via pathfinder...
+Running MCMC with 4 parallel chains...
+
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 1 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 2 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 3 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 4 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 2 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 3 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 4 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 4 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 1 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 1 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 2 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 4 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 1 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 4 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 4 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 1 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 2 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 1 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 4 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 4 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 1 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 1 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 3 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 2 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 3 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 4 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 2 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 4 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 1 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 4 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 4 finished in 77.8 seconds.
+Chain 1 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 1 finished in 79.8 seconds.
+Chain 3 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 1 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 3 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 2 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 3 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 3 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 4 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 3 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 3 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 2 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 1 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 3 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 2 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 3 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 2 finished in 100.6 seconds.
+Chain 2 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 3 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 3 finished in 102.6 seconds.
+Chain 1 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 1 finished in 103.6 seconds.
+Chain 3 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 3 finished in 104.1 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 90.6 seconds.
+Total execution time: 104.5 seconds.
+
+Chain 4 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 2 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 2 finished in 108.1 seconds.
+Chain 4 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 4 finished in 112.9 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 106.8 seconds.
+Total execution time: 113.2 seconds.
+
+Initializing chains via pathfinder...
+
+Pathfinder initialization failed. 
+Falling back to default initialization.
+
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 2 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 3 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 4 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Initializing chains via pathfinder...
+
+Pathfinder initialization failed. 
+Falling back to default initialization.
+
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 2 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 3 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 4 Iteration:   1 / 1000 [  0%]  (Warmup) 
+Chain 4 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 4 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 4 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 4 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 4 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 4 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 4 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 4 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 4 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 4 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 4 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 4 finished in 299.2 seconds.
+Chain 3 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 4 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 4 finished in 294.7 seconds.
+Chain 2 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 3 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 3 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 3 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 1 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 3 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 1 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 2 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 3 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 3 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 200 / 1000 [ 20%]  (Warmup) 
+Chain 3 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 3 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 1 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 3 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 3 finished in 334.3 seconds.
+Chain 2 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 1 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 2 Iteration: 400 / 1000 [ 40%]  (Warmup) 
+Chain 3 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 2 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 1 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 3 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 3 finished in 334.9 seconds.
+Chain 1 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 2 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 1 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 2 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 2 finished in 357.4 seconds.
+Chain 1 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+Chain 2 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 1 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 1 Iteration: 900 / 1000 [ 90%]  (Sampling) 
+Chain 2 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 2 finished in 369.7 seconds.
+Chain 1 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 1 finished in 370.3 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 342.4 seconds.
+Total execution time: 370.4 seconds.
+
+Chain 1 Iteration: 1000 / 1000 [100%]  (Sampling) 
+Chain 1 finished in 381.5 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 343.1 seconds.
+Total execution time: 381.6 seconds.
+
+configs/tree_0/config_beast_xml_sections.toml: mean=[1.1109, 1.1451, 1.1538] sigma=[0.0256, 0.0156, 0.0224] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_0/config_beast_xml_whole_period.toml: mean=1.1364 sigma=0.0126 change_times=[] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_1/config_beast_xml_sections.toml: mean=[1.1431, 1.1481, 1.2081] sigma=[0.0301, 0.0176, 0.0223] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree1/sequences.fasta
+configs/tree_1/config_beast_xml_whole_period.toml: mean=1.1663 sigma=0.0129 change_times=[] fasta=data/simulated_sequences/tree1/sequences.fasta
+Done: 2 of 2 trees written to configs
+configs/tree_0/config_beast_xml_sections.toml: mean=[1.1109, 1.1451, 1.1538] sigma=[0.0256, 0.0156, 0.0224] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_0/config_beast_xml_whole_period.toml: mean=1.1364 sigma=0.0126 change_times=[] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_1/config_beast_xml_sections.toml: mean=[1.1431, 1.1481, 1.2081] sigma=[0.0301, 0.0176, 0.0223] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree1/sequences.fasta
+configs/tree_1/config_beast_xml_whole_period.toml: mean=1.1663 sigma=0.0129 change_times=[] fasta=data/simulated_sequences/tree1/sequences.fasta
+Done: 2 of 2 trees written to configs
+configs/tree_0/config_beast_xml_sections.toml: mean=[1.1109, 1.1451, 1.1538] sigma=[0.0256, 0.0156, 0.0224] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_0/config_beast_xml_whole_period.toml: mean=1.1364 sigma=0.0126 change_times=[] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_1/config_beast_xml_sections.toml: mean=[1.1431, 1.1481, 1.2081] sigma=[0.0301, 0.0176, 0.0223] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree1/sequences.fasta
+configs/tree_1/config_beast_xml_whole_period.toml: mean=1.1663 sigma=0.0129 change_times=[] fasta=data/simulated_sequences/tree1/sequences.fasta
+Done: 2 of 2 trees written to configs
+configs/tree_0/config_beast_xml_sections.toml: mean=[1.1109, 1.1451, 1.1538] sigma=[0.0256, 0.0156, 0.0224] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_0/config_beast_xml_whole_period.toml: mean=1.1364 sigma=0.0126 change_times=[] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_1/config_beast_xml_sections.toml: mean=[1.1431, 1.1481, 1.2081] sigma=[0.0301, 0.0176, 0.0223] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree1/sequences.fasta
+configs/tree_1/config_beast_xml_whole_period.toml: mean=1.1663 sigma=0.0129 change_times=[] fasta=data/simulated_sequences/tree1/sequences.fasta
+Done: 2 of 2 trees written to configs
+configs/tree_1/config_beast_xml_true_values.toml: mean=1.545 sigma=0.05 change_times=[]
+configs/tree_1/config_beast_xml_true_values.toml: mean=1.545 sigma=0.05 change_times=[]
+configs/tree_1/config_beast_xml_true_values.toml: mean=1.545 sigma=0.05 change_times=[]
+configs/tree_1/config_beast_xml_true_values.toml: mean=1.545 sigma=0.05 change_times=[]
+['templates', 'beast_xmls', 'template.xml']
+Wrote data/beast_reconstructions/tree_1/sections.xml
+  sequences : 100 x 500 sites
+  tip dates : 2002.0774 - 2002.3140 (span 0.2366)
+  Re skyline: 3 intervals, change times (ages) = [0.133333, 0.266667]
+    interval 1 (index 0): LogNormal(mean in real space=1.1431, log-sd=0.0301), initial=1.1431
+    interval 2 (index 1): LogNormal(mean in real space=1.1481, log-sd=0.0176), initial=1.1481
+    interval 3 (index 2): LogNormal(mean in real space=1.2081, log-sd=0.0223), initial=1.2081
+['templates', 'beast_xmls', 'template.xml']
+Wrote data/beast_reconstructions/tree_1/true_values.xml
+  sequences : 100 x 500 sites
+  tip dates : 2002.0774 - 2002.3140 (span 0.2366)
+  Re skyline: constant Re (1 interval, no change times)
+    interval 1 (index 0): LogNormal(mean in real space=1.545, log-sd=0.05), initial=1.545
+['templates', 'beast_xmls', 'template.xml']
+Wrote data/beast_reconstructions/tree_1/base.xml
+  sequences : 100 x 500 sites
+  tip dates : 2002.0774 - 2002.3140 (span 0.2366)
+  Re skyline: constant Re (1 interval, no change times)
+    interval 1 (index 0): LogNormal(mean in real space=1.0, log-sd=1.25), initial=1.0
+['templates', 'beast_xmls', 'template.xml']
+Wrote data/beast_reconstructions/tree_1/whole_period.xml
+  sequences : 100 x 500 sites
+  tip dates : 2002.0774 - 2002.3140 (span 0.2366)
+  Re skyline: constant Re (1 interval, no change times)
+    interval 1 (index 0): LogNormal(mean in real space=1.1663, log-sd=0.0129), initial=1.1663
+
+                        BEAST v2.7.8, 2002-2025
+             Bayesian Evolutionary Analysis Sampling Trees
+                       Designed and developed by
+ Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut & Marc A. Suchard
+                                    
+                   Centre for Computational Evolution
+                         University of Auckland
+                       r.bouckaert@auckland.ac.nz
+                        alexei@cs.auckland.ac.nz
+                                    
+                   Institute of Evolutionary Biology
+                        University of Edinburgh
+                           a.rambaut@ed.ac.uk
+                                    
+                    David Geffen School of Medicine
+                 University of California, Los Angeles
+                           msuchard@ucla.edu
+                                    
+                      Downloads, Help & Resources:
+                           http://beast2.org/
+                                    
+  Source code distributed under the GNU Lesser General Public License:
+                   http://github.com/CompEvol/beast2
+                                    
+                           BEAST developers:
+   Alex Alekseyenko, Trevor Bedford, Erik Bloomquist, Joseph Heled, 
+ Sebastian Hoehna, Denise Kuehnert, Philippe Lemey, Wai Lok Sibon Li, 
+Gerton Lunter, Sidney Markowitz, Vladimir Minin, Michael Defoin Platel, 
+          Oliver Pybus, Tim Vaughan, Chieh-Hsi Wu, Walter Xie
+                                    
+                               Thanks to:
+          Roald Forsberg, Beth Shapiro and Korbinian Strimmer
+
+Random number seed: 42
+
+
+                        BEAST v2.7.8, 2002-2025
+             Bayesian Evolutionary Analysis Sampling Trees
+                       Designed and developed by
+ Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut & Marc A. Suchard
+                                    
+                   Centre for Computational Evolution
+                         University of Auckland
+                       r.bouckaert@auckland.ac.nz
+                        alexei@cs.auckland.ac.nz
+                                    
+                   Institute of Evolutionary Biology
+                        University of Edinburgh
+                           a.rambaut@ed.ac.uk
+                                    
+                    David Geffen School of Medicine
+                 University of California, Los Angeles
+                           msuchard@ucla.edu
+                                    
+                      Downloads, Help & Resources:
+                           http://beast2.org/
+                                    
+  Source code distributed under the GNU Lesser General Public License:
+                   http://github.com/CompEvol/beast2
+                                    
+                           BEAST developers:
+   Alex Alekseyenko, Trevor Bedford, Erik Bloomquist, Joseph Heled, 
+ Sebastian Hoehna, Denise Kuehnert, Philippe Lemey, Wai Lok Sibon Li, 
+Gerton Lunter, Sidney Markowitz, Vladimir Minin, Michael Defoin Platel, 
+          Oliver Pybus, Tim Vaughan, Chieh-Hsi Wu, Walter Xie
+                                    
+                               Thanks to:
+          Roald Forsberg, Beth Shapiro and Korbinian Strimmer
+
+Random number seed: 42
+
+
+                        BEAST v2.7.8, 2002-2025
+             Bayesian Evolutionary Analysis Sampling Trees
+                       Designed and developed by
+ Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut & Marc A. Suchard
+                                    
+                   Centre for Computational Evolution
+                         University of Auckland
+                       r.bouckaert@auckland.ac.nz
+                        alexei@cs.auckland.ac.nz
+                                    
+                   Institute of Evolutionary Biology
+                        University of Edinburgh
+                           a.rambaut@ed.ac.uk
+                                    
+                    David Geffen School of Medicine
+                 University of California, Los Angeles
+                           msuchard@ucla.edu
+                                    
+                      Downloads, Help & Resources:
+                           http://beast2.org/
+                                    
+  Source code distributed under the GNU Lesser General Public License:
+                   http://github.com/CompEvol/beast2
+                                    
+                           BEAST developers:
+   Alex Alekseyenko, Trevor Bedford, Erik Bloomquist, Joseph Heled, 
+ Sebastian Hoehna, Denise Kuehnert, Philippe Lemey, Wai Lok Sibon Li, 
+Gerton Lunter, Sidney Markowitz, Vladimir Minin, Michael Defoin Platel, 
+          Oliver Pybus, Tim Vaughan, Chieh-Hsi Wu, Walter Xie
+                                    
+                               Thanks to:
+          Roald Forsberg, Beth Shapiro and Korbinian Strimmer
+
+
+Random number seed: 42
+
+                        BEAST v2.7.8, 2002-2025
+             Bayesian Evolutionary Analysis Sampling Trees
+                       Designed and developed by
+ Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut & Marc A. Suchard
+                                    
+                   Centre for Computational Evolution
+                         University of Auckland
+                       r.bouckaert@auckland.ac.nz
+                        alexei@cs.auckland.ac.nz
+                                    
+             TypeSet null:
+      Institute of Evolutionary Biology
+                        University of Edinburgh
+                           a.rambaut@ed.ac.uk
+                                    
+                    David Geffen School of Medicine
+                 University of California, Los Angeles
+                           msuchard@ucla.edu
+                                    
+                      Downloads, Help & Resources:
+                           http://beast2.org/
+                                    
+  Source code distributed under the GNU Lesser General Public License:
+                   http://github.com/CompEvol/beast2
+                                    
+                           BEAST developers:
+   Alex Alekseyenko, Trevor Bedford, Erik Bloomquist, Joseph Heled, 
+ Sebastian Hoehna, Denise Kuehnert, Philippe Lemey, Wai Lok Sibon Li, 
+Gerton Lunter, Sidney Markowitz, Vladimir Minin, Michael Defoin Platel, 
+          Oliver Pybus, Tim Vaughan, Chieh-Hsi Wu, Walter Xie
+                                    
+                               Thanks to:
+          Roald Forsberg, Beth Shapiro and Korbinian Strimmer
+
+Random number seed: 42
+
+Alignment(sequences)
+  100 taxa
+  500 sites
+  7 patterns
+
+TypeSet null:
+leaf_0_2002.2999 = 2002.2999 (0.01410000000009859)
+leaf_1_2002.2920 = 2002.2920 (0.02200000000016189)
+leaf_2_2002.3086 = 2002.3086 (0.005400000000008731)
+leaf_3_2002.3085 = 2002.3085 (0.005499999999983629)
+leaf_4_2002.2994 = 2002.2994 (0.014599999999973079)
+leaf_5_2002.2064 = 2002.2064 (0.10760000000004766)
+leaf_6_2002.2517 = 2002.2517 (0.062300000000050204)
+leaf_7_2002.2925 = 2002.2925 (0.021500000000060027)
+leaf_8_2002.3132 = 2002.3132 (8.000000000265572E-4)
+leaf_9_2002.3114 = 2002.3114 (0.0026000000000294676)
+90 more...
+leaf_0_2002.2999 = NOT_SET (NaN)
+leaf_1_2002.2920 = NOT_SET (NaN)
+leaf_2_2002.3086 = NOT_SET (NaN)
+leaf_3_2002.3085 = NOT_SET (NaN)
+leaf_4_2002.2994 = NOT_SET (NaN)
+leaf_5_2002.2064 = NOT_SET (NaN)
+leaf_6_2002.2517 = NOT_SET (NaN)
+leaf_7_2002.2925 = NOT_SET (NaN)
+leaf_8_2002.3132 = NOT_SET (NaN)
+leaf_9_2002.3114 = NOT_SET (NaN)
+90 more...
+TypeSet typeSetBDMMPrime.t:sequences:
+	NOT_SET (0)
+Starting frequencies: [0.3239800000000001, 0.17998, 0.1961, 0.29994]
+Alignment(sequences)
+  100 taxa
+  500 sites
+  7 patterns
+
+leaf_0_2002.2999 = 2002.2999 (0.01410000000009859)
+leaf_1_2002.2920 = 2002.2920 (0.02200000000016189)
+leaf_2_2002.3086 = 2002.3086 (0.005400000000008731)
+leaf_3_2002.3085 = 2002.3085 (0.005499999999983629)
+leaf_4_2002.2994 = 2002.2994 (0.014599999999973079)
+leaf_5_2002.2064 = 2002.2064 (0.10760000000004766)
+leaf_6_2002.2517 = 2002.2517 (0.062300000000050204)
+leaf_7_2002.2925 = 2002.2925 (0.021500000000060027)
+leaf_8_2002.3132 = 2002.3132 (8.000000000265572E-4)
+leaf_9_2002.3114 = 2002.3114 (0.0026000000000294676)
+90 more...
+leaf_0_2002.2999 = NOT_SET (NaN)
+leaf_1_2002.2920 = NOT_SET (NaN)
+leaf_2_2002.3086 = NOT_SET (NaN)
+leaf_3_2002.3085 = NOT_SET (NaN)
+leaf_4_2002.2994 = NOT_SET (NaN)
+leaf_5_2002.2064 = NOT_SET (NaN)
+leaf_6_2002.2517 = NOT_SET (NaN)
+leaf_7_2002.2925 = NOT_SET (NaN)
+leaf_8_2002.3132 = NOT_SET (NaN)
+leaf_9_2002.3114 = NOT_SET (NaN)
+90 more...
+TypeSet typeSetBDMMPrime.t:sequences:
+	NOT_SET (0)
+Starting frequencies: [0.3239800000000001, 0.17998, 0.1961, 0.29994]
+  Using BEAGLE version: 3.1.2 resource 0: CPU
+    with instance flags:  PRECISION_DOUBLE COMPUTATION_SYNCH EIGEN_REAL SCALING_MANUAL SCALERS_RAW VECTOR_SSE THREADING_NONE PROCESSOR_CPU FRAMEWORK_CPU
+  Using BEAGLE version: 3.1.2 resource 0: CPU
+    with instance flags:  PRECISION_DOUBLE COMPUTATION_SYNCH EIGEN_REAL SCALING_MANUAL SCALERS_RAW VECTOR_SSE THREADING_NONE PROCESSOR_CPU FRAMEWORK_CPU
+===============================================================================
+Citations for this model:
+===============================================================================
+Citations for this model:
+TypeSet null:
+
+Bouckaert, Remco, Timothy G. Vaughan, Joëlle Barido-Sottani, Sebastián Duchêne, Mathieu Fourment, 
+Alexandra Gavryushkina, Joseph Heled, Graham Jones, Denise Kühnert, Nicola De Maio, Michael Matschiner, 
+Fábio K. Mendes, Nicola F. Müller, Huw A. Ogilvie, Louis du Plessis, Alex Popinga, Andrew Rambaut, 
+David Rasmussen, Igor Siveroni, Marc A. Suchard, Chieh-Hsi Wu, Dong Xie, Chi Zhang, Tanja Stadler, 
+Alexei J. Drummond 
+  BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis. 
+  PLoS computational biology 15, no. 4 (2019): e1006650.
+
+Kuehnert D, Stadler T, Vaughan TG, Drummond AJ. (2016). Phylodynamics with migration: 
+A computational framework to quantify population structure from genomic data. 
+Mol Biol Evol. 33(8):2102–2116.
+
+Hasegawa M, Kishino H, Yano T (1985) Dating the human-ape splitting by a
+  molecular clock of mitochondrial DNA. Journal of Molecular Evolution
+  22:160-174.
+
+Vaughan and Stadler, "Bayesian phylodynamic inference of multi-type population trajectories using genomic data"
+Molecular Biology and Evolution 42:msaf130 (2025), doi:10.1093/molbev/msaf130.
+
+Douglas J, Zhang R, Bouckaert R. Adaptive dating and fast proposals: Revisiting the phylogenetic relaxed clock model. PLoS computational biology. 2021 Feb 2;17(2):e1008322.
+
+===============================================================================
+TypeSet null:
+
+Bouckaert, Remco, Timothy G. Vaughan, Joëlle Barido-Sottani, Sebastián Duchêne, Mathieu Fourment, 
+Alexandra Gavryushkina, Joseph Heled, Graham Jones, Denise Kühnert, Nicola De Maio, Michael Matschiner, 
+Fábio K. Mendes, Nicola F. Müller, Huw A. Ogilvie, Louis du Plessis, Alex Popinga, Andrew Rambaut, 
+David Rasmussen, Igor Siveroni, Marc A. Suchard, Chieh-Hsi Wu, Dong Xie, Chi Zhang, Tanja Stadler, 
+Alexei J. Drummond 
+  BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis. 
+  PLoS computational biology 15, no. 4 (2019): e1006650.
+
+Kuehnert D, Stadler T, Vaughan TG, Drummond AJ. (2016). Phylodynamics with migration: 
+A computational framework to quantify population structure from genomic data. 
+Mol Biol Evol. 33(8):2102–2116.
+
+Hasegawa M, Kishino H, Yano T (1985) Dating the human-ape splitting by a
+  molecular clock of mitochondrial DNA. Journal of Molecular Evolution
+  22:160-174.
+
+Vaughan and Stadler, "Bayesian phylodynamic inference of multi-type population trajectories using genomic data"
+Molecular Biology and Evolution 42:msaf130 (2025), doi:10.1093/molbev/msaf130.
+
+Douglas J, Zhang R, Bouckaert R. Adaptive dating and fast proposals: Revisiting the phylogenetic relaxed clock model. PLoS computational biology. 2021 Feb 2;17(2):e1008322.
+
+===============================================================================
+Start likelihood: -1661.1151596862665 
+Start likelihood: -1714.255384478377 
+Alignment(sequences)
+  100 taxa
+  500 sites
+  7 patterns
+
+leaf_0_2002.2999 = 2002.2999 (0.01410000000009859)
+leaf_1_2002.2920 = 2002.2920 (0.02200000000016189)
+leaf_2_2002.3086 = 2002.3086 (0.005400000000008731)
+leaf_3_2002.3085 = 2002.3085 (0.005499999999983629)
+leaf_4_2002.2994 = 2002.2994 (0.014599999999973079)
+leaf_5_2002.2064 = 2002.2064 (0.10760000000004766)
+leaf_6_2002.2517 = 2002.2517 (0.062300000000050204)
+leaf_7_2002.2925 = 2002.2925 (0.021500000000060027)
+leaf_8_2002.3132 = 2002.3132 (8.000000000265572E-4)
+leaf_9_2002.3114 = 2002.3114 (0.0026000000000294676)
+90 more...
+leaf_0_2002.2999 = NOT_SET (NaN)
+leaf_1_2002.2920 = NOT_SET (NaN)
+leaf_2_2002.3086 = NOT_SET (NaN)
+leaf_3_2002.3085 = NOT_SET (NaN)
+leaf_4_2002.2994 = NOT_SET (NaN)
+leaf_5_2002.2064 = NOT_SET (NaN)
+leaf_6_2002.2517 = NOT_SET (NaN)
+leaf_7_2002.2925 = NOT_SET (NaN)
+leaf_8_2002.3132 = NOT_SET (NaN)
+leaf_9_2002.3114 = NOT_SET (NaN)
+90 more...
+TypeSet typeSetBDMMPrime.t:sequences:
+	NOT_SET (0)
+Starting frequencies: [0.3239800000000001, 0.17998, 0.1961, 0.29994]
+Alignment(sequences)
+  100 taxa
+  500 sites
+  7 patterns
+
+leaf_0_2002.2999 = 2002.2999 (0.01410000000009859)
+leaf_1_2002.2920 = 2002.2920 (0.02200000000016189)
+leaf_2_2002.3086 = 2002.3086 (0.005400000000008731)
+leaf_3_2002.3085 = 2002.3085 (0.005499999999983629)
+leaf_4_2002.2994 = 2002.2994 (0.014599999999973079)
+leaf_5_2002.2064 = 2002.2064 (0.10760000000004766)
+leaf_6_2002.2517 = 2002.2517 (0.062300000000050204)
+leaf_7_2002.2925 = 2002.2925 (0.021500000000060027)
+leaf_8_2002.3132 = 2002.3132 (8.000000000265572E-4)
+leaf_9_2002.3114 = 2002.3114 (0.0026000000000294676)
+90 more...
+leaf_0_2002.2999 = NOT_SET (NaN)
+leaf_1_2002.2920 = NOT_SET (NaN)
+leaf_2_2002.3086 = NOT_SET (NaN)
+leaf_3_2002.3085 = NOT_SET (NaN)
+leaf_4_2002.2994 = NOT_SET (NaN)
+leaf_5_2002.2064 = NOT_SET (NaN)
+leaf_6_2002.2517 = NOT_SET (NaN)
+leaf_7_2002.2925 = NOT_SET (NaN)
+leaf_8_2002.3132 = NOT_SET (NaN)
+leaf_9_2002.3114 = NOT_SET (NaN)
+90 more...
+TypeSet typeSetBDMMPrime.t:sequences:
+	NOT_SET (0)
+Starting frequencies: [0.3239800000000001, 0.17998, 0.1961, 0.29994]
+  Using BEAGLE version: 3.1.2 resource 0: CPU
+    with instance flags:  PRECISION_DOUBLE COMPUTATION_SYNCH EIGEN_REAL SCALING_MANUAL SCALERS_RAW VECTOR_SSE THREADING_NONE PROCESSOR_CPU FRAMEWORK_CPU
+===============================================================================
+Citations for this model:
+
+Bouckaert, Remco, Timothy G. Vaughan, Joëlle Barido-Sottani, Sebastián Duchêne, Mathieu Fourment, 
+Alexandra Gavryushkina, Joseph Heled, Graham Jones, Denise Kühnert, Nicola De Maio, Michael Matschiner, 
+Fábio K. Mendes, Nicola F. Müller, Huw A. Ogilvie, Louis du Plessis, Alex Popinga, Andrew Rambaut, 
+David Rasmussen, Igor Siveroni, Marc A. Suchard, Chieh-Hsi Wu, Dong Xie, Chi Zhang, Tanja Stadler, 
+Alexei J. Drummond 
+  BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis. 
+  PLoS computational biology 15, no. 4 (2019): e1006650.
+
+Kuehnert D, Stadler T, Vaughan TG, Drummond AJ. (2016). Phylodynamics with migration: 
+A computational framework to quantify population structure from genomic data. 
+Mol Biol Evol. 33(8):2102–2116.
+
+Hasegawa M, Kishino H, Yano T (1985) Dating the human-ape splitting by a
+  molecular clock of mitochondrial DNA. Journal of Molecular Evolution
+  22:160-174.
+
+Vaughan and Stadler, "Bayesian phylodynamic inference of multi-type population trajectories using genomic data"
+Molecular Biology and Evolution 42:msaf130 (2025), doi:10.1093/molbev/msaf130.
+
+Douglas J, Zhang R, Bouckaert R. Adaptive dating and fast proposals: Revisiting the phylogenetic relaxed clock model. PLoS computational biology. 2021 Feb 2;17(2):e1008322.
+
+===============================================================================
+Start likelihood: -1659.6475286311008 
+configs/tree_0/config_beast_xml_sections.toml: mean=[1.1109, 1.1451, 1.1538] sigma=[0.0256, 0.0156, 0.0224] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_0/config_beast_xml_whole_period.toml: mean=1.1364 sigma=0.0126 change_times=[] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_1/config_beast_xml_sections.toml: mean=[1.1431, 1.1481, 1.2081] sigma=[0.0301, 0.0176, 0.0223] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree1/sequences.fasta
+configs/tree_1/config_beast_xml_whole_period.toml: mean=1.1663 sigma=0.0129 change_times=[] fasta=data/simulated_sequences/tree1/sequences.fasta
+Done: 2 of 2 trees written to configs
+configs/tree_0/config_beast_xml_sections.toml: mean=[1.1109, 1.1451, 1.1538] sigma=[0.0256, 0.0156, 0.0224] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_0/config_beast_xml_whole_period.toml: mean=1.1364 sigma=0.0126 change_times=[] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_1/config_beast_xml_sections.toml: mean=[1.1431, 1.1481, 1.2081] sigma=[0.0301, 0.0176, 0.0223] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree1/sequences.fasta
+configs/tree_1/config_beast_xml_whole_period.toml: mean=1.1663 sigma=0.0129 change_times=[] fasta=data/simulated_sequences/tree1/sequences.fasta
+Done: 2 of 2 trees written to configs
+         Sample      posterior     likelihood          prior
+  Using BEAGLE version: 3.1.2 resource 0: CPU
+    with instance flags:  PRECISION_DOUBLE COMPUTATION_SYNCH EIGEN_REAL SCALING_MANUAL SCALERS_RAW VECTOR_SSE THREADING_NONE PROCESSOR_CPU FRAMEWORK_CPU
+===============================================================================
+Citations for this model:
+         Sample      posterior     likelihood          prior
+configs/tree_0/config_beast_xml_sections.toml: mean=[1.1109, 1.1451, 1.1538] sigma=[0.0256, 0.0156, 0.0224] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_0/config_beast_xml_whole_period.toml: mean=1.1364 sigma=0.0126 change_times=[] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_1/config_beast_xml_sections.toml: mean=[1.1431, 1.1481, 1.2081] sigma=[0.0301, 0.0176, 0.0223] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree1/sequences.fasta
+configs/tree_1/config_beast_xml_whole_period.toml: mean=1.1663 sigma=0.0129 change_times=[] fasta=data/simulated_sequences/tree1/sequences.fasta
+Done: 2 of 2 trees written to configs
+
+Bouckaert, Remco, Timothy G. Vaughan, Joëlle Barido-Sottani, Sebastián Duchêne, Mathieu Fourment, 
+Alexandra Gavryushkina, Joseph Heled, Graham Jones, Denise Kühnert, Nicola De Maio, Michael Matschiner, 
+Fábio K. Mendes, Nicola F. Müller, Huw A. Ogilvie, Louis du Plessis, Alex Popinga, Andrew Rambaut, 
+David Rasmussen, Igor Siveroni, Marc A. Suchard, Chieh-Hsi Wu, Dong Xie, Chi Zhang, Tanja Stadler, 
+Alexei J. Drummond 
+  BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis. 
+  PLoS computational biology 15, no. 4 (2019): e1006650.
+
+Kuehnert D, Stadler T, Vaughan TG, Drummond AJ. (2016). Phylodynamics with migration: 
+A computational framework to quantify population structure from genomic data. 
+Mol Biol Evol. 33(8):2102–2116.
+
+Hasegawa M, Kishino H, Yano T (1985) Dating the human-ape splitting by a
+  molecular clock of mitochondrial DNA. Journal of Molecular Evolution
+  22:160-174.
+
+Vaughan and Stadler, "Bayesian phylodynamic inference of multi-type population trajectories using genomic data"
+Molecular Biology and Evolution 42:msaf130 (2025), doi:10.1093/molbev/msaf130.
+
+Douglas J, Zhang R, Bouckaert R. Adaptive dating and fast proposals: Revisiting the phylogenetic relaxed clock model. PLoS computational biology. 2021 Feb 2;17(2):e1008322.
+
+===============================================================================
+Start likelihood: -1663.625664850092 
+configs/tree_0/config_beast_xml_sections.toml: mean=[1.1109, 1.1451, 1.1538] sigma=[0.0256, 0.0156, 0.0224] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_0/config_beast_xml_whole_period.toml: mean=1.1364 sigma=0.0126 change_times=[] fasta=data/simulated_sequences/tree0/sequences.fasta
+configs/tree_1/config_beast_xml_sections.toml: mean=[1.1431, 1.1481, 1.2081] sigma=[0.0301, 0.0176, 0.0223] change_times=[0.133333, 0.266667] fasta=data/simulated_sequences/tree1/sequences.fasta
+configs/tree_1/config_beast_xml_whole_period.toml: mean=1.1663 sigma=0.0129 change_times=[] fasta=data/simulated_sequences/tree1/sequences.fasta
+Done: 2 of 2 trees written to configs
+              0     -1713.8542     -1540.5901      -173.2640 --
+         Sample      posterior     likelihood          prior
+              0     -1660.7816     -1540.5901      -120.1915 --
+configs/tree_0/config_beast_xml_true_values.toml: mean=1.545 sigma=0.05 change_times=[]
+configs/tree_0/config_beast_xml_true_values.toml: mean=1.545 sigma=0.05 change_times=[]
+              0     -1659.3114     -1540.5901      -118.7212 --
+configs/tree_0/config_beast_xml_true_values.toml: mean=1.545 sigma=0.05 change_times=[]
+         Sample      posterior     likelihood          prior
+configs/tree_0/config_beast_xml_true_values.toml: mean=1.545 sigma=0.05 change_times=[]
+              0     -1663.3035     -1540.5901      -122.7133 --
+['templates', 'beast_xmls', 'template.xml']
+Wrote data/beast_reconstructions/tree_0/base.xml
+  sequences : 257 x 500 sites
+  tip dates : 2002.1435 - 2002.3873 (span 0.2438)
+  Re skyline: constant Re (1 interval, no change times)
+    interval 1 (index 0): LogNormal(mean in real space=1.0, log-sd=1.25), initial=1.0
+['templates', 'beast_xmls', 'template.xml']
+Wrote data/beast_reconstructions/tree_0/true_values.xml
+  sequences : 257 x 500 sites
+  tip dates : 2002.1435 - 2002.3873 (span 0.2438)
+  Re skyline: constant Re (1 interval, no change times)
+    interval 1 (index 0): LogNormal(mean in real space=1.545, log-sd=0.05), initial=1.545
+['templates', 'beast_xmls', 'template.xml']
+Wrote data/beast_reconstructions/tree_0/sections.xml
+  sequences : 257 x 500 sites
+  tip dates : 2002.1435 - 2002.3873 (span 0.2438)
+  Re skyline: 3 intervals, change times (ages) = [0.133333, 0.266667]
+    interval 1 (index 0): LogNormal(mean in real space=1.1109, log-sd=0.0256), initial=1.1109
+    interval 2 (index 1): LogNormal(mean in real space=1.1451, log-sd=0.0156), initial=1.1451
+    interval 3 (index 2): LogNormal(mean in real space=1.1538, log-sd=0.0224), initial=1.1538
+['templates', 'beast_xmls', 'template.xml']
+Wrote data/beast_reconstructions/tree_0/whole_period.xml
+  sequences : 257 x 500 sites
+  tip dates : 2002.1435 - 2002.3873 (span 0.2438)
+  Re skyline: constant Re (1 interval, no change times)
+    interval 1 (index 0): LogNormal(mean in real space=1.1364, log-sd=0.0126), initial=1.1364
+
+                        BEAST v2.7.8, 2002-2025
+             Bayesian Evolutionary Analysis Sampling Trees
+                       Designed and developed by
+ Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut & Marc A. Suchard
+                                    
+                   Centre for Computational Evolution
+                         University of Auckland
+                       r.bouckaert@auckland.ac.nz
+                        alexei@cs.auckland.ac.nz
+                                    
+                   Institute of Evolutionary Biology
+                        University of Edinburgh
+                           a.rambaut@ed.ac.uk
+                                    
+                    David Geffen School of Medicine
+                 University of California, Los Angeles
+                           msuchard@ucla.edu
+                                    
+                      Downloads, Help & Resources:
+                           http://beast2.org/
+                                    
+  Source code distributed under the GNU Lesser General Public License:
+                   http://github.com/CompEvol/beast2
+                                    
+                           BEAST developers:
+   Alex Alekseyenko, Trevor Bedford, Erik Bloomquist, Joseph Heled, 
+ Sebastian Hoehna, Denise Kuehnert, Philippe Lemey, Wai Lok Sibon Li, 
+Gerton Lunter, Sidney Markowitz, Vladimir Minin, Michael Defoin Platel, 
+          Oliver Pybus, Tim Vaughan, Chieh-Hsi Wu, Walter Xie
+                                    
+                               Thanks to:
+          Roald Forsberg, Beth Shapiro and Korbinian Strimmer
+
+Random number seed: 42
+
+
+                        BEAST v2.7.8, 2002-2025
+             Bayesian Evolutionary Analysis Sampling Trees
+                       Designed and developed by
+ Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut & Marc A. Suchard
+                                    
+                   Centre for Computational Evolution
+                         University of Auckland
+                       r.bouckaert@auckland.ac.nz
+                        alexei@cs.auckland.ac.nz
+                                    
+                   Institute of Evolutionary Biology
+                        University of Edinburgh
+                           a.rambaut@ed.ac.uk
+                                    
+                    David Geffen School of Medicine
+                 University of California, Los Angeles
+                           msuchard@ucla.edu
+                                    
+                      Downloads, Help & Resources:
+                           http://beast2.org/
+                                    
+  Source code distributed under the GNU Lesser General Public License:
+                   http://github.com/CompEvol/beast2
+                                    
+                           BEAST developers:
+   Alex Alekseyenko, Trevor Bedford, Erik Bloomquist, Joseph Heled, 
+ Sebastian Hoehna, Denise Kuehnert, Philippe Lemey, Wai Lok Sibon Li, 
+Gerton Lunter, Sidney Markowitz, Vladimir Minin, Michael Defoin Platel, 
+          Oliver Pybus, Tim Vaughan, Chieh-Hsi Wu, Walter Xie
+                                    
+                               Thanks to:
+          Roald Forsberg, Beth Shapiro and Korbinian Strimmer
+
+Random number seed: 42
+
+
+                        BEAST v2.7.8, 2002-2025
+             Bayesian Evolutionary Analysis Sampling Trees
+                       Designed and developed by
+ Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut & Marc A. Suchard
+                                    
+                   Centre for Computational Evolution
+                         University of Auckland
+                       r.bouckaert@auckland.ac.nz
+                        alexei@cs.auckland.ac.nz
+                                    
+                   Institute of Evolutionary Biology
+                        University of Edinburgh
+                           a.rambaut@ed.ac.uk
+                                    
+                    David Geffen School of Medicine
+                 University of California, Los Angeles
+                           msuchard@ucla.edu
+                                    
+                      Downloads, Help & Resources:
+                           http://beast2.org/
+                                    
+  Source code distributed under the GNU Lesser General Public License:
+                   http://github.com/CompEvol/beast2
+                                    
+                           BEAST developers:
+   Alex Alekseyenko, Trevor Bedford, Erik Bloomquist, Joseph Heled, 
+ Sebastian Hoehna, Denise Kuehnert, Philippe Lemey, Wai Lok Sibon Li, 
+Gerton Lunter, Sidney Markowitz, Vladimir Minin, Michael Defoin Platel, 
+          Oliver Pybus, Tim Vaughan, Chieh-Hsi Wu, Walter Xie
+                                    
+                               Thanks to:
+          Roald Forsberg, Beth Shapiro and Korbinian Strimmer
+
+Random number seed: 42
+
+
+                        BEAST v2.7.8, 2002-2025
+             Bayesian Evolutionary Analysis Sampling Trees
+                       Designed and developed by
+ Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut & Marc A. Suchard
+                                    
+                   Centre for Computational Evolution
+                         University of Auckland
+                       r.bouckaert@auckland.ac.nz
+                        alexei@cs.auckland.ac.nz
+                                    
+                   Institute of Evolutionary Biology
+                        University of Edinburgh
+                           a.rambaut@ed.ac.uk
+                                    
+                    David Geffen School of Medicine
+                 University of California, Los Angeles
+                           msuchard@ucla.edu
+                                    
+                      Downloads, Help & Resources:
+                           http://beast2.org/
+                                    
+  Source code distributed under the GNU Lesser General Public License:
+                   http://github.com/CompEvol/beast2
+                                    
+                           BEAST developers:
+   Alex Alekseyenko, Trevor Bedford, Erik Bloomquist, Joseph Heled, 
+ Sebastian Hoehna, Denise Kuehnert, Philippe Lemey, Wai Lok Sibon Li, 
+Gerton Lunter, Sidney Markowitz, Vladimir Minin, Michael Defoin Platel, 
+          Oliver Pybus, Tim Vaughan, Chieh-Hsi Wu, Walter Xie
+                                    
+                               Thanks to:
+          Roald Forsberg, Beth Shapiro and Korbinian Strimmer
+
+Random number seed: 42
+
+TypeSet null:
+TypeSet null:
+Alignment(sequences)
+  257 taxa
+  500 sites
+  19 patterns
+
+leaf_0_2002.3754 = 2002.3754 (0.011900000000196087)
+leaf_1_2002.3792 = 2002.3792 (0.008100000000013097)
+leaf_2_2002.3435 = 2002.3435 (0.04380000000014661)
+leaf_3_2002.3282 = 2002.3282 (0.05910000000017135)
+leaf_4_2002.3741 = 2002.3741 (0.013200000000097134)
+leaf_5_2002.3664 = 2002.3664 (0.020899999999983265)
+leaf_6_2002.3388 = 2002.3388 (0.04850000000010368)
+leaf_7_2002.3270 = 2002.3270 (0.0603000000000975)
+leaf_8_2002.3690 = 2002.3690 (0.01830000000018117)
+leaf_9_2002.3360 = 2002.3360 (0.051300000000082946)
+247 more...
+leaf_0_2002.3754 = NOT_SET (NaN)
+leaf_1_2002.3792 = NOT_SET (NaN)
+leaf_2_2002.3435 = NOT_SET (NaN)
+leaf_3_2002.3282 = NOT_SET (NaN)
+leaf_4_2002.3741 = NOT_SET (NaN)
+leaf_5_2002.3664 = NOT_SET (NaN)
+leaf_6_2002.3388 = NOT_SET (NaN)
+leaf_7_2002.3270 = NOT_SET (NaN)
+leaf_8_2002.3690 = NOT_SET (NaN)
+leaf_9_2002.3360 = NOT_SET (NaN)
+247 more...
+TypeSet typeSetBDMMPrime.t:sequences:
+	NOT_SET (0)
+Starting frequencies: [0.3239922178988327, 0.18002334630350195, 0.19602334630350193, 0.29996108949416345]
+Alignment(sequences)
+  257 taxa
+  500 sites
+  19 patterns
+
+leaf_0_2002.3754 = 2002.3754 (0.011900000000196087)
+leaf_1_2002.3792 = 2002.3792 (0.008100000000013097)
+leaf_2_2002.3435 = 2002.3435 (0.04380000000014661)
+leaf_3_2002.3282 = 2002.3282 (0.05910000000017135)
+leaf_4_2002.3741 = 2002.3741 (0.013200000000097134)
+leaf_5_2002.3664 = 2002.3664 (0.020899999999983265)
+leaf_6_2002.3388 = 2002.3388 (0.04850000000010368)
+leaf_7_2002.3270 = 2002.3270 (0.0603000000000975)
+leaf_8_2002.3690 = 2002.3690 (0.01830000000018117)
+leaf_9_2002.3360 = 2002.3360 (0.051300000000082946)
+247 more...
+leaf_0_2002.3754 = NOT_SET (NaN)
+leaf_1_2002.3792 = NOT_SET (NaN)
+leaf_2_2002.3435 = NOT_SET (NaN)
+leaf_3_2002.3282 = NOT_SET (NaN)
+leaf_4_2002.3741 = NOT_SET (NaN)
+leaf_5_2002.3664 = NOT_SET (NaN)
+leaf_6_2002.3388 = NOT_SET (NaN)
+leaf_7_2002.3270 = NOT_SET (NaN)
+leaf_8_2002.3690 = NOT_SET (NaN)
+leaf_9_2002.3360 = NOT_SET (NaN)
+247 more...
+TypeSet typeSetBDMMPrime.t:sequences:
+	NOT_SET (0)
+Starting frequencies: [0.3239922178988327, 0.18002334630350195, 0.19602334630350193, 0.29996108949416345]
+TypeSet null:
+TypeSet null:
+  Using BEAGLE version: 3.1.2 resource 0: CPU
+    with instance flags:  PRECISION_DOUBLE COMPUTATION_SYNCH EIGEN_REAL SCALING_MANUAL SCALERS_RAW VECTOR_SSE THREADING_NONE PROCESSOR_CPU FRAMEWORK_CPU
+===============================================================================
+Citations for this model:
+
+Bouckaert, Remco, Timothy G. Vaughan, Joëlle Barido-Sottani, Sebastián Duchêne, Mathieu Fourment, 
+Alexandra Gavryushkina, Joseph Heled, Graham Jones, Denise Kühnert, Nicola De Maio, Michael Matschiner, 
+Fábio K. Mendes, Nicola F. Müller, Huw A. Ogilvie, Louis du Plessis, Alex Popinga, Andrew Rambaut, 
+David Rasmussen, Igor Siveroni, Marc A. Suchard, Chieh-Hsi Wu, Dong Xie, Chi Zhang, Tanja Stadler, 
+Alexei J. Drummond 
+  BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis. 
+  PLoS computational biology 15, no. 4 (2019): e1006650.
+
+Kuehnert D, Stadler T, Vaughan TG, Drummond AJ. (2016). Phylodynamics with migration: 
+A computational framework to quantify population structure from genomic data. 
+Mol Biol Evol. 33(8):2102–2116.
+
+Hasegawa M, Kishino H, Yano T (1985) Dating the human-ape splitting by a
+  molecular clock of mitochondrial DNA. Journal of Molecular Evolution
+  22:160-174.
+
+Vaughan and Stadler, "Bayesian phylodynamic inference of multi-type population trajectories using genomic data"
+Molecular Biology and Evolution 42:msaf130 (2025), doi:10.1093/molbev/msaf130.
+
+Douglas J, Zhang R, Bouckaert R. Adaptive dating and fast proposals: Revisiting the phylogenetic relaxed clock model. PLoS computational biology. 2021 Feb 2;17(2):e1008322.
+
+===============================================================================
+Start likelihood: -1961.643145119548 
+  Using BEAGLE version: 3.1.2 resource 0: CPU
+    with instance flags:  PRECISION_DOUBLE COMPUTATION_SYNCH EIGEN_REAL SCALING_MANUAL SCALERS_RAW VECTOR_SSE THREADING_NONE PROCESSOR_CPU FRAMEWORK_CPU
+===============================================================================
+Alignment(sequences)
+  257 taxa
+  500 sites
+  19 patterns
+
+Alignment(sequences)
+  257 taxa
+  500 sites
+  19 patterns
+
+Citations for this model:
+leaf_0_2002.3754 = 2002.3754 (0.011900000000196087)
+leaf_1_2002.3792 = 2002.3792 (0.008100000000013097)
+leaf_2_2002.3435 = 2002.3435 (0.04380000000014661)
+leaf_3_2002.3282 = 2002.3282 (0.05910000000017135)
+leaf_4_2002.3741 = 2002.3741 (0.013200000000097134)
+leaf_5_2002.3664 = 2002.3664 (0.020899999999983265)
+leaf_6_2002.3388 = 2002.3388 (0.04850000000010368)
+leaf_7_2002.3270 = 2002.3270 (0.0603000000000975)
+leaf_8_2002.3690 = 2002.3690 (0.01830000000018117)
+leaf_9_2002.3360 = 2002.3360 (0.051300000000082946)
+247 more...
+leaf_0_2002.3754 = 2002.3754 (0.011900000000196087)
+leaf_1_2002.3792 = 2002.3792 (0.008100000000013097)
+leaf_2_2002.3435 = 2002.3435 (0.04380000000014661)
+leaf_3_2002.3282 = 2002.3282 (0.05910000000017135)
+leaf_4_2002.3741 = 2002.3741 (0.013200000000097134)
+leaf_5_2002.3664 = 2002.3664 (0.020899999999983265)
+leaf_6_2002.3388 = 2002.3388 (0.04850000000010368)
+leaf_7_2002.3270 = 2002.3270 (0.0603000000000975)
+leaf_8_2002.3690 = 2002.3690 (0.01830000000018117)
+leaf_9_2002.3360 = 2002.3360 (0.051300000000082946)
+247 more...
+
+Bouckaert, Remco, Timothy G. Vaughan, Joëlle Barido-Sottani, Sebastián Duchêne, Mathieu Fourment, 
+Alexandra Gavryushkina, Joseph Heled, Graham Jones, Denise Kühnert, Nicola De Maio, Michael Matschiner, 
+Fábio K. Mendes, Nicola F. Müller, Huw A. Ogilvie, Louis du Plessis, Alex Popinga, Andrew Rambaut, 
+David Rasmussen, Igor Siveroni, Marc A. Suchard, Chieh-Hsi Wu, Dong Xie, Chi Zhang, Tanja Stadler, 
+Alexei J. Drummond 
+  BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis. 
+  PLoS computational biology 15, no. 4 (2019): e1006650.
+
+Kuehnert D, Stadler T, Vaughan TG, Drummond AJ. (2016). Phylodynamics with migration: 
+A computational framework to quantify population structure from genomic data. 
+Mol Biol Evol. 33(8):2102–2116.
+
+Hasegawa M, Kishino H, Yano T (1985) Dating the human-ape splitting by a
+  molecular clock of mitochondrial DNA. Journal of Molecular Evolution
+  22:160-174.
+
+Vaughan and Stadler, "Bayesian phylodynamic inference of multi-type population trajectories using genomic data"
+Molecular Biology and Evolution 42:msaf130 (2025), doi:10.1093/molbev/msaf130.
+
+Douglas J, Zhang R, Bouckaert R. Adaptive dating and fast proposals: Revisiting the phylogenetic relaxed clock model. PLoS computational biology. 2021 Feb 2;17(2):e1008322.
+
+===============================================================================
+Start likelihood: -1938.3389759904371 
+leaf_0_2002.3754 = NOT_SET (NaN)
+leaf_1_2002.3792 = NOT_SET (NaN)
+leaf_2_2002.3435 = NOT_SET (NaN)
+leaf_3_2002.3282 = NOT_SET (NaN)
+leaf_4_2002.3741 = NOT_SET (NaN)
+leaf_5_2002.3664 = NOT_SET (NaN)
+leaf_6_2002.3388 = NOT_SET (NaN)
+leaf_7_2002.3270 = NOT_SET (NaN)
+leaf_8_2002.3690 = NOT_SET (NaN)
+leaf_9_2002.3360 = NOT_SET (NaN)
+247 more...
+TypeSet typeSetBDMMPrime.t:sequences:
+	NOT_SET (0)
+leaf_0_2002.3754 = NOT_SET (NaN)
+leaf_1_2002.3792 = NOT_SET (NaN)
+leaf_2_2002.3435 = NOT_SET (NaN)
+leaf_3_2002.3282 = NOT_SET (NaN)
+leaf_4_2002.3741 = NOT_SET (NaN)
+leaf_5_2002.3664 = NOT_SET (NaN)
+leaf_6_2002.3388 = NOT_SET (NaN)
+leaf_7_2002.3270 = NOT_SET (NaN)
+leaf_8_2002.3690 = NOT_SET (NaN)
+leaf_9_2002.3360 = NOT_SET (NaN)
+247 more...
+TypeSet typeSetBDMMPrime.t:sequences:
+	NOT_SET (0)
+Starting frequencies: [0.3239922178988327, 0.18002334630350195, 0.19602334630350193, 0.29996108949416345]
+Starting frequencies: [0.3239922178988327, 0.18002334630350195, 0.19602334630350193, 0.29996108949416345]
+         Sample      posterior     likelihood          prior
+  Using BEAGLE version: 3.1.2 resource 0: CPU
+    with instance flags:  PRECISION_DOUBLE COMPUTATION_SYNCH EIGEN_REAL SCALING_MANUAL SCALERS_RAW VECTOR_SSE THREADING_NONE PROCESSOR_CPU FRAMEWORK_CPU
+===============================================================================
+Citations for this model:
+
+Bouckaert, Remco, Timothy G. Vaughan, Joëlle Barido-Sottani, Sebastián Duchêne, Mathieu Fourment, 
+Alexandra Gavryushkina, Joseph Heled, Graham Jones, Denise Kühnert, Nicola De Maio, Michael Matschiner, 
+Fábio K. Mendes, Nicola F. Müller, Huw A. Ogilvie, Louis du Plessis, Alex Popinga, Andrew Rambaut, 
+David Rasmussen, Igor Siveroni, Marc A. Suchard, Chieh-Hsi Wu, Dong Xie, Chi Zhang, Tanja Stadler, 
+Alexei J. Drummond 
+  BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis. 
+  PLoS computational biology 15, no. 4 (2019): e1006650.
+
+Kuehnert D, Stadler T, Vaughan TG, Drummond AJ. (2016). Phylodynamics with migration: 
+A computational framework to quantify population structure from genomic data. 
+Mol Biol Evol. 33(8):2102–2116.
+
+Hasegawa M, Kishino H, Yano T (1985) Dating the human-ape splitting by a
+  molecular clock of mitochondrial DNA. Journal of Molecular Evolution
+  22:160-174.
+
+Vaughan and Stadler, "Bayesian phylodynamic inference of multi-type population trajectories using genomic data"
+Molecular Biology and Evolution 42:msaf130 (2025), doi:10.1093/molbev/msaf130.
+
+Douglas J, Zhang R, Bouckaert R. Adaptive dating and fast proposals: Revisiting the phylogenetic relaxed clock model. PLoS computational biology. 2021 Feb 2;17(2):e1008322.
+
+===============================================================================
+Start likelihood: -1940.2125871695675 
+  Using BEAGLE version: 3.1.2 resource 0: CPU
+    with instance flags:  PRECISION_DOUBLE COMPUTATION_SYNCH EIGEN_REAL SCALING_MANUAL SCALERS_RAW VECTOR_SSE THREADING_NONE PROCESSOR_CPU FRAMEWORK_CPU
+===============================================================================
+Citations for this model:
+
+Bouckaert, Remco, Timothy G. Vaughan, Joëlle Barido-Sottani, Sebastián Duchêne, Mathieu Fourment, 
+Alexandra Gavryushkina, Joseph Heled, Graham Jones, Denise Kühnert, Nicola De Maio, Michael Matschiner, 
+Fábio K. Mendes, Nicola F. Müller, Huw A. Ogilvie, Louis du Plessis, Alex Popinga, Andrew Rambaut, 
+David Rasmussen, Igor Siveroni, Marc A. Suchard, Chieh-Hsi Wu, Dong Xie, Chi Zhang, Tanja Stadler, 
+Alexei J. Drummond 
+  BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis. 
+  PLoS computational biology 15, no. 4 (2019): e1006650.
+
+Kuehnert D, Stadler T, Vaughan TG, Drummond AJ. (2016). Phylodynamics with migration: 
+A computational framework to quantify population structure from genomic data. 
+Mol Biol Evol. 33(8):2102–2116.
+
+Hasegawa M, Kishino H, Yano T (1985) Dating the human-ape splitting by a
+  molecular clock of mitochondrial DNA. Journal of Molecular Evolution
+  22:160-174.
+
+Vaughan and Stadler, "Bayesian phylodynamic inference of multi-type population trajectories using genomic data"
+Molecular Biology and Evolution 42:msaf130 (2025), doi:10.1093/molbev/msaf130.
+
+Douglas J, Zhang R, Bouckaert R. Adaptive dating and fast proposals: Revisiting the phylogenetic relaxed clock model. PLoS computational biology. 2021 Feb 2;17(2):e1008322.
+
+===============================================================================
+              0     -1961.6431     -1760.8687      -200.7744 --
+Start likelihood: -1971.4236128293155 
+         Sample      posterior     likelihood          prior
+              0     -1938.3389     -1760.8687      -177.4702 --
+         Sample      posterior     likelihood          prior
+         Sample      posterior     likelihood          prior
+              0     -1940.2125     -1760.8687      -179.3438 --
+              0     -1971.4236     -1760.8687      -210.5548 --
+        1000000      -514.3583      -713.8324       199.4740 --
+        1000000      -485.1405      -715.8801       230.7396 --
+        1000000      -501.3812      -714.5753       213.1940 --
+        1000000      -495.6536      -712.0646       216.4110 --
+        2000000      -449.5278      -712.0741       262.5462 --
+        2000000      -465.6643      -719.4661       253.8017 --
+        2000000      -561.9893      -714.2301       152.2407 --
+        2000000      -494.1448      -713.1526       219.0078 --
+        1000000      -510.2346      -865.9349       355.7003 --
+        1000000      -682.6255      -859.3327       176.7071 --
+        1000000      -725.0762      -859.0348       133.9585 --
+        1000000      -465.4144      -867.7736       402.3592 --
+        3000000      -464.0751      -715.2523       251.1772 --
+        3000000      -479.2709      -714.5052       235.2342 --
+        3000000      -500.5527      -713.5684       213.0157 --
+        3000000      -530.6100      -713.4244       182.8144 --
+        4000000      -490.1145      -713.6629       223.5483 --
+        4000000      -506.6196      -715.1312       208.5116 --
+        4000000      -541.5999      -712.0606       170.4606 --
+        4000000      -497.2017      -715.4314       218.2297 --
+        5000000      -509.0387      -713.6807       204.6419 --
+        5000000      -482.9251      -713.7854       230.8602 --
+        2000000      -507.6223      -865.6343       358.0120 --
+        5000000      -589.6521      -715.1076       125.4555 --
+        2000000      -917.9049      -862.5608       -55.3441 --
+        2000000      -461.5356      -863.1271       401.5915 --
+        5000000      -459.5194      -715.2176       255.6981 --
+        2000000      -481.7648      -860.1126       378.3477 --
+        6000000      -468.1823      -714.9886       246.8062 21s/Msamples
+        6000000      -607.4863      -715.2559       107.7696 22s/Msamples
+        6000000      -481.3041      -711.8398       230.5357 23s/Msamples
+        6000000      -506.4643      -711.9317       205.4673 23s/Msamples
+        7000000      -489.6678      -715.5619       225.8940 21s/Msamples
+        7000000      -460.7775      -717.8078       257.0302 22s/Msamples
+        7000000      -424.5529      -713.0787       288.5257 22s/Msamples
+        3000000      -482.6298      -856.5551       373.9253 --
+        7000000      -466.2115      -714.3018       248.0902 23s/Msamples
+        3000000      -694.1829      -861.4845       167.3016 --
+        3000000      -721.7244      -858.5523       136.8279 --
+        8000000      -494.2616      -717.5905       223.3288 21s/Msamples
+        8000000      -470.9806      -714.9347       243.9540 22s/Msamples
+        3000000      -534.4815      -860.2393       325.7577 --
+        8000000      -559.8899      -715.1803       155.2903 22s/Msamples
+        8000000      -471.7287      -717.2769       245.5482 23s/Msamples
+        9000000      -510.4975      -714.2395       203.7419 21s/Msamples
+        9000000      -437.0495      -714.3504       277.3008 22s/Msamples
+        9000000      -479.1771      -713.8286       234.6515 22s/Msamples
+        9000000      -456.3122      -712.9847       256.6724 23s/Msamples
+        4000000      -467.1048      -865.5043       398.3994 --
+       10000000      -462.8062      -715.6948       252.8885 21s/Msamples
+       10000000      -521.8369      -714.0852       192.2482 21s/Msamples
+       10000000      -526.5020      -714.5719       188.0699 22s/Msamples
+        4000000      -867.7094      -856.4477       -11.2617 --
+        4000000      -876.1798      -857.7576       -18.4222 --
+       10000000      -487.8700      -714.5025       226.6325 23s/Msamples
+        4000000      -525.3048      -861.1410       335.8361 --
+       11000000      -460.3197      -713.9096       253.5898 21s/Msamples
+       11000000      -449.9250      -713.6344       263.7093 22s/Msamples
+       11000000      -533.7750      -714.1069       180.3318 22s/Msamples
+       11000000      -459.6431      -713.5866       253.9434 23s/Msamples
+       12000000      -499.7194      -717.3470       217.6276 21s/Msamples
+       12000000      -568.2093      -714.6831       146.4737 22s/Msamples
+       12000000      -467.2064      -715.2707       248.0642 22s/Msamples
+        5000000      -504.5656      -859.1515       354.5858 --
+       12000000      -488.8301      -714.4035       225.5733 23s/Msamples
+       13000000      -502.2899      -715.3693       213.0793 21s/Msamples
+        5000000      -705.6750      -862.1086       156.4335 --
+        5000000      -781.2627      -860.9193        79.6565 --
+       13000000      -588.5009      -713.0464       124.5454 22s/Msamples
+       13000000      -476.4103      -715.5376       239.1272 22s/Msamples
+        5000000      -515.0137      -861.3801       346.3663 --
+       13000000      -447.9277      -717.0895       269.1618 23s/Msamples
+       14000000      -523.0498      -712.7744       189.7245 21s/Msamples
+       14000000      -473.4260      -713.9800       240.5539 22s/Msamples
+       14000000      -486.6977      -714.0095       227.3117 22s/Msamples
+        6000000      -521.0751      -869.2930       348.2178 52s/Msamples
+       14000000      -500.5052      -713.5945       213.0893 23s/Msamples
+       15000000      -473.5474      -712.0343       238.4868 21s/Msamples
+       15000000      -483.8649      -715.5437       231.6787 22s/Msamples
+       15000000      -563.4910      -715.3526       151.8616 22s/Msamples
+        6000000      -731.8214      -860.0653       128.2438 55s/Msamples
+        6000000      -732.0846      -864.5975       132.5129 57s/Msamples
+       16000000      -456.0452      -713.2540       257.2088 21s/Msamples
+       15000000      -443.8935      -713.4251       269.5316 23s/Msamples
+        6000000      -596.3481      -859.0495       262.7014 57s/Msamples
+       16000000      -531.4783      -716.0366       184.5583 22s/Msamples
+       16000000      -509.1364      -715.6522       206.5158 22s/Msamples
+       17000000      -481.7017      -716.4042       234.7024 21s/Msamples
+       16000000      -480.2171      -715.2905       235.0734 23s/Msamples
+       17000000      -445.4591      -712.5294       267.0702 22s/Msamples
+        7000000      -574.5747      -855.8575       281.2828 52s/Msamples
+       17000000      -447.5221      -712.9918       265.4697 22s/Msamples
+       18000000      -472.0171      -712.7473       240.7302 21s/Msamples
+       18000000      -494.4981      -714.8894       220.3913 22s/Msamples
+        7000000      -772.8334      -860.8749        88.0415 56s/Msamples
+       17000000      -459.8422      -715.7061       255.8638 23s/Msamples
+        7000000      -930.2715      -861.7889       -68.4826 57s/Msamples
+       18000000      -535.2465      -713.3862       178.1396 22s/Msamples
+        7000000      -474.3293      -857.9913       383.6620 57s/Msamples
+       19000000      -454.7679      -714.9589       260.1909 21s/Msamples
+       19000000      -508.5106      -713.6141       205.1034 22s/Msamples
+       18000000      -472.7269      -713.9483       241.2214 23s/Msamples
+       19000000      -410.6447      -713.7089       303.0641 22s/Msamples
+        8000000      -502.4926      -869.5813       367.0887 52s/Msamples
+       20000000      -464.4716      -715.4515       250.9798 21s/Msamples
+
+Operator                                                                            Tuning    #accept    #reject      Pr(m)  Pr(acc|m)
+AdaptableOperatorSampler(StrictClockRateScaler.c:sequences)                              -     113078     281099    0.01974    0.28687 
+AdaptableOperatorSampler(strictClockUpDownOperator.c:sequences)                          -         19     395125    0.01974    0.00005 
+sa.evolution.operators.LeafToSampledAncestorJump(BDMMPrimeLeafToSA.t:sequences)          -          0    2630913    0.13158    0.00000 
+sa.evolution.operators.SAWilsonBalding(BDMMPrimeSAWilsonBalding.t:sequences)             -     571338    2058494    0.13158    0.21725 
+sa.evolution.operators.SAExchange(BDMMPrimeSAWide.t:sequences)                           -     465272    2164455    0.13158    0.17693 
+sa.evolution.operators.SAExchange(BDMMPrimeSANarrow.t:sequences)                         -    1418621    1214613    0.13158    0.53874 
+sa.evolution.operators.SAUniform(BDMMPrimeSAUniformOperator.t:sequences)                 -    4285428     978494    0.26316    0.81411 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeRootScaler.t:sequences)      0.72444      28007     235675    0.01316    0.10622 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeScaler.t:sequences)          0.92763      31866     758288    0.03947    0.04033 Try setting scaleFactor to about 0.963
+ScaleOperator(originBDMMPrimeScaler.t:sequences)                                   0.77578     179217     610923    0.03947    0.22682 
+ScaleOperator(ReEpiScaler.t:sequences)                                             0.90428     153262     636276    0.03947    0.19412 
+ScaleOperator(samplingProportionEpiScaler.t:sequences)                             0.07598      29653     759885    0.03947    0.03756 Try setting scaleFactor to about 0.276
+
+     Tuning: The value of the operator's tuning parameter, or '-' if the operator can't be optimized.
+    #accept: The total number of times a proposal by this operator has been accepted.
+    #reject: The total number of times a proposal by this operator has been rejected.
+      Pr(m): The probability this operator is chosen in a step of the MCMC (i.e. the normalized weight).
+  Pr(acc|m): The acceptance probability (#accept as a fraction of the total proposals for this operator).
+
+
+Total calculation time: 442.572 seconds
+Done!
+       20000000      -506.6662      -715.0743       208.4081 22s/Msamples
+
+Operator                                                                            Tuning    #accept    #reject      Pr(m)  Pr(acc|m)
+AdaptableOperatorSampler(StrictClockRateScaler.c:sequences)                              -     111304     283180    0.01974    0.28215 
+AdaptableOperatorSampler(strictClockUpDownOperator.c:sequences)                          -         72     395382    0.01974    0.00018 
+sa.evolution.operators.LeafToSampledAncestorJump(BDMMPrimeLeafToSA.t:sequences)          -          0    2632254    0.13158    0.00000 
+sa.evolution.operators.SAWilsonBalding(BDMMPrimeSAWilsonBalding.t:sequences)             -     663682    1968561    0.13158    0.25214 
+sa.evolution.operators.SAExchange(BDMMPrimeSAWide.t:sequences)                           -     553196    2075610    0.13158    0.21044 
+sa.evolution.operators.SAExchange(BDMMPrimeSANarrow.t:sequences)                         -    1453515    1177946    0.13158    0.55236 
+sa.evolution.operators.SAUniform(BDMMPrimeSAUniformOperator.t:sequences)                 -    4386256     876638    0.26316    0.83343 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeRootScaler.t:sequences)      0.68204      28440     235374    0.01316    0.10780 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeScaler.t:sequences)          0.90889      31381     758237    0.03947    0.03974 Try setting scaleFactor to about 0.953
+ScaleOperator(originBDMMPrimeScaler.t:sequences)                                   0.75479     187668     602128    0.03947    0.23762 
+ScaleOperator(ReEpiScaler.t:sequences)                                             0.76033     179892     609782    0.03947    0.22781 
+ScaleOperator(samplingProportionEpiScaler.t:sequences)                             0.37060     164449     625054    0.03947    0.20829 
+
+     Tuning: The value of the operator's tuning parameter, or '-' if the operator can't be optimized.
+    #accept: The total number of times a proposal by this operator has been accepted.
+    #reject: The total number of times a proposal by this operator has been rejected.
+      Pr(m): The probability this operator is chosen in a step of the MCMC (i.e. the normalized weight).
+  Pr(acc|m): The acceptance probability (#accept as a fraction of the total proposals for this operator).
+
+
+Total calculation time: 446.165 seconds
+Done!
+       19000000      -512.8817      -716.0641       203.1824 23s/Msamples
+       20000000      -489.3291      -714.0129       224.6837 22s/Msamples
+
+Operator                                                                            Tuning    #accept    #reject      Pr(m)  Pr(acc|m)
+AdaptableOperatorSampler(StrictClockRateScaler.c:sequences)                              -     114601     279750    0.01974    0.29061 
+AdaptableOperatorSampler(strictClockUpDownOperator.c:sequences)                          -         44     394428    0.01974    0.00011 
+sa.evolution.operators.LeafToSampledAncestorJump(BDMMPrimeLeafToSA.t:sequences)          -          0    2632658    0.13158    0.00000 
+sa.evolution.operators.SAWilsonBalding(BDMMPrimeSAWilsonBalding.t:sequences)             -     627395    2004553    0.13158    0.23838 
+sa.evolution.operators.SAExchange(BDMMPrimeSAWide.t:sequences)                           -     524679    2105327    0.13158    0.19950 
+sa.evolution.operators.SAExchange(BDMMPrimeSANarrow.t:sequences)                         -    1441543    1189885    0.13158    0.54782 
+sa.evolution.operators.SAUniform(BDMMPrimeSAUniformOperator.t:sequences)                 -    4368497     894851    0.26316    0.82998 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeRootScaler.t:sequences)      0.67837      25161     238458    0.01316    0.09544 Try setting scaleFactor to about 0.824
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeScaler.t:sequences)          0.90365      27155     762305    0.03947    0.03440 Try setting scaleFactor to about 0.951
+ScaleOperator(originBDMMPrimeScaler.t:sequences)                                   0.74452     161795     626870    0.03947    0.20515 
+ScaleOperator(ReEpiScaler.t:sequences)                                             0.66203     208535     580538    0.03947    0.26428 
+ScaleOperator(samplingProportionEpiScaler.t:sequences)                             0.34550     150908     640065    0.03947    0.19079 
+
+     Tuning: The value of the operator's tuning parameter, or '-' if the operator can't be optimized.
+    #accept: The total number of times a proposal by this operator has been accepted.
+    #reject: The total number of times a proposal by this operator has been rejected.
+      Pr(m): The probability this operator is chosen in a step of the MCMC (i.e. the normalized weight).
+  Pr(acc|m): The acceptance probability (#accept as a fraction of the total proposals for this operator).
+
+
+Total calculation time: 453.162 seconds
+Done!
+        8000000      -718.7465      -863.7198       144.9732 56s/Msamples
+        8000000      -522.2164      -874.1868       351.9704 57s/Msamples
+        8000000      -482.5455      -862.3461       379.8006 57s/Msamples
+       20000000      -450.8344      -715.3656       264.5311 23s/Msamples
+
+Operator                                                                            Tuning    #accept    #reject      Pr(m)  Pr(acc|m)
+AdaptableOperatorSampler(StrictClockRateScaler.c:sequences)                              -     112990     281464    0.01974    0.28645 
+AdaptableOperatorSampler(strictClockUpDownOperator.c:sequences)                          -         53     395113    0.01974    0.00013 
+sa.evolution.operators.LeafToSampledAncestorJump(BDMMPrimeLeafToSA.t:sequences)          -          0    2630982    0.13158    0.00000 
+sa.evolution.operators.SAWilsonBalding(BDMMPrimeSAWilsonBalding.t:sequences)             -     569371    2061664    0.13158    0.21641 
+sa.evolution.operators.SAExchange(BDMMPrimeSAWide.t:sequences)                           -     466181    2165235    0.13158    0.17716 
+sa.evolution.operators.SAExchange(BDMMPrimeSANarrow.t:sequences)                         -    1419135    1214004    0.13158    0.53895 
+sa.evolution.operators.SAUniform(BDMMPrimeSAUniformOperator.t:sequences)                 -    4285111     978405    0.26316    0.81412 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeRootScaler.t:sequences)      0.74027      30765     233713    0.01316    0.11632 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeScaler.t:sequences)          0.90292      22888     766533    0.03947    0.02899 Try setting scaleFactor to about 0.95
+ScaleOperator(originBDMMPrimeScaler.t:sequences)                                   0.78063     182022     606417    0.03947    0.23086 
+ScaleOperator(ReEpiScaler.t:sequences)                                             0.84671     169402     619767    0.03947    0.21466 
+ScaleOperator(samplingProportionEpiScaler.t:sequences)                             0.09984      37388     751398    0.03947    0.04740 Try setting scaleFactor to about 0.316
+
+     Tuning: The value of the operator's tuning parameter, or '-' if the operator can't be optimized.
+    #accept: The total number of times a proposal by this operator has been accepted.
+    #reject: The total number of times a proposal by this operator has been rejected.
+      Pr(m): The probability this operator is chosen in a step of the MCMC (i.e. the normalized weight).
+  Pr(acc|m): The acceptance probability (#accept as a fraction of the total proposals for this operator).
+
+
+Total calculation time: 471.714 seconds
+Done!
+        9000000      -541.2748      -855.9478       314.6729 53s/Msamples
+        9000000      -729.9911      -859.8509       129.8598 56s/Msamples
+        9000000      -764.9252      -861.5097        96.5845 57s/Msamples
+        9000000      -499.9082      -857.4651       357.5568 58s/Msamples
+       10000000      -521.3694      -858.1529       336.7835 53s/Msamples
+       10000000      -781.4907      -863.5823        82.0916 56s/Msamples
+       10000000      -554.3926      -861.7604       307.3678 57s/Msamples
+       10000000      -572.2487      -858.2005       285.9518 59s/Msamples
+       11000000      -504.0445      -867.5685       363.5239 53s/Msamples
+       11000000      -710.5055      -871.1389       160.6334 56s/Msamples
+       11000000      -761.5371      -859.2752        97.7381 57s/Msamples
+       12000000      -508.3093      -861.9427       353.6334 53s/Msamples
+       11000000      -536.6033      -859.5733       322.9700 59s/Msamples
+       12000000      -785.6239      -858.6771        73.0532 56s/Msamples
+       12000000      -898.3574      -859.6397       -38.7177 57s/Msamples
+       13000000      -516.3196      -855.3323       339.0127 53s/Msamples
+       12000000      -522.7468      -865.5243       342.7774 59s/Msamples
+       13000000      -639.4684      -855.7870       216.3185 57s/Msamples
+       13000000      -832.4930      -856.7079        24.2148 57s/Msamples
+       14000000      -514.3099      -858.1096       343.7997 53s/Msamples
+       13000000      -530.7753      -855.7247       324.9493 1m0s/Msamples
+       14000000      -573.4864      -859.4332       285.9468 58s/Msamples
+       14000000      -790.6752      -867.7508        77.0756 58s/Msamples
+       15000000      -514.4865      -859.3714       344.8849 55s/Msamples
+       14000000      -477.3335      -870.3153       392.9818 1m0s/Msamples
+       15000000      -757.4256      -858.3946       100.9689 58s/Msamples
+       15000000      -685.9176      -858.6404       172.7227 58s/Msamples
+       16000000      -549.8225      -860.7542       310.9317 55s/Msamples
+       15000000      -525.3603      -861.8355       336.4751 1m0s/Msamples
+       16000000      -791.1260      -861.5211        70.3951 58s/Msamples
+       16000000      -625.2535      -855.3347       230.0812 58s/Msamples
+       17000000      -525.3162      -864.5382       339.2220 55s/Msamples
+       16000000      -598.4595      -860.7155       262.2559 1m0s/Msamples
+       17000000      -892.0184      -861.9740       -30.0443 57s/Msamples
+       18000000      -550.7678      -871.6364       320.8686 54s/Msamples
+       17000000      -862.6656      -856.6629        -6.0026 58s/Msamples
+       17000000      -514.9877      -863.5781       348.5903 1m0s/Msamples
+       18000000      -741.7002      -858.2368       116.5366 57s/Msamples
+       19000000      -455.8726      -860.8806       405.0080 54s/Msamples
+       18000000      -978.1674      -858.0469      -120.1205 58s/Msamples
+       18000000      -478.4855      -858.7252       380.2397 1m0s/Msamples
+       19000000      -812.3044      -862.2679        49.9635 57s/Msamples
+       20000000      -541.2497      -859.9914       318.7416 54s/Msamples
+
+Operator                                                                            Tuning    #accept    #reject      Pr(m)  Pr(acc|m)
+AdaptableOperatorSampler(StrictClockRateScaler.c:sequences)                              -     113194     281379    0.01974    0.28688 
+AdaptableOperatorSampler(strictClockUpDownOperator.c:sequences)                          -         11     395950    0.01974    0.00003 
+sa.evolution.operators.LeafToSampledAncestorJump(BDMMPrimeLeafToSA.t:sequences)          -          0    2628859    0.13158    0.00000 
+sa.evolution.operators.SAWilsonBalding(BDMMPrimeSAWilsonBalding.t:sequences)             -     587867    2043482    0.13158    0.22341 
+sa.evolution.operators.SAExchange(BDMMPrimeSAWide.t:sequences)                           -     465637    2162311    0.13158    0.17719 
+sa.evolution.operators.SAExchange(BDMMPrimeSANarrow.t:sequences)                         -    1407544    1224179    0.13158    0.53484 
+sa.evolution.operators.SAUniform(BDMMPrimeSAUniformOperator.t:sequences)                 -    4274961     989498    0.26316    0.81204 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeRootScaler.t:sequences)      0.74597      28229     235729    0.01316    0.10695 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeScaler.t:sequences)          0.90176       7393     783203    0.03947    0.00935 Try setting scaleFactor to about 0.95
+ScaleOperator(originBDMMPrimeScaler.t:sequences)                                   0.79087     179558     610698    0.03947    0.22721 
+ScaleOperator(ReEpiScaler.t:sequences)                                             0.91172     163657     626539    0.03947    0.20711 
+ScaleOperator(samplingProportionEpiScaler.t:sequences)                             0.30539      72972     717151    0.03947    0.09236 Try setting scaleFactor to about 0.553
+
+     Tuning: The value of the operator's tuning parameter, or '-' if the operator can't be optimized.
+    #accept: The total number of times a proposal by this operator has been accepted.
+    #reject: The total number of times a proposal by this operator has been rejected.
+      Pr(m): The probability this operator is chosen in a step of the MCMC (i.e. the normalized weight).
+  Pr(acc|m): The acceptance probability (#accept as a fraction of the total proposals for this operator).
+
+
+Total calculation time: 1096.571 seconds
+Done!
+       19000000      -915.9166      -859.7387       -56.1778 58s/Msamples

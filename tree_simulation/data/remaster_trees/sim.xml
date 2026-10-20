@@ -6,7 +6,7 @@
 				<samplePopulation id="S" spec="RealParameter" value="0"/>
 				<samplePopulation id="removed" spec="RealParameter" value="0"/>
 
-				<reaction spec="Reaction" rate="52.0"> X -> 2X </reaction>
+				<reaction spec="Reaction" rate="47.0"> X -> 2X </reaction>
 				<reaction spec="Reaction" rate="29.63"> X -> removed </reaction>
 				<reaction spec="Reaction" rate="0.79 0" changeTimes="0.4"> X -> S + removed </reaction>
 				<reaction spec="PunctualReaction" p="1.0" times="0.4383299110198494"> X -> removed </reaction>

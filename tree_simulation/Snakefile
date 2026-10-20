@@ -152,7 +152,7 @@ rule mutate_sequences:
         """
     
 # Simulate wastewater data from the full remaster trees
-checkpoint simulate_wastewater_data:
+rule simulate_wastewater_data:
     input:
         script = "wastewater_data.py",
         config = "configs/config_wastewater_data.toml",

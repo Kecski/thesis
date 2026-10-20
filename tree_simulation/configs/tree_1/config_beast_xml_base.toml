@@ -18,9 +18,9 @@ date_regex = '_(\d{4}(?:\.\d+)?)$'
 # dates_csv = "dates.csv"
 
 [mcmc]
-chain_length = 20000000
-store_every  = 5000
-log_every    = 5000
+chain_length = 20_000_000
+store_every  = 10_000
+log_every    = 1_000_000
 
 [model]
 # Rate of becoming uninfectious, per YEAR (30.42 = 365/12 -> 12-day infectious period)

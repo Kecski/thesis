@@ -1,0 +1,3470 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+Checked 70 packages in 152ms
+Assuming unrestricted shared filesystem usage.
+
+SNAKEMAKE
+=========
+  Date: 2026-10-20 17:00:04
+  Workflow ID: 7e86534f-ab34-4fd9-a919-36e10e5ba4eb
+  Platform: Linux-5.15.0-194-generic-x86_64-with-glibc2.35
+  Host: eu-a2p-303
+  User: aimolay
+  Snakemake version: 9.27.0
+  Python version: 3.15.0 (main, Oct 14 2026, 01:05:07) [Clang 23.1.3 ]
+  Command: /cluster/scratch/aimolay/thesis/.venv/bin/snakemake --cores 8
+  Snakefile: /cluster/scratch/aimolay/thesis/tree_simulation/Snakefile
+  Base directory: /cluster/scratch/aimolay/thesis/tree_simulation
+  Run directory: /cluster/scratch/aimolay/thesis/tree_simulation
+  Working directory: /cluster/scratch/aimolay/thesis/tree_simulation
+  Config file(s): []
+  Config MD5: 99914b932bd37a50b983c5e7c90ae93b
+
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job                         count
+------------------------  -------
+create_remaster_xml             1
+run_remaster                    1
+mutate_sequences                2
+simulate_wastewater_data        2
+run_episewer                    2
+make_beast_configs              8
+make_beast_xml                  8
+run_beast                       8
+all                             1
+total                          33
+
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:00:07 2026]
+localrule create_remaster_xml:
+    input: create_remaster_xml.py, configs/config_remaster_xml.toml
+    output: data/remaster_trees/sim.xml, data/remaster_trees/parameters.txt
+    jobid: 3
+    reason: Missing output files: data/remaster_trees/sim.xml
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:00:07 2026]
+Finished jobid: 3 (Rule: create_remaster_xml)
+1 of 33 steps (3%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:00:07 2026]
+localrule run_remaster:
+    input: data/remaster_trees/sim.xml
+    output: data/remaster_trees/logs/sim.full.trees, data/remaster_trees/logs/sim.sampled.trees, data/remaster_trees/logs/sim.traj
+    jobid: 2
+    reason: Missing output files: data/remaster_trees/logs/sim.full.trees, data/remaster_trees/logs/sim.sampled.trees; Input files updated by another job: data/remaster_trees/sim.xml
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy.service.consul -Dhttps.proxyPort=3128 -Dhttp.proxyHost=proxy.service.consul -Dhttp.proxyPort=3128
+File: sim.xml seed: 1792508408402 threads: 1
+Loading package BEAST.base v2.7.8 BEAST.app v2.7.8 ORC v1.2.1 starbeast3 v1.2.1 BEASTLabs v2.0.3 BDMM-Prime v2.7.2 remaster v2.7.4 BDSKY v1.5.1 feast v10.6.1    SA v2.1.1 
+Writing file logs/sim.traj
+Writing file logs/sim.full.trees
+Writing file logs/sim.sampled.trees
+[Tue Oct 20 17:00:10 2026]
+Finished jobid: 2 (Rule: run_remaster)
+2 of 33 steps (6%) done
+Select jobs to execute...
+Execute 4 jobs...
+
+[Tue Oct 20 17:00:10 2026]
+localrule mutate_sequences:
+    input: sequence_mutation.py, configs/config_sequence_mutation.toml, data/remaster_trees/logs/sim.sampled.trees, templates/root_sequences/test_root_sequence_500.txt
+    output: data/simulated_sequences/tree_0/sequences_info.txt, data/simulated_sequences/tree_0/sequences_rates.txt, data/simulated_sequences/tree_0/sequences.fasta
+    jobid: 1
+    reason: Missing output files: data/simulated_sequences/tree_0/sequences.fasta; Input files updated by another job: data/remaster_trees/logs/sim.sampled.trees
+    wildcards: tree_id=tree_0
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:00:10 2026]
+localrule mutate_sequences:
+    input: sequence_mutation.py, configs/config_sequence_mutation.toml, data/remaster_trees/logs/sim.sampled.trees, templates/root_sequences/test_root_sequence_500.txt
+    output: data/simulated_sequences/tree_1/sequences_info.txt, data/simulated_sequences/tree_1/sequences_rates.txt, data/simulated_sequences/tree_1/sequences.fasta
+    jobid: 18
+    reason: Missing output files: data/simulated_sequences/tree_1/sequences.fasta; Input files updated by another job: data/remaster_trees/logs/sim.sampled.trees
+    wildcards: tree_id=tree_1
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:00:10 2026]
+localrule simulate_wastewater_data:
+    input: wastewater_data.py, configs/config_wastewater_data.toml, data/remaster_trees/logs/sim.full.trees
+    output: data/wastewater/tree_1/measurements.csv, data/wastewater/tree_1/flows.csv, data/wastewater/tree_1/full_data.csv
+    jobid: 9
+    reason: Missing output files: data/wastewater/tree_1/measurements.csv, data/wastewater/tree_1/flows.csv; Input files updated by another job: data/remaster_trees/logs/sim.full.trees
+    wildcards: tree_id=tree_1
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:00:10 2026]
+localrule simulate_wastewater_data:
+    input: wastewater_data.py, configs/config_wastewater_data.toml, data/remaster_trees/logs/sim.full.trees
+    output: data/wastewater/tree_0/measurements.csv, data/wastewater/tree_0/flows.csv, data/wastewater/tree_0/full_data.csv
+    jobid: 4
+    reason: Missing output files: data/wastewater/tree_0/measurements.csv, data/wastewater/tree_0/flows.csv; Input files updated by another job: data/remaster_trees/logs/sim.full.trees
+    wildcards: tree_id=tree_0
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:00:18 2026]
+Finished jobid: 18 (Rule: mutate_sequences)
+3 of 33 steps (9%) done
+[Tue Oct 20 17:00:19 2026]
+Finished jobid: 1 (Rule: mutate_sequences)
+4 of 33 steps (12%) done
+[Tue Oct 20 17:00:35 2026]
+Finished jobid: 9 (Rule: simulate_wastewater_data)
+5 of 33 steps (15%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:00:35 2026]
+localrule run_episewer:
+    input: episewer.R, data/wastewater/tree_1/measurements.csv, data/wastewater/tree_1/flows.csv
+    output: data/wastewater/tree_1/episewer_summary.csv
+    jobid: 8
+    reason: Missing output files: data/wastewater/tree_1/episewer_summary.csv; Input files updated by another job: data/wastewater/tree_1/measurements.csv, data/wastewater/tree_1/flows.csv
+    wildcards: tree_id=tree_1
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:00:36 2026]
+Finished jobid: 4 (Rule: simulate_wastewater_data)
+6 of 33 steps (18%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:00:36 2026]
+localrule run_episewer:
+    input: episewer.R, data/wastewater/tree_0/measurements.csv, data/wastewater/tree_0/flows.csv
+    output: data/wastewater/tree_0/episewer_summary.csv
+    jobid: 5
+    reason: Missing output files: data/wastewater/tree_0/episewer_summary.csv; Input files updated by another job: data/wastewater/tree_0/measurements.csv, data/wastewater/tree_0/flows.csv
+    wildcards: tree_id=tree_0
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+Working in data/wastewater/tree_0
+Working in data/wastewater/tree_0
+Failed to query server: Failed to activate service 'org.freedesktop.timedate1': timed out (service_start_timeout=25000ms)
+Failed to query server: Failed to activate service 'org.freedesktop.timedate1': timed out (service_start_timeout=25000ms)
+Section-level summary written to episewer_section_summary.csv
+Working in data/wastewater/tree_1
+Section-level summary written to episewer_section_summary.csv
+Working in data/wastewater/tree_1
+Section-level summary written to episewer_section_summary.csv
+Warning message:
+In system("timedatectl", intern = TRUE) :
+  running command 'timedatectl' had status 1
+EpiSewer finished. Results in: data/wastewater
+[Tue Oct 20 17:09:40 2026]
+Finished jobid: 8 (Rule: run_episewer)
+7 of 33 steps (21%) done
+Select jobs to execute...
+Execute 4 jobs...
+
+[Tue Oct 20 17:09:40 2026]
+localrule make_beast_configs:
+    input: make_beast_configs.py, configs/config_beast_xml_template.toml, data/wastewater/tree_1/episewer_summary.csv
+    output: configs/tree_1/config_beast_xml_sections.toml
+    jobid: 7
+    reason: Input files updated by another job: data/wastewater/tree_1/episewer_summary.csv; Params have changed since last execution: Union of exclusive params before and now across all output: before: '1.7094017094017095' now: '1.5450361604207759' 
+    wildcards: tree_id=tree_1, config_type=sections
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:40 2026]
+localrule make_beast_configs:
+    input: make_beast_configs.py, configs/config_beast_xml_template.toml, data/wastewater/tree_1/episewer_summary.csv
+    output: configs/tree_1/config_beast_xml_true_values.toml
+    jobid: 24
+    reason: Input files updated by another job: data/wastewater/tree_1/episewer_summary.csv; Params have changed since last execution: Union of exclusive params before and now across all output: before: '1.7094017094017095' now: '1.5450361604207759' 
+    wildcards: tree_id=tree_1, config_type=true_values
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:40 2026]
+localrule make_beast_configs:
+    input: make_beast_configs.py, configs/config_beast_xml_template.toml, data/wastewater/tree_1/episewer_summary.csv
+    output: configs/tree_1/config_beast_xml_base.toml
+    jobid: 19
+    reason: Input files updated by another job: data/wastewater/tree_1/episewer_summary.csv; Params have changed since last execution: Union of exclusive params before and now across all output: before: '1.7094017094017095' now: '1.5450361604207759' 
+    wildcards: tree_id=tree_1, config_type=base
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:40 2026]
+localrule make_beast_configs:
+    input: make_beast_configs.py, configs/config_beast_xml_template.toml, data/wastewater/tree_1/episewer_summary.csv
+    output: configs/tree_1/config_beast_xml_whole_period.toml
+    jobid: 22
+    reason: Input files updated by another job: data/wastewater/tree_1/episewer_summary.csv; Params have changed since last execution: Union of exclusive params before and now across all output: before: '1.7094017094017095' now: '1.5450361604207759' 
+    wildcards: tree_id=tree_1, config_type=whole_period
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:40 2026]
+Finished jobid: 7 (Rule: make_beast_configs)
+8 of 33 steps (24%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:40 2026]
+localrule make_beast_xml:
+    input: make_beast_xml.py, data/simulated_sequences/tree_1/sequences.fasta, configs/tree_1/config_beast_xml_sections.toml, templates/beast_xmls/template.xml
+    output: data/beast_reconstructions/tree_1/sections.xml
+    jobid: 20
+    reason: Missing output files: data/beast_reconstructions/tree_1/sections.xml; Input files updated by another job: data/simulated_sequences/tree_1/sequences.fasta, configs/tree_1/config_beast_xml_sections.toml
+    wildcards: tree_id=tree_1, config_type=sections
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:40 2026]
+Finished jobid: 24 (Rule: make_beast_configs)
+9 of 33 steps (27%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:40 2026]
+localrule make_beast_xml:
+    input: make_beast_xml.py, data/simulated_sequences/tree_1/sequences.fasta, configs/tree_1/config_beast_xml_true_values.toml, templates/beast_xmls/template.xml
+    output: data/beast_reconstructions/tree_1/true_values.xml
+    jobid: 23
+    reason: Missing output files: data/beast_reconstructions/tree_1/true_values.xml; Input files updated by another job: data/simulated_sequences/tree_1/sequences.fasta, configs/tree_1/config_beast_xml_true_values.toml
+    wildcards: tree_id=tree_1, config_type=true_values
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:40 2026]
+Finished jobid: 19 (Rule: make_beast_configs)
+10 of 33 steps (30%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:40 2026]
+localrule make_beast_xml:
+    input: make_beast_xml.py, data/simulated_sequences/tree_1/sequences.fasta, configs/tree_1/config_beast_xml_base.toml, templates/beast_xmls/template.xml
+    output: data/beast_reconstructions/tree_1/base.xml
+    jobid: 17
+    reason: Missing output files: data/beast_reconstructions/tree_1/base.xml; Input files updated by another job: data/simulated_sequences/tree_1/sequences.fasta, configs/tree_1/config_beast_xml_base.toml
+    wildcards: tree_id=tree_1, config_type=base
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:40 2026]
+Finished jobid: 22 (Rule: make_beast_configs)
+11 of 33 steps (33%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:40 2026]
+localrule make_beast_xml:
+    input: make_beast_xml.py, data/simulated_sequences/tree_1/sequences.fasta, configs/tree_1/config_beast_xml_whole_period.toml, templates/beast_xmls/template.xml
+    output: data/beast_reconstructions/tree_1/whole_period.xml
+    jobid: 21
+    reason: Missing output files: data/beast_reconstructions/tree_1/whole_period.xml; Input files updated by another job: data/simulated_sequences/tree_1/sequences.fasta, configs/tree_1/config_beast_xml_whole_period.toml
+    wildcards: tree_id=tree_1, config_type=whole_period
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:41 2026]
+Finished jobid: 20 (Rule: make_beast_xml)
+12 of 33 steps (36%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:41 2026]
+localrule run_beast:
+    input: data/beast_reconstructions/tree_1/sections.xml
+    output: data/beast_reconstructions/tree_1/sections-sequences.trees, data/beast_reconstructions/tree_1/sections.log, data/beast_reconstructions/tree_1/sections.sequences.typed.trees, data/beast_reconstructions/tree_1/sections.sequences.typed.node.trees, data/beast_reconstructions/tree_1/sections.xml.state
+    jobid: 30
+    reason: Missing output files: data/beast_reconstructions/tree_1/sections.log; Input files updated by another job: data/beast_reconstructions/tree_1/sections.xml
+    wildcards: tree_id=tree_1, config_type=sections
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy.service.consul -Dhttps.proxyPort=3128 -Dhttp.proxyHost=proxy.service.consul -Dhttp.proxyPort=3128
+[Tue Oct 20 17:09:41 2026]
+Finished jobid: 23 (Rule: make_beast_xml)
+13 of 33 steps (39%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:41 2026]
+localrule run_beast:
+    input: data/beast_reconstructions/tree_1/true_values.xml
+    output: data/beast_reconstructions/tree_1/true_values-sequences.trees, data/beast_reconstructions/tree_1/true_values.log, data/beast_reconstructions/tree_1/true_values.sequences.typed.trees, data/beast_reconstructions/tree_1/true_values.sequences.typed.node.trees, data/beast_reconstructions/tree_1/true_values.xml.state
+    jobid: 32
+    reason: Missing output files: data/beast_reconstructions/tree_1/true_values.log; Input files updated by another job: data/beast_reconstructions/tree_1/true_values.xml
+    wildcards: tree_id=tree_1, config_type=true_values
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy.service.consul -Dhttps.proxyPort=3128 -Dhttp.proxyHost=proxy.service.consul -Dhttp.proxyPort=3128
+[Tue Oct 20 17:09:41 2026]
+Finished jobid: 17 (Rule: make_beast_xml)
+14 of 33 steps (42%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:41 2026]
+localrule run_beast:
+    input: data/beast_reconstructions/tree_1/base.xml
+    output: data/beast_reconstructions/tree_1/base-sequences.trees, data/beast_reconstructions/tree_1/base.log, data/beast_reconstructions/tree_1/base.sequences.typed.trees, data/beast_reconstructions/tree_1/base.sequences.typed.node.trees, data/beast_reconstructions/tree_1/base.xml.state
+    jobid: 29
+    reason: Missing output files: data/beast_reconstructions/tree_1/base.log; Input files updated by another job: data/beast_reconstructions/tree_1/base.xml
+    wildcards: tree_id=tree_1, config_type=base
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy.service.consul -Dhttps.proxyPort=3128 -Dhttp.proxyHost=proxy.service.consul -Dhttp.proxyPort=3128
+[Tue Oct 20 17:09:41 2026]
+Finished jobid: 21 (Rule: make_beast_xml)
+15 of 33 steps (45%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:41 2026]
+localrule run_beast:
+    input: data/beast_reconstructions/tree_1/whole_period.xml
+    output: data/beast_reconstructions/tree_1/whole_period-sequences.trees, data/beast_reconstructions/tree_1/whole_period.log, data/beast_reconstructions/tree_1/whole_period.sequences.typed.trees, data/beast_reconstructions/tree_1/whole_period.sequences.typed.node.trees, data/beast_reconstructions/tree_1/whole_period.xml.state
+    jobid: 31
+    reason: Missing output files: data/beast_reconstructions/tree_1/whole_period.log; Input files updated by another job: data/beast_reconstructions/tree_1/whole_period.xml
+    wildcards: tree_id=tree_1, config_type=whole_period
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy.service.consul -Dhttps.proxyPort=3128 -Dhttp.proxyHost=proxy.service.consul -Dhttp.proxyPort=3128
+File: sections.xml seed: 42 threads: 1
+Loading package BEAST.base v2.7.8 BEAST.app v2.7.8 ORC v1.2.1 starbeast3 v1.2.1 BEASTLabs v2.0.3 BDMM-Prime v2.7.2 remaster v2.7.4 BDSKY v1.5.1 feast v10.6.1    SA v2.1.1 
+File: true_values.xml seed: 42 threads: 1
+Loading package BEAST.base v2.7.8 BEAST.app v2.7.8 ORC v1.2.1 starbeast3 v1.2.1 BEASTLabs v2.0.3 BDMM-Prime v2.7.2 remaster v2.7.4 BDSKY v1.5.1 feast v10.6.1    SA v2.1.1 
+File: whole_period.xml seed: 42 threads: 1
+File: base.xml seed: 42 threads: 1
+Loading package Loading package BEAST.base v2.7.8 BEAST.app v2.7.8 ORC v1.2.1 starbeast3 v1.2.1 BEASTLabs v2.0.3BEAST.base v2.7.8 leaf_0_2002.2999=2002.2999
+BDMM-Prime v2.7.2leaf_1_2002.2920=2002.2920
+leaf_2_2002.3086=2002.3086
+leaf_3_2002.3085=2002.3085
+leaf_4_2002.2994=2002.2994
+leaf_5_2002.2064=2002.2064
+leaf_6_2002.2517=2002.2517
+leaf_7_2002.2925=2002.2925
+leaf_8_2002.3132=2002.3132
+leaf_9_2002.3114=2002.3114
+leaf_10_2002.2471=2002.2471
+leaf_11_2002.3097=2002.3097
+leaf_12_2002.2862=2002.2862
+leaf_13_2002.3085=2002.3085
+leaf_14_2002.0774=2002.0774
+leaf_15_2002.1536=2002.1536
+leaf_16_2002.1559=2002.1559
+leaf_17_2002.2559=2002.2559
+leaf_18_2002.2540=2002.2540
+leaf_19_2002.2967=2002.2967
+leaf_20_2002.2877=2002.2877
+leaf_21_2002.2546=2002.2546
+leaf_22_2002.3086=2002.3086
+ leaf_23_2002.2977=2002.2977
+leaf_24_2002.3004=2002.3004
+leaf_25_2002.1717=2002.1717
+leaf_26_2002.1633=2002.1633
+leaf_27_2002.3060=2002.3060
+leaf_28_2002.1152=2002.1152
+leaf_29_2002.1623=2002.1623
+leaf_30_2002.3081=2002.3081
+leaf_31_2002.1224=2002.1224
+leaf_32_2002.3120=2002.3120
+leaf_33_2002.2932=2002.2932
+leaf_34_2002.2963=2002.2963
+leaf_35_2002.3067=2002.3067
+leaf_36_2002.2191=2002.2191
+leaf_37_2002.1281=2002.1281
+leaf_38_2002.3126=2002.3126
+leaf_39_2002.2992=2002.2992
+leaf_40_2002.2511=2002.2511
+leaf_41_2002.3063=2002.3063
+leaf_42_2002.3140=2002.3140
+leaf_43_2002.2946=2002.2946
+leaf_44_2002.2708=2002.2708
+leaf_45_2002.2822=2002.2822
+leaf_46_2002.2901=2002.2901
+leaf_47_2002.3018=2002.3018
+leaf_48_2002.3128=2002.3128
+leaf_49_2002.2973=2002.2973
+leaf_50_2002.2378=2002.2378
+leaf_51_2002.2291=2002.2291
+leaf_52_2002.2293=2002.2293
+leaf_53_2002.3080=2002.3080
+leaf_54_2002.2593=2002.2593
+leaf_55_2002.3061=2002.3061
+leaf_56_2002.2608=2002.2608
+remaster v2.7.4leaf_57_2002.2130=2002.2130
+leaf_58_2002.2233=2002.2233
+leaf_59_2002.3132=2002.3132
+leaf_60_2002.3019=2002.3019
+leaf_61_2002.2699=2002.2699
+leaf_62_2002.2873=2002.2873
+leaf_63_2002.1690=2002.1690
+leaf_64_2002.2144=2002.2144
+leaf_65_2002.2512=2002.2512
+leaf_66_2002.2727=2002.2727
+leaf_67_2002.2820=2002.2820
+leaf_68_2002.3069=2002.3069
+leaf_69_2002.3129=2002.3129
+ leaf_70_2002.2804=2002.2804
+leaf_71_2002.3077=2002.3077
+leaf_72_2002.3118=2002.3118
+leaf_73_2002.2284=2002.2284
+leaf_74_2002.2909=2002.2909
+ leaf_75_2002.2823=2002.2823
+leaf_76_2002.2843=2002.2843
+leaf_77_2002.2635=2002.2635
+leaf_78_2002.2217=2002.2217
+leaf_79_2002.3136=2002.3136
+leaf_80_2002.1663=2002.1663
+leaf_81_2002.2489=2002.2489
+leaf_82_2002.1874=2002.1874
+leaf_83_2002.2864=2002.2864
+leaf_84_2002.2555=2002.2555
+leaf_85_2002.2962=2002.2962
+leaf_86_2002.2791=2002.2791
+leaf_87_2002.2689=2002.2689
+leaf_88_2002.2742=2002.2742
+leaf_89_2002.2785=2002.2785
+leaf_90_2002.2924=2002.2924
+leaf_91_2002.3116=2002.3116
+leaf_92_2002.2636=2002.2636
+leaf_93_2002.2535=2002.2535
+leaf_94_2002.2246=2002.2246
+leaf_95_2002.3077=2002.3077
+leaf_96_2002.2998=2002.2998
+leaf_97_2002.2754=2002.2754
+leaf_98_2002.3023=2002.3023
+leaf_99_2002.1572=2002.1572
+BEAST.app v2.7.8BDSKY v1.5.1  ORC v1.2.1 feast v10.6.1    SA v2.1.1 
+starbeast3 v1.2.1 BEASTLabs v2.0.3 BDMM-Prime v2.7.2 remaster v2.7.4 BDSKY v1.5.1 feast v10.6.1    SA v2.1.1 
+leaf_0_2002.2999=NOT_SET
+leaf_1_2002.2920=NOT_SET
+leaf_2_2002.3086=NOT_SET
+leaf_3_2002.3085=NOT_SET
+leaf_4_2002.2994=NOT_SET
+leaf_5_2002.2064=NOT_SET
+leaf_6_2002.2517=NOT_SET
+leaf_7_2002.2925=NOT_SET
+leaf_8_2002.3132=NOT_SET
+leaf_9_2002.3114=NOT_SET
+leaf_10_2002.2471=NOT_SET
+leaf_11_2002.3097=NOT_SET
+leaf_12_2002.2862=NOT_SET
+leaf_13_2002.3085=NOT_SET
+leaf_14_2002.0774=NOT_SET
+leaf_15_2002.1536=NOT_SET
+leaf_16_2002.1559=NOT_SET
+leaf_17_2002.2559=NOT_SET
+leaf_18_2002.2540=NOT_SET
+leaf_19_2002.2967=NOT_SET
+leaf_20_2002.2877=NOT_SET
+leaf_21_2002.2546=NOT_SET
+leaf_22_2002.3086=NOT_SET
+leaf_23_2002.2977=NOT_SET
+leaf_24_2002.3004=NOT_SET
+leaf_25_2002.1717=NOT_SET
+leaf_26_2002.1633=NOT_SET
+leaf_27_2002.3060=NOT_SET
+leaf_28_2002.1152=NOT_SET
+leaf_29_2002.1623=NOT_SET
+leaf_30_2002.3081=NOT_SET
+leaf_31_2002.1224=NOT_SET
+leaf_32_2002.3120=NOT_SET
+leaf_33_2002.2932=NOT_SET
+leaf_34_2002.2963=NOT_SET
+leaf_35_2002.3067=NOT_SET
+leaf_36_2002.2191=NOT_SET
+leaf_37_2002.1281=NOT_SET
+leaf_38_2002.3126=NOT_SET
+leaf_39_2002.2992=NOT_SET
+leaf_40_2002.2511=NOT_SET
+leaf_41_2002.3063=NOT_SET
+leaf_42_2002.3140=NOT_SET
+leaf_43_2002.2946=NOT_SET
+leaf_44_2002.2708=NOT_SET
+leaf_45_2002.2822=NOT_SET
+leaf_46_2002.2901=NOT_SET
+leaf_47_2002.3018=NOT_SET
+leaf_48_2002.3128=NOT_SET
+leaf_49_2002.2973=NOT_SET
+leaf_50_2002.2378=NOT_SET
+leaf_51_2002.2291=NOT_SET
+leaf_52_2002.2293=NOT_SET
+leaf_53_2002.3080=NOT_SET
+leaf_54_2002.2593=NOT_SET
+leaf_55_2002.3061=NOT_SET
+leaf_56_2002.2608=NOT_SET
+leaf_57_2002.2130=NOT_SET
+leaf_58_2002.2233=NOT_SET
+leaf_59_2002.3132=NOT_SET
+leaf_60_2002.3019=NOT_SET
+leaf_61_2002.2699=NOT_SET
+leaf_62_2002.2873=NOT_SET
+leaf_63_2002.1690=NOT_SET
+leaf_64_2002.2144=NOT_SET
+leaf_65_2002.2512=NOT_SET
+leaf_66_2002.2727=NOT_SET
+leaf_67_2002.2820=NOT_SET
+leaf_68_2002.3069=NOT_SET
+leaf_69_2002.3129=NOT_SET
+leaf_70_2002.2804=NOT_SET
+leaf_71_2002.3077=NOT_SET
+leaf_72_2002.3118=NOT_SET
+leaf_73_2002.2284=NOT_SET
+leaf_74_2002.2909=NOT_SET
+leaf_75_2002.2823=NOT_SET
+leaf_76_2002.2843=NOT_SET
+leaf_77_2002.2635=NOT_SET
+leaf_78_2002.2217=NOT_SET
+leaf_79_2002.3136=NOT_SET
+leaf_80_2002.1663=NOT_SET
+leaf_81_2002.2489=NOT_SET
+leaf_82_2002.1874=NOT_SET
+leaf_83_2002.2864=NOT_SET
+leaf_84_2002.2555=NOT_SET
+leaf_85_2002.2962=NOT_SET
+leaf_86_2002.2791=NOT_SET
+leaf_87_2002.2689=NOT_SET
+leaf_88_2002.2742=NOT_SET
+leaf_89_2002.2785=NOT_SET
+leaf_90_2002.2924=NOT_SET
+leaf_91_2002.3116=NOT_SET
+leaf_92_2002.2636=NOT_SET
+leaf_93_2002.2535=NOT_SET
+leaf_94_2002.2246=NOT_SET
+leaf_95_2002.3077=NOT_SET
+leaf_96_2002.2998=NOT_SET
+leaf_97_2002.2754=NOT_SET
+leaf_98_2002.3023=NOT_SET
+leaf_99_2002.1572=NOT_SET
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by beagle.BeagleJNIWrapper in an unnamed module (file:/cluster/home/aimolay/.beast/2.7/BEAST.base/lib/BEAST.base.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+leaf_0_2002.2999=2002.2999
+leaf_1_2002.2920=2002.2920
+leaf_2_2002.3086=2002.3086
+leaf_3_2002.3085=2002.3085
+leaf_4_2002.2994=2002.2994
+leaf_5_2002.2064=2002.2064
+leaf_6_2002.2517=2002.2517
+leaf_7_2002.2925=2002.2925
+leaf_8_2002.3132=2002.3132
+leaf_9_2002.3114=2002.3114
+leaf_10_2002.2471=2002.2471
+leaf_11_2002.3097=2002.3097
+leaf_12_2002.2862=2002.2862
+leaf_13_2002.3085=2002.3085
+leaf_14_2002.0774=2002.0774
+leaf_15_2002.1536=2002.1536
+leaf_16_2002.1559=2002.1559
+leaf_17_2002.2559=2002.2559
+leaf_18_2002.2540=2002.2540
+leaf_19_2002.2967=2002.2967
+leaf_20_2002.2877=2002.2877
+leaf_21_2002.2546=2002.2546
+leaf_22_2002.3086=2002.3086
+leaf_23_2002.2977=2002.2977
+leaf_24_2002.3004=2002.3004
+leaf_25_2002.1717=2002.1717
+leaf_26_2002.1633=2002.1633
+leaf_27_2002.3060=2002.3060
+leaf_28_2002.1152=2002.1152
+leaf_29_2002.1623=2002.1623
+leaf_30_2002.3081=2002.3081
+leaf_31_2002.1224=2002.1224
+leaf_32_2002.3120=2002.3120
+leaf_33_2002.2932=2002.2932
+leaf_34_2002.2963=2002.2963
+leaf_35_2002.3067=2002.3067
+leaf_36_2002.2191=2002.2191
+leaf_37_2002.1281=2002.1281
+leaf_38_2002.3126=2002.3126
+leaf_39_2002.2992=2002.2992
+leaf_40_2002.2511=2002.2511
+leaf_41_2002.3063=2002.3063
+leaf_42_2002.3140=2002.3140
+leaf_43_2002.2946=2002.2946
+leaf_44_2002.2708=2002.2708
+leaf_45_2002.2822=2002.2822
+leaf_46_2002.2901=2002.2901
+leaf_47_2002.3018=2002.3018
+leaf_48_2002.3128=2002.3128
+leaf_49_2002.2973=2002.2973
+leaf_50_2002.2378=2002.2378
+leaf_51_2002.2291=2002.2291
+leaf_52_2002.2293=2002.2293
+leaf_53_2002.3080=2002.3080
+leaf_54_2002.2593=2002.2593
+leaf_55_2002.3061=2002.3061
+leaf_56_2002.2608=2002.2608
+leaf_57_2002.2130=2002.2130
+leaf_58_2002.2233=2002.2233
+leaf_59_2002.3132=2002.3132
+leaf_60_2002.3019=2002.3019
+leaf_61_2002.2699=2002.2699
+leaf_62_2002.2873=2002.2873
+leaf_63_2002.1690=2002.1690
+leaf_64_2002.2144=2002.2144
+leaf_65_2002.2512=2002.2512
+leaf_66_2002.2727=2002.2727
+leaf_67_2002.2820=2002.2820
+leaf_68_2002.3069=2002.3069
+leaf_69_2002.3129=2002.3129
+leaf_70_2002.2804=2002.2804
+leaf_71_2002.3077=2002.3077
+leaf_72_2002.3118=2002.3118
+leaf_73_2002.2284=2002.2284
+leaf_74_2002.2909=2002.2909
+leaf_75_2002.2823=2002.2823
+leaf_76_2002.2843=2002.2843
+leaf_77_2002.2635=2002.2635
+leaf_78_2002.2217=2002.2217
+leaf_79_2002.3136=2002.3136
+leaf_80_2002.1663=2002.1663
+leaf_81_2002.2489=2002.2489
+leaf_82_2002.1874=2002.1874
+leaf_83_2002.2864=2002.2864
+leaf_84_2002.2555=2002.2555
+leaf_85_2002.2962=2002.2962
+leaf_86_2002.2791=2002.2791
+leaf_87_2002.2689=2002.2689
+leaf_88_2002.2742=2002.2742
+leaf_89_2002.2785=2002.2785
+leaf_90_2002.2924=2002.2924
+leaf_91_2002.3116=2002.3116
+leaf_92_2002.2636=2002.2636
+leaf_93_2002.2535=2002.2535
+leaf_94_2002.2246=2002.2246
+leaf_95_2002.3077=2002.3077
+leaf_96_2002.2998=2002.2998
+leaf_97_2002.2754=2002.2754
+leaf_98_2002.3023=2002.3023
+leaf_99_2002.1572=2002.1572
+leaf_0_2002.2999=NOT_SET
+leaf_1_2002.2920=NOT_SET
+leaf_2_2002.3086=NOT_SET
+leaf_3_2002.3085=NOT_SET
+leaf_4_2002.2994=NOT_SET
+leaf_5_2002.2064=NOT_SET
+leaf_6_2002.2517=NOT_SET
+leaf_7_2002.2925=NOT_SET
+leaf_8_2002.3132=NOT_SET
+leaf_9_2002.3114=NOT_SET
+leaf_10_2002.2471=NOT_SET
+leaf_11_2002.3097=NOT_SET
+leaf_12_2002.2862=NOT_SET
+leaf_13_2002.3085=NOT_SET
+leaf_14_2002.0774=NOT_SET
+leaf_15_2002.1536=NOT_SET
+leaf_16_2002.1559=NOT_SET
+leaf_17_2002.2559=NOT_SET
+leaf_18_2002.2540=NOT_SET
+leaf_19_2002.2967=NOT_SET
+leaf_20_2002.2877=NOT_SET
+leaf_21_2002.2546=NOT_SET
+leaf_22_2002.3086=NOT_SET
+leaf_23_2002.2977=NOT_SET
+leaf_24_2002.3004=NOT_SET
+leaf_25_2002.1717=NOT_SET
+leaf_26_2002.1633=NOT_SET
+leaf_27_2002.3060=NOT_SET
+leaf_28_2002.1152=NOT_SET
+leaf_29_2002.1623=NOT_SET
+leaf_30_2002.3081=NOT_SET
+leaf_31_2002.1224=NOT_SET
+leaf_32_2002.3120=NOT_SET
+leaf_33_2002.2932=NOT_SET
+leaf_34_2002.2963=NOT_SET
+leaf_35_2002.3067=NOT_SET
+leaf_36_2002.2191=NOT_SET
+leaf_37_2002.1281=NOT_SET
+leaf_38_2002.3126=NOT_SET
+leaf_39_2002.2992=NOT_SET
+leaf_40_2002.2511=NOT_SET
+leaf_41_2002.3063=NOT_SET
+leaf_42_2002.3140=NOT_SET
+leaf_43_2002.2946=NOT_SET
+leaf_44_2002.2708=NOT_SET
+leaf_45_2002.2822=NOT_SET
+leaf_46_2002.2901=NOT_SET
+leaf_47_2002.3018=NOT_SET
+leaf_48_2002.3128=NOT_SET
+leaf_49_2002.2973=NOT_SET
+leaf_50_2002.2378=NOT_SET
+leaf_51_2002.2291=NOT_SET
+leaf_52_2002.2293=NOT_SET
+leaf_53_2002.3080=NOT_SET
+leaf_54_2002.2593=NOT_SET
+leaf_55_2002.3061=NOT_SET
+leaf_56_2002.2608=NOT_SET
+leaf_57_2002.2130=NOT_SET
+leaf_58_2002.2233=NOT_SET
+leaf_59_2002.3132=NOT_SET
+leaf_60_2002.3019=NOT_SET
+leaf_61_2002.2699=NOT_SET
+leaf_62_2002.2873=NOT_SET
+leaf_63_2002.1690=NOT_SET
+leaf_64_2002.2144=NOT_SET
+leaf_65_2002.2512=NOT_SET
+leaf_66_2002.2727=NOT_SET
+leaf_67_2002.2820=NOT_SET
+leaf_68_2002.3069=NOT_SET
+leaf_69_2002.3129=NOT_SET
+leaf_70_2002.2804=NOT_SET
+leaf_71_2002.3077=NOT_SET
+leaf_72_2002.3118=NOT_SET
+leaf_73_2002.2284=NOT_SET
+leaf_74_2002.2909=NOT_SET
+leaf_75_2002.2823=NOT_SET
+leaf_76_2002.2843=NOT_SET
+leaf_77_2002.2635=NOT_SET
+leaf_78_2002.2217=NOT_SET
+leaf_79_2002.3136=NOT_SET
+leaf_80_2002.1663=NOT_SET
+leaf_81_2002.2489=NOT_SET
+leaf_82_2002.1874=NOT_SET
+leaf_83_2002.2864=NOT_SET
+leaf_84_2002.2555=NOT_SET
+leaf_85_2002.2962=NOT_SET
+leaf_86_2002.2791=NOT_SET
+leaf_87_2002.2689=NOT_SET
+leaf_88_2002.2742=NOT_SET
+leaf_89_2002.2785=NOT_SET
+leaf_90_2002.2924=NOT_SET
+leaf_91_2002.3116=NOT_SET
+leaf_92_2002.2636=NOT_SET
+leaf_93_2002.2535=NOT_SET
+leaf_94_2002.2246=NOT_SET
+leaf_95_2002.3077=NOT_SET
+leaf_96_2002.2998=NOT_SET
+leaf_97_2002.2754=NOT_SET
+leaf_98_2002.3023=NOT_SET
+leaf_99_2002.1572=NOT_SET
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by beagle.BeagleJNIWrapper in an unnamed module (file:/cluster/home/aimolay/.beast/2.7/BEAST.base/lib/BEAST.base.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Section-level summary written to episewer_section_summary.csv
+Warning message:
+In system("timedatectl", intern = TRUE) :
+  running command 'timedatectl' had status 1
+EpiSewer finished. Results in: data/wastewater
+  Ignoring ambiguities in tree likelihood.
+  Ignoring character uncertainty in tree likelihood.
+  With 7 unique site patterns.
+  Using rescaling scheme : dynamic
+Warning: removing transform class beast.base.inference.operator.kernel.Transform$LogConstrainedSumTransform because it should have at least 2 dimensions but it has 0
+  Ignoring ambiguities in tree likelihood.
+  Ignoring character uncertainty in tree likelihood.
+  With 7 unique site patterns.
+  Using rescaling scheme : dynamic
+Warning: removing transform class beast.base.inference.operator.kernel.Transform$LogConstrainedSumTransform because it should have at least 2 dimensions but it has 0
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/sections.log
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/true_values.log
+[Tue Oct 20 17:09:42 2026]
+Finished jobid: 5 (Rule: run_episewer)
+16 of 33 steps (48%) done
+Select jobs to execute...
+leaf_0_2002.2999=2002.2999
+leaf_1_2002.2920=2002.2920
+leaf_2_2002.3086=2002.3086
+leaf_3_2002.3085=2002.3085
+leaf_4_2002.2994=2002.2994
+leaf_5_2002.2064=2002.2064
+leaf_6_2002.2517=2002.2517
+leaf_7_2002.2925=2002.2925
+leaf_8_2002.3132=2002.3132
+leaf_9_2002.3114=2002.3114
+leaf_10_2002.2471=2002.2471
+leaf_11_2002.3097=2002.3097
+leaf_12_2002.2862=2002.2862
+leaf_13_2002.3085=2002.3085
+leaf_14_2002.0774=2002.0774
+leaf_15_2002.1536=2002.1536
+leaf_16_2002.1559=2002.1559
+leaf_17_2002.2559=2002.2559
+leaf_18_2002.2540=2002.2540
+leaf_19_2002.2967=2002.2967
+leaf_20_2002.2877=2002.2877
+leaf_21_2002.2546=2002.2546
+leaf_22_2002.3086=2002.3086
+leaf_23_2002.2977=2002.2977
+leaf_24_2002.3004=2002.3004
+leaf_25_2002.1717=2002.1717
+leaf_26_2002.1633=2002.1633
+leaf_27_2002.3060=2002.3060
+leaf_28_2002.1152=2002.1152
+leaf_29_2002.1623=2002.1623
+leaf_30_2002.3081=2002.3081
+leaf_31_2002.1224=2002.1224
+leaf_32_2002.3120=2002.3120
+leaf_33_2002.2932=2002.2932
+leaf_34_2002.2963=2002.2963
+leaf_35_2002.3067=2002.3067
+leaf_36_2002.2191=2002.2191
+leaf_37_2002.1281=2002.1281
+leaf_38_2002.3126=2002.3126
+leaf_39_2002.2992=2002.2992
+leaf_40_2002.2511=2002.2511
+leaf_41_2002.3063=2002.3063
+leaf_42_2002.3140=2002.3140
+leaf_43_2002.2946=2002.2946
+leaf_44_2002.2708=2002.2708
+leaf_45_2002.2822=2002.2822
+leaf_46_2002.2901=2002.2901
+leaf_47_2002.3018=2002.3018
+leaf_48_2002.3128=2002.3128
+leaf_49_2002.2973=2002.2973
+leaf_50_2002.2378=2002.2378
+leaf_51_2002.2291=2002.2291
+leaf_52_2002.2293=2002.2293
+leaf_53_2002.3080=2002.3080
+leaf_54_2002.2593=2002.2593
+leaf_55_2002.3061=2002.3061
+leaf_56_2002.2608=2002.2608
+leaf_57_2002.2130=2002.2130
+leaf_58_2002.2233=2002.2233
+leaf_59_2002.3132=2002.3132
+leaf_60_2002.3019=2002.3019
+leaf_61_2002.2699=2002.2699
+leaf_62_2002.2873=2002.2873
+leaf_63_2002.1690=2002.1690
+leaf_64_2002.2144=2002.2144
+leaf_65_2002.2512=2002.2512
+leaf_66_2002.2727=2002.2727
+leaf_67_2002.2820=2002.2820
+leaf_68_2002.3069=2002.3069
+leaf_69_2002.3129=2002.3129
+leaf_70_2002.2804=2002.2804
+leaf_71_2002.3077=2002.3077
+leaf_72_2002.3118=2002.3118
+leaf_73_2002.2284=2002.2284
+leaf_74_2002.2909=2002.2909
+leaf_75_2002.2823=2002.2823
+leaf_76_2002.2843=2002.2843
+leaf_77_2002.2635=2002.2635
+leaf_78_2002.2217=2002.2217
+leaf_79_2002.3136=2002.3136
+leaf_80_2002.1663=2002.1663
+leaf_81_2002.2489=2002.2489
+leaf_82_2002.1874=2002.1874
+leaf_83_2002.2864=2002.2864
+leaf_84_2002.2555=2002.2555
+leaf_85_2002.2962=2002.2962
+leaf_86_2002.2791=2002.2791
+leaf_87_2002.2689=2002.2689
+leaf_88_2002.2742=2002.2742
+leaf_89_2002.2785=2002.2785
+leaf_90_2002.2924=2002.2924
+leaf_91_2002.3116=2002.3116
+leaf_92_2002.2636=2002.2636
+leaf_93_2002.2535=2002.2535
+leaf_94_2002.2246=2002.2246
+leaf_95_2002.3077=2002.3077
+leaf_96_2002.2998=2002.2998
+leaf_97_2002.2754=2002.2754
+leaf_98_2002.3023=2002.3023
+leaf_99_2002.1572=2002.1572
+Execute 4 jobs...
+
+[Tue Oct 20 17:09:42 2026]
+localrule make_beast_configs:
+    input: make_beast_configs.py, configs/config_beast_xml_template.toml, data/wastewater/tree_0/episewer_summary.csv
+    output: configs/tree_0/config_beast_xml_base.toml
+    jobid: 11
+    reason: Input files updated by another job: data/wastewater/tree_0/episewer_summary.csv; Params have changed since last execution: Union of exclusive params before and now across all output: before: '1.7094017094017095' now: '1.5450361604207759' 
+    wildcards: tree_id=tree_0, config_type=base
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:42 2026]
+localrule make_beast_configs:
+    input: make_beast_configs.py, configs/config_beast_xml_template.toml, data/wastewater/tree_0/episewer_summary.csv
+    output: configs/tree_0/config_beast_xml_true_values.toml
+    jobid: 16
+    reason: Input files updated by another job: data/wastewater/tree_0/episewer_summary.csv; Params have changed since last execution: Union of exclusive params before and now across all output: before: '1.7094017094017095' now: '1.5450361604207759' 
+    wildcards: tree_id=tree_0, config_type=true_values
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+leaf_0_2002.2999=NOT_SET
+leaf_1_2002.2920=NOT_SET
+leaf_2_2002.3086=NOT_SET
+leaf_3_2002.3085=NOT_SET
+leaf_4_2002.2994=NOT_SET
+leaf_5_2002.2064=NOT_SET
+leaf_6_2002.2517=NOT_SET
+leaf_7_2002.2925=NOT_SET
+leaf_8_2002.3132=NOT_SET
+leaf_9_2002.3114=NOT_SET
+leaf_10_2002.2471=NOT_SET
+leaf_11_2002.3097=NOT_SET
+leaf_12_2002.2862=NOT_SET
+leaf_13_2002.3085=NOT_SET
+leaf_14_2002.0774=NOT_SET
+leaf_15_2002.1536=NOT_SET
+leaf_16_2002.1559=NOT_SET
+leaf_17_2002.2559=NOT_SET
+leaf_18_2002.2540=NOT_SET
+leaf_19_2002.2967=NOT_SET
+leaf_20_2002.2877=NOT_SET
+leaf_21_2002.2546=NOT_SET
+leaf_22_2002.3086=NOT_SET
+leaf_23_2002.2977=NOT_SET
+leaf_24_2002.3004=NOT_SET
+leaf_25_2002.1717=NOT_SET
+leaf_26_2002.1633=NOT_SET
+leaf_27_2002.3060=NOT_SET
+leaf_28_2002.1152=NOT_SET
+leaf_29_2002.1623=NOT_SET
+leaf_30_2002.3081=NOT_SET
+leaf_31_2002.1224=NOT_SET
+leaf_32_2002.3120=NOT_SET
+leaf_33_2002.2932=NOT_SET
+leaf_34_2002.2963=NOT_SET
+leaf_35_2002.3067=NOT_SET
+leaf_36_2002.2191=NOT_SET
+leaf_37_2002.1281=NOT_SET
+leaf_38_2002.3126=NOT_SET
+leaf_39_2002.2992=NOT_SET
+leaf_40_2002.2511=NOT_SET
+leaf_41_2002.3063=NOT_SET
+leaf_42_2002.3140=NOT_SET
+leaf_43_2002.2946=NOT_SET
+leaf_44_2002.2708=NOT_SET
+leaf_45_2002.2822=NOT_SET
+leaf_46_2002.2901=NOT_SET
+leaf_47_2002.3018=NOT_SET
+leaf_48_2002.3128=NOT_SET
+leaf_49_2002.2973=NOT_SET
+leaf_50_2002.2378=NOT_SET
+leaf_51_2002.2291=NOT_SET
+leaf_52_2002.2293=NOT_SET
+leaf_53_2002.3080=NOT_SET
+leaf_54_2002.2593=NOT_SET
+leaf_55_2002.3061=NOT_SET
+leaf_56_2002.2608=NOT_SET
+leaf_57_2002.2130=NOT_SET
+leaf_58_2002.2233=NOT_SET
+leaf_59_2002.3132=NOT_SET
+leaf_60_2002.3019=NOT_SET
+leaf_61_2002.2699=NOT_SET
+leaf_62_2002.2873=NOT_SET
+leaf_63_2002.1690=NOT_SET
+leaf_64_2002.2144=NOT_SET
+leaf_65_2002.2512=NOT_SET
+leaf_66_2002.2727=NOT_SET
+leaf_67_2002.2820=NOT_SET
+leaf_68_2002.3069=NOT_SET
+leaf_69_2002.3129=NOT_SET
+leaf_70_2002.2804=NOT_SET
+leaf_71_2002.3077=NOT_SET
+leaf_72_2002.3118=NOT_SET
+leaf_73_2002.2284=NOT_SET
+leaf_74_2002.2909=NOT_SET
+leaf_75_2002.2823=NOT_SET
+leaf_76_2002.2843=NOT_SET
+leaf_77_2002.2635=NOT_SET
+leaf_78_2002.2217=NOT_SET
+leaf_79_2002.3136=NOT_SET
+leaf_80_2002.1663=NOT_SET
+leaf_81_2002.2489=NOT_SET
+leaf_82_2002.1874=NOT_SET
+leaf_83_2002.2864=NOT_SET
+leaf_84_2002.2555=NOT_SET
+leaf_85_2002.2962=NOT_SET
+leaf_86_2002.2791=NOT_SET
+leaf_87_2002.2689=NOT_SET
+leaf_88_2002.2742=NOT_SET
+leaf_89_2002.2785=NOT_SET
+leaf_90_2002.2924=NOT_SET
+leaf_91_2002.3116=NOT_SET
+leaf_92_2002.2636=NOT_SET
+leaf_93_2002.2535=NOT_SET
+leaf_94_2002.2246=NOT_SET
+leaf_95_2002.3077=NOT_SET
+leaf_96_2002.2998=NOT_SET
+leaf_97_2002.2754=NOT_SET
+leaf_98_2002.3023=NOT_SET
+leaf_99_2002.1572=NOT_SET
+[Tue Oct 20 17:09:42 2026]
+localrule make_beast_configs:
+    input: make_beast_configs.py, configs/config_beast_xml_template.toml, data/wastewater/tree_0/episewer_summary.csv
+    output: configs/tree_0/config_beast_xml_sections.toml
+    jobid: 6
+    reason: Input files updated by another job: data/wastewater/tree_0/episewer_summary.csv; Params have changed since last execution: Union of exclusive params before and now across all output: before: '1.7094017094017095' now: '1.5450361604207759' 
+    wildcards: tree_id=tree_0, config_type=sections
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:42 2026]
+localrule make_beast_configs:
+    input: make_beast_configs.py, configs/config_beast_xml_template.toml, data/wastewater/tree_0/episewer_summary.csv
+    output: configs/tree_0/config_beast_xml_whole_period.toml
+    jobid: 14
+    reason: Input files updated by another job: data/wastewater/tree_0/episewer_summary.csv; Params have changed since last execution: Union of exclusive params before and now across all output: before: '1.7094017094017095' now: '1.5450361604207759' 
+    wildcards: tree_id=tree_0, config_type=whole_period
+    resources: tmpdir=/scratch/tmp.17680975.aimolayWARNING: A restricted method in 
+java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by beagle.BeagleJNIWrapper in an unnamed module (file:/cluster/home/aimolay/.beast/2.7/BEAST.base/lib/BEAST.base.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+leaf_0_2002.2999=2002.2999
+leaf_1_2002.2920=2002.2920
+leaf_2_2002.3086=2002.3086
+leaf_3_2002.3085=2002.3085
+leaf_4_2002.2994=2002.2994
+leaf_5_2002.2064=2002.2064
+leaf_6_2002.2517=2002.2517
+leaf_7_2002.2925=2002.2925
+leaf_8_2002.3132=2002.3132
+leaf_9_2002.3114=2002.3114
+leaf_10_2002.2471=2002.2471
+leaf_11_2002.3097=2002.3097
+leaf_12_2002.2862=2002.2862
+leaf_13_2002.3085=2002.3085
+leaf_14_2002.0774=2002.0774
+leaf_15_2002.1536=2002.1536
+leaf_16_2002.1559=2002.1559
+leaf_17_2002.2559=2002.2559
+leaf_18_2002.2540=2002.2540
+leaf_19_2002.2967=2002.2967
+leaf_20_2002.2877=2002.2877
+leaf_21_2002.2546=2002.2546
+leaf_22_2002.3086=2002.3086
+leaf_23_2002.2977=2002.2977
+leaf_24_2002.3004=2002.3004
+leaf_25_2002.1717=2002.1717
+leaf_26_2002.1633=2002.1633
+leaf_27_2002.3060=2002.3060
+leaf_28_2002.1152=2002.1152
+leaf_29_2002.1623=2002.1623
+leaf_30_2002.3081=2002.3081
+leaf_31_2002.1224=2002.1224
+leaf_32_2002.3120=2002.3120
+leaf_33_2002.2932=2002.2932
+leaf_34_2002.2963=2002.2963
+leaf_35_2002.3067=2002.3067
+leaf_36_2002.2191=2002.2191
+leaf_37_2002.1281=2002.1281
+leaf_38_2002.3126=2002.3126
+leaf_39_2002.2992=2002.2992
+leaf_40_2002.2511=2002.2511
+leaf_41_2002.3063=2002.3063
+leaf_42_2002.3140=2002.3140
+leaf_43_2002.2946=2002.2946
+leaf_44_2002.2708=2002.2708
+leaf_45_2002.2822=2002.2822
+leaf_46_2002.2901=2002.2901
+leaf_47_2002.3018=2002.3018
+leaf_48_2002.3128=2002.3128
+leaf_49_2002.2973=2002.2973
+leaf_50_2002.2378=2002.2378
+leaf_51_2002.2291=2002.2291
+leaf_52_2002.2293=2002.2293
+leaf_53_2002.3080=2002.3080
+leaf_54_2002.2593=2002.2593
+leaf_55_2002.3061=2002.3061
+leaf_56_2002.2608=2002.2608
+leaf_57_2002.2130=2002.2130
+leaf_58_2002.2233=2002.2233
+leaf_59_2002.3132=2002.3132
+leaf_60_2002.3019=2002.3019
+leaf_61_2002.2699=2002.2699
+leaf_62_2002.2873=2002.2873
+leaf_63_2002.1690=2002.1690
+leaf_64_2002.2144=2002.2144
+leaf_65_2002.2512=2002.2512
+leaf_66_2002.2727=2002.2727
+leaf_67_2002.2820=2002.2820
+leaf_68_2002.3069=2002.3069
+leaf_69_2002.3129=2002.3129
+leaf_70_2002.2804=2002.2804
+leaf_71_2002.3077=2002.3077
+leaf_72_2002.3118=2002.3118
+leaf_73_2002.2284=2002.2284
+leaf_74_2002.2909=2002.2909
+leaf_75_2002.2823=2002.2823
+leaf_76_2002.2843=2002.2843
+leaf_77_2002.2635=2002.2635
+leaf_78_2002.2217=2002.2217
+leaf_79_2002.3136=2002.3136
+leaf_80_2002.1663=2002.1663
+leaf_81_2002.2489=2002.2489
+leaf_82_2002.1874=2002.1874
+leaf_83_2002.2864=2002.2864
+leaf_84_2002.2555=2002.2555
+leaf_85_2002.2962=2002.2962
+leaf_86_2002.2791=2002.2791
+leaf_87_2002.2689=2002.2689
+leaf_88_2002.2742=2002.2742
+leaf_89_2002.2785=2002.2785
+leaf_90_2002.2924=2002.2924
+leaf_91_2002.3116=2002.3116
+leaf_92_2002.2636=2002.2636
+leaf_93_2002.2535=2002.2535
+leaf_94_2002.2246=2002.2246
+leaf_95_2002.3077=2002.3077
+leaf_96_2002.2998=2002.2998
+leaf_97_2002.2754=2002.2754
+leaf_98_2002.3023=2002.3023
+leaf_99_2002.1572=2002.1572
+leaf_0_2002.2999=NOT_SET
+leaf_1_2002.2920=NOT_SET
+leaf_2_2002.3086=NOT_SET
+leaf_3_2002.3085=NOT_SET
+leaf_4_2002.2994=NOT_SET
+leaf_5_2002.2064=NOT_SET
+leaf_6_2002.2517=NOT_SET
+leaf_7_2002.2925=NOT_SET
+leaf_8_2002.3132=NOT_SET
+leaf_9_2002.3114=NOT_SET
+leaf_10_2002.2471=NOT_SET
+leaf_11_2002.3097=NOT_SET
+leaf_12_2002.2862=NOT_SET
+leaf_13_2002.3085=NOT_SET
+leaf_14_2002.0774=NOT_SET
+leaf_15_2002.1536=NOT_SET
+leaf_16_2002.1559=NOT_SET
+leaf_17_2002.2559=NOT_SET
+leaf_18_2002.2540=NOT_SET
+leaf_19_2002.2967=NOT_SET
+leaf_20_2002.2877=NOT_SET
+leaf_21_2002.2546=NOT_SET
+leaf_22_2002.3086=NOT_SET
+leaf_23_2002.2977=NOT_SET
+leaf_24_2002.3004=NOT_SET
+leaf_25_2002.1717=NOT_SET
+leaf_26_2002.1633=NOT_SET
+leaf_27_2002.3060=NOT_SET
+leaf_28_2002.1152=NOT_SET
+leaf_29_2002.1623=NOT_SET
+leaf_30_2002.3081=NOT_SET
+leaf_31_2002.1224=NOT_SET
+leaf_32_2002.3120=NOT_SET
+leaf_33_2002.2932=NOT_SET
+leaf_34_2002.2963=NOT_SET
+leaf_35_2002.3067=NOT_SET
+leaf_36_2002.2191=NOT_SET
+leaf_37_2002.1281=NOT_SET
+leaf_38_2002.3126=NOT_SET
+leaf_39_2002.2992=NOT_SET
+leaf_40_2002.2511=NOT_SET
+leaf_41_2002.3063=NOT_SET
+leaf_42_2002.3140=NOT_SET
+leaf_43_2002.2946=NOT_SET
+leaf_44_2002.2708=NOT_SET
+leaf_45_2002.2822=NOT_SET
+leaf_46_2002.2901=NOT_SET
+leaf_47_2002.3018=NOT_SET
+leaf_48_2002.3128=NOT_SET
+leaf_49_2002.2973=NOT_SET
+leaf_50_2002.2378=NOT_SET
+leaf_51_2002.2291=NOT_SET
+leaf_52_2002.2293=NOT_SET
+leaf_53_2002.3080=NOT_SET
+leaf_54_2002.2593=NOT_SET
+leaf_55_2002.3061=NOT_SET
+leaf_56_2002.2608=NOT_SET
+leaf_57_2002.2130=NOT_SET
+leaf_58_2002.2233=NOT_SET
+leaf_59_2002.3132=NOT_SET
+leaf_60_2002.3019=NOT_SET
+leaf_61_2002.2699=NOT_SET
+leaf_62_2002.2873=NOT_SET
+leaf_63_2002.1690=NOT_SET
+leaf_64_2002.2144=NOT_SET
+leaf_65_2002.2512=NOT_SET
+leaf_66_2002.2727=NOT_SET
+leaf_67_2002.2820=NOT_SET
+leaf_68_2002.3069=NOT_SET
+leaf_69_2002.3129=NOT_SET
+leaf_70_2002.2804=NOT_SET
+leaf_71_2002.3077=NOT_SET
+leaf_72_2002.3118=NOT_SET
+leaf_73_2002.2284=NOT_SET
+leaf_74_2002.2909=NOT_SET
+leaf_75_2002.2823=NOT_SET
+leaf_76_2002.2843=NOT_SET
+leaf_77_2002.2635=NOT_SET
+leaf_78_2002.2217=NOT_SET
+leaf_79_2002.3136=NOT_SET
+leaf_80_2002.1663=NOT_SET
+leaf_81_2002.2489=NOT_SET
+leaf_82_2002.1874=NOT_SET
+leaf_83_2002.2864=NOT_SET
+leaf_84_2002.2555=NOT_SET
+leaf_85_2002.2962=NOT_SET
+leaf_86_2002.2791=NOT_SET
+leaf_87_2002.2689=NOT_SET
+leaf_88_2002.2742=NOT_SET
+leaf_89_2002.2785=NOT_SET
+leaf_90_2002.2924=NOT_SET
+leaf_91_2002.3116=NOT_SET
+leaf_92_2002.2636=NOT_SET
+leaf_93_2002.2535=NOT_SET
+leaf_94_2002.2246=NOT_SET
+leaf_95_2002.3077=NOT_SET
+leaf_96_2002.2998=NOT_SET
+leaf_97_2002.2754=NOT_SET
+leaf_98_2002.3023=NOT_SET
+leaf_99_2002.1572=NOT_SET
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by beagle.BeagleJNIWrapper in an unnamed module (file:/cluster/home/aimolay/.beast/2.7/BEAST.base/lib/BEAST.base.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+  Ignoring ambiguities in tree likelihood.
+  Ignoring character uncertainty in tree likelihood.
+  With 7 unique site patterns.
+  Using rescaling scheme : dynamic
+Warning: removing transform class beast.base.inference.operator.kernel.Transform$LogConstrainedSumTransform because it should have at least 2 dimensions but it has 0
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/whole_period.log
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/true_values-sequences.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/sections-sequences.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/true_values.sequences.typed.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/sections.sequences.typed.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/true_values.sequences.typed.node.trees
+  Ignoring ambiguities in tree likelihood.
+  Ignoring character uncertainty in tree likelihood.
+  With 7 unique site patterns.
+  Using rescaling scheme : dynamic
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/sections.sequences.typed.node.trees
+Warning: removing transform class beast.base.inference.operator.kernel.Transform$LogConstrainedSumTransform because it should have at least 2 dimensions but it has 0
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/base.log
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/whole_period-sequences.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/whole_period.sequences.typed.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/whole_period.sequences.typed.node.trees
+[Tue Oct 20 17:09:43 2026]
+Finished jobid: 11 (Rule: make_beast_configs)
+17 of 33 steps (52%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:43 2026]
+localrule make_beast_xml:
+    input: make_beast_xml.py, data/simulated_sequences/tree_0/sequences.fasta, configs/tree_0/config_beast_xml_base.toml, templates/beast_xmls/template.xml
+    output: data/beast_reconstructions/tree_0/base.xml
+    jobid: 10
+    reason: Missing output files: data/beast_reconstructions/tree_0/base.xml; Input files updated by another job: configs/tree_0/config_beast_xml_base.toml, data/simulated_sequences/tree_0/sequences.fasta
+    wildcards: tree_id=tree_0, config_type=base
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:43 2026]
+Finished jobid: 16 (Rule: make_beast_configs)
+18 of 33 steps (55%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:43 2026]
+localrule make_beast_xml:
+    input: make_beast_xml.py, data/simulated_sequences/tree_0/sequences.fasta, configs/tree_0/config_beast_xml_true_values.toml, templates/beast_xmls/template.xml
+    output: data/beast_reconstructions/tree_0/true_values.xml
+    jobid: 15
+    reason: Missing output files: data/beast_reconstructions/tree_0/true_values.xml; Input files updated by another job: configs/tree_0/config_beast_xml_true_values.toml, data/simulated_sequences/tree_0/sequences.fasta
+    wildcards: tree_id=tree_0, config_type=true_values
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/base-sequences.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/base.sequences.typed.trees
+[Tue Oct 20 17:09:43 2026]
+Finished jobid: 6 (Rule: make_beast_configs)
+19 of 33 steps (58%) done
+Select jobs to execute...
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_1/base.sequences.typed.node.trees
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:43 2026]
+localrule make_beast_xml:
+    input: make_beast_xml.py, data/simulated_sequences/tree_0/sequences.fasta, configs/tree_0/config_beast_xml_sections.toml, templates/beast_xmls/template.xml
+    output: data/beast_reconstructions/tree_0/sections.xml
+    jobid: 12
+    reason: Missing output files: data/beast_reconstructions/tree_0/sections.xml; Input files updated by another job: configs/tree_0/config_beast_xml_sections.toml, data/simulated_sequences/tree_0/sequences.fasta
+    wildcards: tree_id=tree_0, config_type=sections
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:43 2026]
+Finished jobid: 14 (Rule: make_beast_configs)
+20 of 33 steps (61%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:43 2026]
+localrule make_beast_xml:
+    input: make_beast_xml.py, data/simulated_sequences/tree_0/sequences.fasta, configs/tree_0/config_beast_xml_whole_period.toml, templates/beast_xmls/template.xml
+    output: data/beast_reconstructions/tree_0/whole_period.xml
+    jobid: 13
+    reason: Missing output files: data/beast_reconstructions/tree_0/whole_period.xml; Input files updated by another job: configs/tree_0/config_beast_xml_whole_period.toml, data/simulated_sequences/tree_0/sequences.fasta
+    wildcards: tree_id=tree_0, config_type=whole_period
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:43 2026]
+Finished jobid: 10 (Rule: make_beast_xml)
+21 of 33 steps (64%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:43 2026]
+localrule run_beast:
+    input: data/beast_reconstructions/tree_0/base.xml
+    output: data/beast_reconstructions/tree_0/base-sequences.trees, data/beast_reconstructions/tree_0/base.log, data/beast_reconstructions/tree_0/base.sequences.typed.trees, data/beast_reconstructions/tree_0/base.sequences.typed.node.trees, data/beast_reconstructions/tree_0/base.xml.state
+    jobid: 25
+    reason: Missing output files: data/beast_reconstructions/tree_0/base.log; Input files updated by another job: data/beast_reconstructions/tree_0/base.xml
+    wildcards: tree_id=tree_0, config_type=base
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:43 2026]
+Finished jobid: 15 (Rule: make_beast_xml)
+22 of 33 steps (67%) done
+Select jobs to execute...
+Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy.service.consul -Dhttps.proxyPort=3128 -Dhttp.proxyHost=proxy.service.consul -Dhttp.proxyPort=3128
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:44 2026]
+localrule run_beast:
+    input: data/beast_reconstructions/tree_0/true_values.xml
+    output: data/beast_reconstructions/tree_0/true_values-sequences.trees, data/beast_reconstructions/tree_0/true_values.log, data/beast_reconstructions/tree_0/true_values.sequences.typed.trees, data/beast_reconstructions/tree_0/true_values.sequences.typed.node.trees, data/beast_reconstructions/tree_0/true_values.xml.state
+    jobid: 28
+    reason: Missing output files: data/beast_reconstructions/tree_0/true_values.log; Input files updated by another job: data/beast_reconstructions/tree_0/true_values.xml
+    wildcards: tree_id=tree_0, config_type=true_values
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:44 2026]
+Finished jobid: 12 (Rule: make_beast_xml)
+23 of 33 steps (70%) done
+Select jobs to execute...
+Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy.service.consul -Dhttps.proxyPort=3128 -Dhttp.proxyHost=proxy.service.consul -Dhttp.proxyPort=3128
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:44 2026]
+localrule run_beast:
+    input: data/beast_reconstructions/tree_0/sections.xml
+    output: data/beast_reconstructions/tree_0/sections-sequences.trees, data/beast_reconstructions/tree_0/sections.log, data/beast_reconstructions/tree_0/sections.sequences.typed.trees, data/beast_reconstructions/tree_0/sections.sequences.typed.node.trees, data/beast_reconstructions/tree_0/sections.xml.state
+    jobid: 26
+    reason: Missing output files: data/beast_reconstructions/tree_0/sections.log; Input files updated by another job: data/beast_reconstructions/tree_0/sections.xml
+    wildcards: tree_id=tree_0, config_type=sections
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:09:44 2026]
+Finished jobid: 13 (Rule: make_beast_xml)
+24 of 33 steps (73%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:09:44 2026]
+localrule run_beast:
+    input: data/beast_reconstructions/tree_0/whole_period.xml
+    output: data/beast_reconstructions/tree_0/whole_period-sequences.trees, data/beast_reconstructions/tree_0/whole_period.log, data/beast_reconstructions/tree_0/whole_period.sequences.typed.trees, data/beast_reconstructions/tree_0/whole_period.sequences.typed.node.trees, data/beast_reconstructions/tree_0/whole_period.xml.state
+    jobid: 27
+    reason: Missing output files: data/beast_reconstructions/tree_0/whole_period.log; Input files updated by another job: data/beast_reconstructions/tree_0/whole_period.xml
+    wildcards: tree_id=tree_0, config_type=whole_period
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy.service.consul -Dhttps.proxyPort=3128 -Dhttp.proxyHost=proxy.service.consul -Dhttp.proxyPort=3128
+Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy.service.consul -Dhttps.proxyPort=3128 -Dhttp.proxyHost=proxy.service.consul -Dhttp.proxyPort=3128
+File: base.xml seed: 42 threads: 1
+Loading package BEAST.base v2.7.8 BEAST.app v2.7.8 ORC v1.2.1 starbeast3 v1.2.1 File: true_values.xml seed: 42 threads: 1
+BEASTLabs v2.0.3 BDMM-Prime v2.7.2 remaster v2.7.4 BDSKY v1.5.1 feast v10.6.1    SA v2.1.1 
+Loading package BEAST.base v2.7.8 BEAST.app v2.7.8 ORC v1.2.1 starbeast3 v1.2.1 BEASTLabs v2.0.3 BDMM-Prime v2.7.2 remaster v2.7.4 BDSKY v1.5.1 feast v10.6.1    SA v2.1.1 
+File: whole_period.xml seed: 42 threads: 1
+Loading package BEAST.base v2.7.8 BEAST.app v2.7.8 ORC v1.2.1 starbeast3 v1.2.1 BEASTLabs v2.0.3 BDMM-Prime v2.7.2 remaster v2.7.4 BDSKY v1.5.1 feast v10.6.1    SA v2.1.1 
+File: sections.xml seed: 42 threads: 1
+Loading package BEAST.base v2.7.8 BEAST.app v2.7.8 ORC v1.2.1 starbeast3 v1.2.1 BEASTLabs v2.0.3 BDMM-Prime v2.7.2 remaster v2.7.4 BDSKY v1.5.1 feast v10.6.1    SA v2.1.1 
+leaf_0_2002.3754=2002.3754
+leaf_1_2002.3792=2002.3792
+leaf_2_2002.3435=2002.3435
+leaf_3_2002.3282=2002.3282
+leaf_4_2002.3741=2002.3741
+leaf_5_2002.3664=2002.3664
+leaf_6_2002.3388=2002.3388
+leaf_7_2002.3270=2002.3270
+leaf_8_2002.3690=2002.3690
+leaf_9_2002.3360=2002.3360
+leaf_10_2002.3707=2002.3707
+leaf_11_2002.2818=2002.2818
+leaf_12_2002.2682=2002.2682
+leaf_13_2002.3271=2002.3271
+leaf_14_2002.2224=2002.2224
+leaf_15_2002.2075=2002.2075
+leaf_16_2002.3794=2002.3794
+leaf_17_2002.2364=2002.2364
+leaf_18_2002.3722=2002.3722
+leaf_19_2002.3546=2002.3546
+leaf_20_2002.3586=2002.3586
+leaf_21_2002.3362=2002.3362
+leaf_22_2002.3635=2002.3635
+leaf_23_2002.3576=2002.3576
+leaf_24_2002.3779=2002.3779
+leaf_25_2002.3738=2002.3738
+leaf_26_2002.3651=2002.3651
+leaf_27_2002.3491=2002.3491
+leaf_28_2002.3695=2002.3695
+leaf_29_2002.2581=2002.2581
+leaf_30_2002.3729=2002.3729
+leaf_31_2002.3776=2002.3776
+leaf_32_2002.2137=2002.2137
+leaf_33_2002.3594=2002.3594
+leaf_34_2002.3478=2002.3478
+leaf_35_2002.3546=2002.3546
+leaf_36_2002.3369=2002.3369
+leaf_37_2002.2954=2002.2954
+leaf_38_2002.3084=2002.3084
+leaf_39_2002.3784=2002.3784
+leaf_40_2002.2626=2002.2626
+leaf_41_2002.2505=2002.2505
+leaf_42_2002.3803=2002.3803
+leaf_43_2002.3858=2002.3858
+leaf_44_2002.3201=2002.3201
+leaf_45_2002.3774=2002.3774
+leaf_46_2002.3851=2002.3851
+leaf_47_2002.3348=2002.3348
+leaf_48_2002.3487=2002.3487
+leaf_49_2002.3051=2002.3051
+leaf_50_2002.3834=2002.3834
+leaf_51_2002.3445=2002.3445
+leaf_52_2002.3617=2002.3617
+leaf_53_2002.3051=2002.3051
+leaf_54_2002.3002=2002.3002
+leaf_55_2002.3226=2002.3226
+leaf_56_2002.3748=2002.3748
+leaf_57_2002.3813=2002.3813
+leaf_58_2002.3104=2002.3104
+leaf_59_2002.3770=2002.3770
+leaf_60_2002.3873=2002.3873
+leaf_61_2002.3856=2002.3856
+leaf_62_2002.3132=2002.3132
+leaf_63_2002.2496=2002.2496
+leaf_64_2002.2471=2002.2471
+leaf_65_2002.2959=2002.2959
+leaf_66_2002.3288=2002.3288
+leaf_67_2002.2144=2002.2144
+leaf_68_2002.3731=2002.3731
+leaf_69_2002.3126=2002.3126
+leaf_70_2002.3671=2002.3671
+leaf_71_2002.3620=2002.3620
+leaf_72_2002.3397=2002.3397
+leaf_73_2002.3585=2002.3585
+leaf_74_2002.3700=2002.3700
+leaf_75_2002.3649=2002.3649
+leaf_76_2002.3296=2002.3296
+leaf_77_2002.3282=2002.3282
+leaf_78_2002.3844=2002.3844
+leaf_79_2002.3686=2002.3686
+leaf_80_2002.2536=2002.2536
+leaf_81_2002.2838=2002.2838
+leaf_82_2002.3172=2002.3172
+leaf_83_2002.3525=2002.3525
+leaf_84_2002.1939=2002.1939
+leaf_85_2002.2563=2002.2563
+leaf_86_2002.3796=2002.3796
+leaf_87_2002.3639=2002.3639
+leaf_88_2002.1959=2002.1959
+leaf_89_2002.3229=2002.3229
+leaf_90_2002.3775=2002.3775
+leaf_91_2002.3577=2002.3577
+leaf_92_2002.3332=2002.3332
+leaf_93_2002.3485=2002.3485
+leaf_94_2002.1613=2002.1613
+leaf_95_2002.1859=2002.1859
+leaf_96_2002.1840=2002.1840
+leaf_97_2002.2875=2002.2875
+leaf_98_2002.3531=2002.3531
+leaf_99_2002.3729=2002.3729
+leaf_100_2002.3367=2002.3367
+leaf_101_2002.3645=2002.3645
+leaf_102_2002.3605=2002.3605
+leaf_103_2002.3857=2002.3857
+leaf_104_2002.3047=2002.3047
+leaf_105_2002.3633=2002.3633
+leaf_106_2002.2525=2002.2525
+leaf_107_2002.3301=2002.3301
+leaf_108_2002.3311=2002.3311
+leaf_109_2002.3316=2002.3316
+leaf_110_2002.2559=2002.2559
+leaf_111_2002.3700=2002.3700
+leaf_112_2002.3751=2002.3751
+leaf_113_2002.3050=2002.3050
+leaf_114_2002.2414=2002.2414
+leaf_115_2002.2461=2002.2461
+leaf_116_2002.2722=2002.2722
+leaf_117_2002.3100=2002.3100
+leaf_118_2002.2969=2002.2969
+leaf_119_2002.3544=2002.3544
+leaf_120_2002.3547=2002.3547
+leaf_121_2002.3583=2002.3583
+leaf_122_2002.2826=2002.2826
+leaf_123_2002.3623=2002.3623
+leaf_124_2002.3781=2002.3781
+leaf_125_2002.3769=2002.3769
+leaf_126_2002.3254=2002.3254
+leaf_127_2002.3795=2002.3795
+leaf_128_2002.3748=2002.3748
+leaf_129_2002.3620=2002.3620
+leaf_130_2002.3795=2002.3795
+leaf_131_2002.3228=2002.3228
+leaf_132_2002.3425=2002.3425
+leaf_133_2002.3485=2002.3485
+leaf_134_2002.3631=2002.3631
+leaf_135_2002.3713=2002.3713
+leaf_136_2002.3289=2002.3289
+leaf_137_2002.2554=2002.2554
+leaf_138_2002.3760=2002.3760
+leaf_139_2002.3167=2002.3167
+leaf_140_2002.2693=2002.2693
+leaf_141_2002.3429=2002.3429
+leaf_142_2002.3350=2002.3350
+leaf_143_2002.3685=2002.3685
+leaf_144_2002.3565=2002.3565
+leaf_145_2002.2998=2002.2998
+leaf_146_2002.3227=2002.3227
+leaf_147_2002.3858=2002.3858
+leaf_148_2002.2933=2002.2933
+leaf_149_2002.3655=2002.3655
+leaf_150_2002.3718=2002.3718
+leaf_151_2002.3171=2002.3171
+leaf_152_2002.3723=2002.3723
+leaf_153_2002.3751=2002.3751
+leaf_154_2002.3627=2002.3627
+leaf_155_2002.3204=2002.3204
+leaf_156_2002.2540=2002.2540
+leaf_157_2002.3141=2002.3141
+leaf_158_2002.3239=2002.3239
+leaf_159_2002.3643=2002.3643
+leaf_160_2002.2464=2002.2464
+leaf_161_2002.3065=2002.3065
+leaf_162_2002.3642=2002.3642
+leaf_163_2002.3243=2002.3243
+leaf_164_2002.3819=2002.3819
+leaf_165_2002.3696=2002.3696
+leaf_166_2002.3206=2002.3206
+leaf_167_2002.2935=2002.2935
+leaf_168_2002.3239=2002.3239
+leaf_169_2002.3282=2002.3282
+leaf_170_2002.2396=2002.2396
+leaf_171_2002.3612=2002.3612
+leaf_172_2002.3193=2002.3193
+leaf_173_2002.3365=2002.3365
+leaf_174_2002.3361=2002.3361
+leaf_175_2002.3532=2002.3532
+leaf_176_2002.2935=2002.2935
+leaf_177_2002.3687=2002.3687
+leaf_178_2002.2879=2002.2879
+leaf_179_2002.3044=2002.3044
+leaf_180_2002.3838=2002.3838
+leaf_181_2002.3665=2002.3665
+leaf_182_2002.3051=2002.3051
+leaf_183_2002.3486=2002.3486
+leaf_184_2002.3379=2002.3379
+leaf_185_2002.3391=2002.3391
+leaf_186_2002.3600=2002.3600
+leaf_187_2002.2157=2002.2157
+leaf_188_2002.3837=2002.3837
+leaf_189_2002.2375=2002.2375
+leaf_190_2002.3179=2002.3179
+leaf_191_2002.3691=2002.3691
+leaf_192_2002.3041=2002.3041
+leaf_193_2002.3803=2002.3803
+leaf_194_2002.3655=2002.3655
+leaf_195_2002.3118=2002.3118
+leaf_196_2002.3787=2002.3787
+leaf_197_2002.3748=2002.3748
+leaf_198_2002.3795=2002.3795
+leaf_199_2002.2782=2002.2782
+leaf_200_2002.3691=2002.3691
+leaf_201_2002.2574=2002.2574
+leaf_202_2002.3593=2002.3593
+leaf_203_2002.3547=2002.3547
+leaf_204_2002.3726=2002.3726
+leaf_205_2002.2698=2002.2698
+leaf_206_2002.2973=2002.2973
+leaf_207_2002.3142=2002.3142
+leaf_208_2002.3368=2002.3368
+leaf_209_2002.2847=2002.2847
+leaf_210_2002.1435=2002.1435
+leaf_211_2002.3761=2002.3761
+leaf_212_2002.3479=2002.3479
+leaf_213_2002.3742=2002.3742
+leaf_214_2002.3651=2002.3651
+leaf_215_2002.2330=2002.2330
+leaf_216_2002.2533=2002.2533
+leaf_217_2002.3802=2002.3802
+leaf_218_2002.3594=2002.3594
+leaf_219_2002.3832=2002.3832
+leaf_220_2002.3742=2002.3742
+leaf_221_2002.3817=2002.3817
+leaf_222_2002.3730=2002.3730
+leaf_223_2002.1977=2002.1977
+leaf_224_2002.3819=2002.3819
+leaf_225_2002.3268=2002.3268
+leaf_226_2002.1614=2002.1614
+leaf_227_2002.1540=2002.1540
+leaf_228_2002.2477=2002.2477
+leaf_229_2002.3593=2002.3593
+leaf_230_2002.3864=2002.3864
+leaf_231_2002.3264=2002.3264
+leaf_232_2002.2401=2002.2401
+leaf_233_2002.3406=2002.3406
+leaf_234_2002.3775=2002.3775
+leaf_235_2002.3748=2002.3748
+leaf_236_2002.3770=2002.3770
+leaf_237_2002.2929=2002.2929
+leaf_238_2002.3654=2002.3654
+leaf_239_2002.3576=2002.3576
+leaf_240_2002.3201=2002.3201
+leaf_241_2002.2819=2002.2819
+leaf_242_2002.3376=2002.3376
+leaf_243_2002.3462=2002.3462
+leaf_244_2002.2899=2002.2899
+leaf_245_2002.3811=2002.3811
+leaf_246_2002.2222=2002.2222
+leaf_247_2002.2889=2002.2889
+leaf_248_2002.3596=2002.3596
+leaf_249_2002.3863=2002.3863
+leaf_250_2002.3833=2002.3833
+leaf_251_2002.3705=2002.3705
+leaf_252_2002.3774=2002.3774
+leaf_253_2002.3790=2002.3790
+leaf_254_2002.3697=2002.3697
+leaf_255_2002.3602=2002.3602
+leaf_256_2002.3631=2002.3631
+leaf_0_2002.3754=NOT_SET
+leaf_1_2002.3792=NOT_SET
+leaf_2_2002.3435=NOT_SET
+leaf_3_2002.3282=NOT_SET
+leaf_4_2002.3741=NOT_SET
+leaf_5_2002.3664=NOT_SET
+leaf_6_2002.3388=NOT_SET
+leaf_7_2002.3270=NOT_SET
+leaf_8_2002.3690=NOT_SET
+leaf_9_2002.3360=NOT_SET
+leaf_10_2002.3707=NOT_SET
+leaf_11_2002.2818=NOT_SET
+leaf_12_2002.2682=NOT_SET
+leaf_13_2002.3271=NOT_SET
+leaf_14_2002.2224=NOT_SET
+leaf_15_2002.2075=NOT_SET
+leaf_16_2002.3794=NOT_SET
+leaf_17_2002.2364=NOT_SET
+leaf_18_2002.3722=NOT_SET
+leaf_19_2002.3546=NOT_SET
+leaf_20_2002.3586=NOT_SET
+leaf_21_2002.3362=NOT_SET
+leaf_22_2002.3635=NOT_SET
+leaf_23_2002.3576=NOT_SET
+leaf_24_2002.3779=NOT_SET
+leaf_25_2002.3738=NOT_SET
+leaf_26_2002.3651=NOT_SET
+leaf_27_2002.3491=NOT_SET
+leaf_28_2002.3695=NOT_SET
+leaf_29_2002.2581=NOT_SET
+leaf_30_2002.3729=NOT_SET
+leaf_31_2002.3776=NOT_SET
+leaf_32_2002.2137=NOT_SET
+leaf_33_2002.3594=NOT_SET
+leaf_34_2002.3478=NOT_SET
+leaf_35_2002.3546=NOT_SET
+leaf_36_2002.3369=NOT_SET
+leaf_37_2002.2954=NOT_SET
+leaf_38_2002.3084=NOT_SET
+leaf_39_2002.3784=NOT_SET
+leaf_40_2002.2626=NOT_SET
+leaf_41_2002.2505=NOT_SET
+leaf_42_2002.3803=NOT_SET
+leaf_43_2002.3858=NOT_SET
+leaf_44_2002.3201=NOT_SET
+leaf_45_2002.3774=NOT_SET
+leaf_46_2002.3851=NOT_SET
+leaf_47_2002.3348=NOT_SET
+leaf_48_2002.3487=NOT_SET
+leaf_49_2002.3051=NOT_SET
+leaf_50_2002.3834=NOT_SET
+leaf_51_2002.3445=NOT_SET
+leaf_52_2002.3617=NOT_SET
+leaf_53_2002.3051=NOT_SET
+leaf_54_2002.3002=NOT_SET
+leaf_55_2002.3226=NOT_SET
+leaf_56_2002.3748=NOT_SET
+leaf_57_2002.3813=NOT_SET
+leaf_58_2002.3104=NOT_SET
+leaf_59_2002.3770=NOT_SET
+leaf_60_2002.3873=NOT_SET
+leaf_61_2002.3856=NOT_SET
+leaf_62_2002.3132=NOT_SET
+leaf_63_2002.2496=NOT_SET
+leaf_64_2002.2471=NOT_SET
+leaf_65_2002.2959=NOT_SET
+leaf_66_2002.3288=NOT_SET
+leaf_67_2002.2144=NOT_SET
+leaf_68_2002.3731=NOT_SET
+leaf_69_2002.3126=NOT_SET
+leaf_70_2002.3671=NOT_SET
+leaf_71_2002.3620=NOT_SET
+leaf_72_2002.3397=NOT_SET
+leaf_73_2002.3585=NOT_SET
+leaf_74_2002.3700=NOT_SET
+leaf_75_2002.3649=NOT_SET
+leaf_76_2002.3296=NOT_SET
+leaf_77_2002.3282=NOT_SET
+leaf_78_2002.3844=NOT_SET
+leaf_79_2002.3686=NOT_SET
+leaf_80_2002.2536=NOT_SET
+leaf_81_2002.2838=NOT_SET
+leaf_82_2002.3172=NOT_SET
+leaf_83_2002.3525=NOT_SET
+leaf_84_2002.1939=NOT_SET
+leaf_85_2002.2563=NOT_SET
+leaf_86_2002.3796=NOT_SET
+leaf_87_2002.3639=NOT_SET
+leaf_88_2002.1959=NOT_SET
+leaf_89_2002.3229=NOT_SET
+leaf_90_2002.3775=NOT_SET
+leaf_91_2002.3577=NOT_SET
+leaf_92_2002.3332=NOT_SET
+leaf_93_2002.3485=NOT_SET
+leaf_94_2002.1613=NOT_SET
+leaf_95_2002.1859=NOT_SET
+leaf_96_2002.1840=NOT_SET
+leaf_97_2002.2875=NOT_SET
+leaf_98_2002.3531=NOT_SET
+leaf_99_2002.3729=NOT_SET
+leaf_100_2002.3367=NOT_SET
+leaf_101_2002.3645=NOT_SET
+leaf_102_2002.3605=NOT_SET
+leaf_103_2002.3857=NOT_SET
+leaf_104_2002.3047=NOT_SET
+leaf_105_2002.3633=NOT_SET
+leaf_106_2002.2525=NOT_SET
+leaf_107_2002.3301=NOT_SET
+leaf_108_2002.3311=NOT_SET
+leaf_109_2002.3316=NOT_SET
+leaf_110_2002.2559=NOT_SET
+leaf_111_2002.3700=NOT_SET
+leaf_112_2002.3751=NOT_SET
+leaf_113_2002.3050=NOT_SET
+leaf_114_2002.2414=NOT_SET
+leaf_115_2002.2461=NOT_SET
+leaf_116_2002.2722=NOT_SET
+leaf_117_2002.3100=NOT_SET
+leaf_118_2002.2969=NOT_SET
+leaf_119_2002.3544=NOT_SET
+leaf_120_2002.3547=NOT_SET
+leaf_121_2002.3583=NOT_SET
+leaf_122_2002.2826=NOT_SET
+leaf_123_2002.3623=NOT_SET
+leaf_124_2002.3781=NOT_SET
+leaf_125_2002.3769=NOT_SET
+leaf_126_2002.3254=NOT_SET
+leaf_127_2002.3795=NOT_SET
+leaf_128_2002.3748=NOT_SET
+leaf_129_2002.3620=NOT_SET
+leaf_130_2002.3795=NOT_SET
+leaf_131_2002.3228=NOT_SET
+leaf_132_2002.3425=NOT_SET
+leaf_133_2002.3485=NOT_SET
+leaf_134_2002.3631=NOT_SET
+leaf_135_2002.3713=NOT_SET
+leaf_136_2002.3289=NOT_SET
+leaf_137_2002.2554=NOT_SET
+leaf_138_2002.3760=NOT_SET
+leaf_139_2002.3167=NOT_SET
+leaf_140_2002.2693=NOT_SET
+leaf_141_2002.3429=NOT_SET
+leaf_142_2002.3350=NOT_SET
+leaf_143_2002.3685=NOT_SET
+leaf_144_2002.3565=NOT_SET
+leaf_145_2002.2998=NOT_SET
+leaf_146_2002.3227=NOT_SET
+leaf_147_2002.3858=NOT_SET
+leaf_148_2002.2933=NOT_SET
+leaf_149_2002.3655=NOT_SET
+leaf_150_2002.3718=NOT_SET
+leaf_151_2002.3171=NOT_SET
+leaf_152_2002.3723=NOT_SET
+leaf_153_2002.3751=NOT_SET
+leaf_154_2002.3627=NOT_SET
+leaf_155_2002.3204=NOT_SET
+leaf_156_2002.2540=NOT_SET
+leaf_157_2002.3141=NOT_SET
+leaf_158_2002.3239=NOT_SET
+leaf_159_2002.3643=NOT_SET
+leaf_160_2002.2464=NOT_SET
+leaf_161_2002.3065=NOT_SET
+leaf_162_2002.3642=NOT_SET
+leaf_163_2002.3243=NOT_SET
+leaf_164_2002.3819=NOT_SET
+leaf_165_2002.3696=NOT_SET
+leaf_166_2002.3206=NOT_SET
+leaf_167_2002.2935=NOT_SET
+leaf_168_2002.3239=NOT_SET
+leaf_169_2002.3282=NOT_SET
+leaf_170_2002.2396=NOT_SET
+leaf_171_2002.3612=NOT_SET
+leaf_172_2002.3193=NOT_SET
+leaf_173_2002.3365=NOT_SET
+leaf_174_2002.3361=NOT_SET
+leaf_175_2002.3532=NOT_SET
+leaf_176_2002.2935=NOT_SET
+leaf_177_2002.3687=NOT_SET
+leaf_178_2002.2879=NOT_SET
+leaf_179_2002.3044=NOT_SET
+leaf_180_2002.3838=NOT_SET
+leaf_181_2002.3665=NOT_SET
+leaf_182_2002.3051=NOT_SET
+leaf_183_2002.3486=NOT_SET
+leaf_184_2002.3379=NOT_SET
+leaf_185_2002.3391=NOT_SET
+leaf_186_2002.3600=NOT_SET
+leaf_187_2002.2157=NOT_SET
+leaf_188_2002.3837=NOT_SET
+leaf_189_2002.2375=NOT_SET
+leaf_190_2002.3179=NOT_SET
+leaf_191_2002.3691=NOT_SET
+leaf_192_2002.3041=NOT_SET
+leaf_193_2002.3803=NOT_SET
+leaf_194_2002.3655=NOT_SET
+leaf_195_2002.3118=NOT_SET
+leaf_196_2002.3787=NOT_SET
+leaf_197_2002.3748=NOT_SET
+leaf_198_2002.3795=NOT_SET
+leaf_199_2002.2782=NOT_SET
+leaf_200_2002.3691=NOT_SET
+leaf_201_2002.2574=NOT_SET
+leaf_202_2002.3593=NOT_SET
+leaf_203_2002.3547=NOT_SET
+leaf_204_2002.3726=NOT_SET
+leaf_205_2002.2698=NOT_SET
+leaf_206_2002.2973=NOT_SET
+leaf_207_2002.3142=NOT_SET
+leaf_208_2002.3368=NOT_SET
+leaf_209_2002.2847=NOT_SET
+leaf_210_2002.1435=NOT_SET
+leaf_211_2002.3761=NOT_SET
+leaf_212_2002.3479=NOT_SET
+leaf_213_2002.3742=NOT_SET
+leaf_214_2002.3651=NOT_SET
+leaf_215_2002.2330=NOT_SET
+leaf_216_2002.2533=NOT_SET
+leaf_217_2002.3802=NOT_SET
+leaf_218_2002.3594=NOT_SET
+leaf_219_2002.3832=NOT_SET
+leaf_220_2002.3742=NOT_SET
+leaf_221_2002.3817=NOT_SET
+leaf_222_2002.3730=NOT_SET
+leaf_223_2002.1977=NOT_SET
+leaf_224_2002.3819=NOT_SET
+leaf_225_2002.3268=NOT_SET
+leaf_226_2002.1614=NOT_SET
+leaf_227_2002.1540=NOT_SET
+leaf_228_2002.2477=NOT_SET
+leaf_229_2002.3593=NOT_SET
+leaf_230_2002.3864=NOT_SET
+leaf_231_2002.3264=NOT_SET
+leaf_232_2002.2401=NOT_SET
+leaf_233_2002.3406=NOT_SET
+leaf_234_2002.3775=NOT_SET
+leaf_235_2002.3748=NOT_SET
+leaf_236_2002.3770=NOT_SET
+leaf_237_2002.2929=NOT_SET
+leaf_238_2002.3654=NOT_SET
+leaf_239_2002.3576=NOT_SET
+leaf_240_2002.3201=NOT_SET
+leaf_241_2002.2819=NOT_SET
+leaf_242_2002.3376=NOT_SET
+leaf_243_2002.3462=NOT_SET
+leaf_244_2002.2899=NOT_SET
+leaf_245_2002.3811=NOT_SET
+leaf_246_2002.2222=NOT_SET
+leaf_247_2002.2889=NOT_SET
+leaf_248_2002.3596=NOT_SET
+leaf_249_2002.3863=NOT_SET
+leaf_250_2002.3833=NOT_SET
+leaf_251_2002.3705=NOT_SET
+leaf_252_2002.3774=NOT_SET
+leaf_253_2002.3790=NOT_SET
+leaf_254_2002.3697=NOT_SET
+leaf_255_2002.3602=NOT_SET
+leaf_256_2002.3631=NOT_SET
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by beagle.BeagleJNIWrapper in an unnamed module (file:/cluster/home/aimolay/.beast/2.7/BEAST.base/lib/BEAST.base.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+leaf_0_2002.3754=2002.3754
+leaf_1_2002.3792=2002.3792
+leaf_2_2002.3435=2002.3435
+leaf_3_2002.3282=2002.3282
+leaf_4_2002.3741=2002.3741
+leaf_5_2002.3664=2002.3664
+leaf_6_2002.3388=2002.3388
+leaf_7_2002.3270=2002.3270
+leaf_8_2002.3690=2002.3690
+leaf_9_2002.3360=2002.3360
+leaf_10_2002.3707=2002.3707
+leaf_11_2002.2818=2002.2818
+leaf_12_2002.2682=2002.2682
+leaf_13_2002.3271=2002.3271
+leaf_14_2002.2224=2002.2224
+leaf_15_2002.2075=2002.2075
+leaf_16_2002.3794=2002.3794
+leaf_17_2002.2364=2002.2364
+leaf_18_2002.3722=2002.3722
+leaf_19_2002.3546=2002.3546
+leaf_20_2002.3586=2002.3586
+leaf_21_2002.3362=2002.3362
+leaf_22_2002.3635=2002.3635
+leaf_23_2002.3576=2002.3576
+leaf_24_2002.3779=2002.3779
+leaf_25_2002.3738=2002.3738
+leaf_26_2002.3651=2002.3651
+leaf_27_2002.3491=2002.3491
+leaf_28_2002.3695=2002.3695
+leaf_29_2002.2581=2002.2581
+leaf_30_2002.3729=2002.3729
+leaf_31_2002.3776=2002.3776
+leaf_32_2002.2137=2002.2137
+leaf_33_2002.3594=2002.3594
+leaf_34_2002.3478=2002.3478
+leaf_35_2002.3546=2002.3546
+leaf_36_2002.3369=2002.3369
+leaf_37_2002.2954=2002.2954
+leaf_38_2002.3084=2002.3084
+leaf_39_2002.3784=2002.3784
+leaf_40_2002.2626=2002.2626
+leaf_41_2002.2505=2002.2505
+leaf_42_2002.3803=2002.3803
+leaf_43_2002.3858=2002.3858
+leaf_44_2002.3201=2002.3201
+leaf_45_2002.3774=2002.3774
+leaf_46_2002.3851=2002.3851
+leaf_47_2002.3348=2002.3348
+leaf_48_2002.3487=2002.3487
+leaf_49_2002.3051=2002.3051
+leaf_50_2002.3834=2002.3834
+leaf_51_2002.3445=2002.3445
+leaf_52_2002.3617=2002.3617
+leaf_53_2002.3051=2002.3051
+leaf_54_2002.3002=2002.3002
+leaf_55_2002.3226=2002.3226
+leaf_56_2002.3748=2002.3748
+leaf_57_2002.3813=2002.3813
+leaf_58_2002.3104=2002.3104
+leaf_59_2002.3770=2002.3770
+leaf_60_2002.3873=2002.3873
+leaf_61_2002.3856=2002.3856
+leaf_62_2002.3132=2002.3132
+leaf_63_2002.2496=2002.2496
+leaf_64_2002.2471=2002.2471
+leaf_65_2002.2959=2002.2959
+leaf_66_2002.3288=2002.3288
+leaf_67_2002.2144=2002.2144
+leaf_68_2002.3731=2002.3731
+leaf_69_2002.3126=2002.3126
+leaf_70_2002.3671=2002.3671
+leaf_71_2002.3620=2002.3620
+leaf_72_2002.3397=2002.3397
+leaf_73_2002.3585=2002.3585
+leaf_74_2002.3700=2002.3700
+leaf_75_2002.3649=2002.3649
+leaf_76_2002.3296=2002.3296
+leaf_77_2002.3282=2002.3282
+leaf_78_2002.3844=2002.3844
+leaf_79_2002.3686=2002.3686
+leaf_80_2002.2536=2002.2536
+leaf_81_2002.2838=2002.2838
+leaf_82_2002.3172=2002.3172
+leaf_83_2002.3525=2002.3525
+leaf_84_2002.1939=2002.1939
+leaf_85_2002.2563=2002.2563
+leaf_86_2002.3796=2002.3796
+leaf_87_2002.3639=2002.3639
+leaf_88_2002.1959=2002.1959
+leaf_89_2002.3229=2002.3229
+leaf_90_2002.3775=2002.3775
+leaf_91_2002.3577=2002.3577
+leaf_92_2002.3332=2002.3332
+leaf_93_2002.3485=2002.3485
+leaf_94_2002.1613=2002.1613
+leaf_95_2002.1859=2002.1859
+leaf_96_2002.1840=2002.1840
+leaf_97_2002.2875=2002.2875
+leaf_98_2002.3531=2002.3531
+leaf_99_2002.3729=2002.3729
+leaf_100_2002.3367=2002.3367
+leaf_101_2002.3645=2002.3645
+leaf_102_2002.3605=2002.3605
+leaf_103_2002.3857=2002.3857
+leaf_104_2002.3047=2002.3047
+leaf_105_2002.3633=2002.3633
+leaf_106_2002.2525=2002.2525
+leaf_107_2002.3301=2002.3301
+leaf_108_2002.3311=2002.3311
+leaf_109_2002.3316=2002.3316
+leaf_110_2002.2559=2002.2559
+leaf_111_2002.3700=2002.3700
+leaf_112_2002.3751=2002.3751
+leaf_113_2002.3050=2002.3050
+leaf_114_2002.2414=2002.2414
+leaf_115_2002.2461=2002.2461
+leaf_116_2002.2722=2002.2722
+leaf_117_2002.3100=2002.3100
+leaf_118_2002.2969=2002.2969
+leaf_119_2002.3544=2002.3544
+leaf_120_2002.3547=2002.3547
+leaf_121_2002.3583=2002.3583
+leaf_122_2002.2826=2002.2826
+leaf_123_2002.3623=2002.3623
+leaf_124_2002.3781=2002.3781
+leaf_125_2002.3769=2002.3769
+leaf_126_2002.3254=2002.3254
+leaf_127_2002.3795=2002.3795
+leaf_128_2002.3748=2002.3748
+leaf_129_2002.3620=2002.3620
+leaf_130_2002.3795=2002.3795
+leaf_131_2002.3228=2002.3228
+leaf_132_2002.3425=2002.3425
+leaf_133_2002.3485=2002.3485
+leaf_134_2002.3631=2002.3631
+leaf_135_2002.3713=2002.3713
+leaf_136_2002.3289=2002.3289
+leaf_137_2002.2554=2002.2554
+leaf_138_2002.3760=2002.3760
+leaf_139_2002.3167=2002.3167
+leaf_140_2002.2693=2002.2693
+leaf_141_2002.3429=2002.3429
+leaf_142_2002.3350=2002.3350
+leaf_143_2002.3685=2002.3685
+leaf_144_2002.3565=2002.3565
+leaf_145_2002.2998=2002.2998
+leaf_146_2002.3227=2002.3227
+leaf_147_2002.3858=2002.3858
+leaf_148_2002.2933=2002.2933
+leaf_149_2002.3655=2002.3655
+leaf_150_2002.3718=2002.3718
+leaf_151_2002.3171=2002.3171
+leaf_152_2002.3723=2002.3723
+leaf_153_2002.3751=2002.3751
+leaf_154_2002.3627=2002.3627
+leaf_155_2002.3204=2002.3204
+leaf_156_2002.2540=2002.2540
+leaf_157_2002.3141=2002.3141
+leaf_158_2002.3239=2002.3239
+leaf_159_2002.3643=2002.3643
+leaf_160_2002.2464=2002.2464
+leaf_161_2002.3065=2002.3065
+leaf_162_2002.3642=2002.3642
+leaf_163_2002.3243=2002.3243
+leaf_164_2002.3819=2002.3819
+leaf_165_2002.3696=2002.3696
+leaf_166_2002.3206=2002.3206
+leaf_167_2002.2935=2002.2935
+leaf_168_2002.3239=2002.3239
+leaf_169_2002.3282=2002.3282
+leaf_170_2002.2396=2002.2396
+leaf_171_2002.3612=2002.3612
+leaf_172_2002.3193=2002.3193
+leaf_173_2002.3365=2002.3365
+leaf_174_2002.3361=2002.3361
+leaf_175_2002.3532=2002.3532
+leaf_176_2002.2935=2002.2935
+leaf_177_2002.3687=2002.3687
+leaf_178_2002.2879=2002.2879
+leaf_179_2002.3044=2002.3044
+leaf_180_2002.3838=2002.3838
+leaf_181_2002.3665=2002.3665
+leaf_182_2002.3051=2002.3051
+leaf_183_2002.3486=2002.3486
+leaf_184_2002.3379=2002.3379
+leaf_185_2002.3391=2002.3391
+leaf_186_2002.3600=2002.3600
+leaf_187_2002.2157=2002.2157
+leaf_188_2002.3837=2002.3837
+leaf_189_2002.2375=2002.2375
+leaf_190_2002.3179=2002.3179
+leaf_191_2002.3691=2002.3691
+leaf_192_2002.3041=2002.3041
+leaf_193_2002.3803=2002.3803
+leaf_194_2002.3655=2002.3655
+leaf_195_2002.3118=2002.3118
+leaf_196_2002.3787=2002.3787
+leaf_197_2002.3748=2002.3748
+leaf_198_2002.3795=2002.3795
+leaf_199_2002.2782=2002.2782
+leaf_200_2002.3691=2002.3691
+leaf_201_2002.2574=2002.2574
+leaf_202_2002.3593=2002.3593
+leaf_203_2002.3547=2002.3547
+leaf_204_2002.3726=2002.3726
+leaf_205_2002.2698=2002.2698
+leaf_206_2002.2973=2002.2973
+leaf_207_2002.3142=2002.3142
+leaf_208_2002.3368=2002.3368
+leaf_209_2002.2847=2002.2847
+leaf_210_2002.1435=2002.1435
+leaf_211_2002.3761=2002.3761
+leaf_212_2002.3479=2002.3479
+leaf_213_2002.3742=2002.3742
+leaf_214_2002.3651=2002.3651
+leaf_215_2002.2330=2002.2330
+leaf_216_2002.2533=2002.2533
+leaf_217_2002.3802=2002.3802
+leaf_218_2002.3594=2002.3594
+leaf_219_2002.3832=2002.3832
+leaf_220_2002.3742=2002.3742
+leaf_221_2002.3817=2002.3817
+leaf_222_2002.3730=2002.3730
+leaf_223_2002.1977=2002.1977
+leaf_224_2002.3819=2002.3819
+leaf_225_2002.3268=2002.3268
+leaf_226_2002.1614=2002.1614
+leaf_227_2002.1540=2002.1540
+leaf_228_2002.2477=2002.2477
+leaf_229_2002.3593=2002.3593
+leaf_230_2002.3864=2002.3864
+leaf_231_2002.3264=2002.3264
+leaf_232_2002.2401=2002.2401
+leaf_233_2002.3406=2002.3406
+leaf_234_2002.3775=2002.3775
+leaf_235_2002.3748=2002.3748
+leaf_236_2002.3770=2002.3770
+leaf_237_2002.2929=2002.2929
+leaf_238_2002.3654=2002.3654
+leaf_239_2002.3576=2002.3576
+leaf_240_2002.3201=2002.3201
+leaf_241_2002.2819=2002.2819
+leaf_242_2002.3376=2002.3376
+leaf_243_2002.3462=2002.3462
+leaf_244_2002.2899=2002.2899
+leaf_245_2002.3811=2002.3811
+leaf_246_2002.2222=2002.2222
+leaf_247_2002.2889=2002.2889
+leaf_248_2002.3596=2002.3596
+leaf_249_2002.3863=2002.3863
+leaf_250_2002.3833=2002.3833
+leaf_251_2002.3705=2002.3705
+leaf_252_2002.3774=2002.3774
+leaf_253_2002.3790=2002.3790
+leaf_254_2002.3697=2002.3697
+leaf_255_2002.3602=2002.3602
+leaf_256_2002.3631=2002.3631
+leaf_0_2002.3754=NOT_SET
+leaf_1_2002.3792=NOT_SET
+leaf_2_2002.3435=NOT_SET
+leaf_3_2002.3282=NOT_SET
+leaf_4_2002.3741=NOT_SET
+leaf_5_2002.3664=NOT_SET
+leaf_6_2002.3388=NOT_SET
+leaf_7_2002.3270=NOT_SET
+leaf_8_2002.3690=NOT_SET
+leaf_9_2002.3360=NOT_SET
+leaf_10_2002.3707=NOT_SET
+leaf_11_2002.2818=NOT_SET
+leaf_12_2002.2682=NOT_SET
+leaf_13_2002.3271=NOT_SET
+leaf_14_2002.2224=NOT_SET
+leaf_15_2002.2075=NOT_SET
+leaf_16_2002.3794=NOT_SET
+leaf_17_2002.2364=NOT_SET
+leaf_18_2002.3722=NOT_SET
+leaf_19_2002.3546=NOT_SET
+leaf_20_2002.3586=NOT_SET
+leaf_21_2002.3362=NOT_SET
+leaf_22_2002.3635=NOT_SET
+leaf_23_2002.3576=NOT_SET
+leaf_24_2002.3779=NOT_SET
+leaf_25_2002.3738=NOT_SET
+leaf_26_2002.3651=NOT_SET
+leaf_27_2002.3491=NOT_SET
+leaf_28_2002.3695=NOT_SET
+leaf_29_2002.2581=NOT_SET
+leaf_30_2002.3729=NOT_SET
+leaf_31_2002.3776=NOT_SET
+leaf_32_2002.2137=NOT_SET
+leaf_33_2002.3594=NOT_SET
+leaf_34_2002.3478=NOT_SET
+leaf_35_2002.3546=NOT_SET
+leaf_36_2002.3369=NOT_SET
+leaf_37_2002.2954=NOT_SET
+leaf_38_2002.3084=NOT_SET
+leaf_39_2002.3784=NOT_SET
+leaf_40_2002.2626=NOT_SET
+leaf_41_2002.2505=NOT_SET
+leaf_42_2002.3803=NOT_SET
+leaf_43_2002.3858=NOT_SET
+leaf_44_2002.3201=NOT_SET
+leaf_45_2002.3774=NOT_SET
+leaf_46_2002.3851=NOT_SET
+leaf_47_2002.3348=NOT_SET
+leaf_48_2002.3487=NOT_SET
+leaf_49_2002.3051=NOT_SET
+leaf_50_2002.3834=NOT_SET
+leaf_51_2002.3445=NOT_SET
+leaf_52_2002.3617=NOT_SET
+leaf_53_2002.3051=NOT_SET
+leaf_54_2002.3002=NOT_SET
+leaf_55_2002.3226=NOT_SET
+leaf_56_2002.3748=NOT_SET
+leaf_57_2002.3813=NOT_SET
+leaf_58_2002.3104=NOT_SET
+leaf_59_2002.3770=NOT_SET
+leaf_60_2002.3873=NOT_SET
+leaf_61_2002.3856=NOT_SET
+leaf_62_2002.3132=NOT_SET
+leaf_63_2002.2496=NOT_SET
+leaf_64_2002.2471=NOT_SET
+leaf_65_2002.2959=NOT_SET
+leaf_66_2002.3288=NOT_SET
+leaf_67_2002.2144=NOT_SET
+leaf_68_2002.3731=NOT_SET
+leaf_69_2002.3126=NOT_SET
+leaf_70_2002.3671=NOT_SET
+leaf_71_2002.3620=NOT_SET
+leaf_72_2002.3397=NOT_SET
+leaf_73_2002.3585=NOT_SET
+leaf_74_2002.3700=NOT_SET
+leaf_75_2002.3649=NOT_SET
+leaf_76_2002.3296=NOT_SET
+leaf_77_2002.3282=NOT_SET
+leaf_78_2002.3844=NOT_SET
+leaf_79_2002.3686=NOT_SET
+leaf_80_2002.2536=NOT_SET
+leaf_81_2002.2838=NOT_SET
+leaf_82_2002.3172=NOT_SET
+leaf_83_2002.3525=NOT_SET
+leaf_84_2002.1939=NOT_SET
+leaf_85_2002.2563=NOT_SET
+leaf_86_2002.3796=NOT_SET
+leaf_87_2002.3639=NOT_SET
+leaf_88_2002.1959=NOT_SET
+leaf_89_2002.3229=NOT_SET
+leaf_90_2002.3775=NOT_SET
+leaf_91_2002.3577=NOT_SET
+leaf_92_2002.3332=NOT_SET
+leaf_93_2002.3485=NOT_SET
+leaf_94_2002.1613=NOT_SET
+leaf_95_2002.1859=NOT_SET
+leaf_96_2002.1840=NOT_SET
+leaf_97_2002.2875=NOT_SET
+leaf_98_2002.3531=NOT_SET
+leaf_99_2002.3729=NOT_SET
+leaf_100_2002.3367=NOT_SET
+leaf_101_2002.3645=NOT_SET
+leaf_102_2002.3605=NOT_SET
+leaf_103_2002.3857=NOT_SET
+leaf_104_2002.3047=NOT_SET
+leaf_105_2002.3633=NOT_SET
+leaf_106_2002.2525=NOT_SET
+leaf_107_2002.3301=NOT_SET
+leaf_108_2002.3311=NOT_SET
+leaf_109_2002.3316=NOT_SET
+leaf_110_2002.2559=NOT_SET
+leaf_111_2002.3700=NOT_SET
+leaf_112_2002.3751=NOT_SET
+leaf_113_2002.3050=NOT_SET
+leaf_114_2002.2414=NOT_SET
+leaf_115_2002.2461=NOT_SET
+leaf_116_2002.2722=NOT_SET
+leaf_117_2002.3100=NOT_SET
+leaf_118_2002.2969=NOT_SET
+leaf_119_2002.3544=NOT_SET
+leaf_120_2002.3547=NOT_SET
+leaf_121_2002.3583=NOT_SET
+leaf_122_2002.2826=NOT_SET
+leaf_123_2002.3623=NOT_SET
+leaf_124_2002.3781=NOT_SET
+leaf_125_2002.3769=NOT_SET
+leaf_126_2002.3254=NOT_SET
+leaf_127_2002.3795=NOT_SET
+leaf_128_2002.3748=NOT_SET
+leaf_129_2002.3620=NOT_SET
+leaf_130_2002.3795=NOT_SET
+leaf_131_2002.3228=NOT_SET
+leaf_132_2002.3425=NOT_SET
+leaf_133_2002.3485=NOT_SET
+leaf_134_2002.3631=NOT_SET
+leaf_135_2002.3713=NOT_SET
+leaf_136_2002.3289=NOT_SET
+leaf_137_2002.2554=NOT_SET
+leaf_138_2002.3760=NOT_SET
+leaf_139_2002.3167=NOT_SET
+leaf_140_2002.2693=NOT_SET
+leaf_141_2002.3429=NOT_SET
+leaf_142_2002.3350=NOT_SET
+leaf_143_2002.3685=NOT_SET
+leaf_144_2002.3565=NOT_SET
+leaf_145_2002.2998=NOT_SET
+leaf_146_2002.3227=NOT_SET
+leaf_147_2002.3858=NOT_SET
+leaf_148_2002.2933=NOT_SET
+leaf_149_2002.3655=NOT_SET
+leaf_150_2002.3718=NOT_SET
+leaf_151_2002.3171=NOT_SET
+leaf_152_2002.3723=NOT_SET
+leaf_153_2002.3751=NOT_SET
+leaf_154_2002.3627=NOT_SET
+leaf_155_2002.3204=NOT_SET
+leaf_156_2002.2540=NOT_SET
+leaf_157_2002.3141=NOT_SET
+leaf_158_2002.3239=NOT_SET
+leaf_159_2002.3643=NOT_SET
+leaf_160_2002.2464=NOT_SET
+leaf_161_2002.3065=NOT_SET
+leaf_162_2002.3642=NOT_SET
+leaf_163_2002.3243=NOT_SET
+leaf_164_2002.3819=NOT_SET
+leaf_165_2002.3696=NOT_SET
+leaf_166_2002.3206=NOT_SET
+leaf_167_2002.2935=NOT_SET
+leaf_168_2002.3239=NOT_SET
+leaf_169_2002.3282=NOT_SET
+leaf_170_2002.2396=NOT_SET
+leaf_171_2002.3612=NOT_SET
+leaf_172_2002.3193=NOT_SET
+leaf_173_2002.3365=NOT_SET
+leaf_174_2002.3361=NOT_SET
+leaf_175_2002.3532=NOT_SET
+leaf_176_2002.2935=NOT_SET
+leaf_177_2002.3687=NOT_SET
+leaf_178_2002.2879=NOT_SET
+leaf_179_2002.3044=NOT_SET
+leaf_180_2002.3838=NOT_SET
+leaf_181_2002.3665=NOT_SET
+leaf_182_2002.3051=NOT_SET
+leaf_183_2002.3486=NOT_SET
+leaf_184_2002.3379=NOT_SET
+leaf_185_2002.3391=NOT_SET
+leaf_186_2002.3600=NOT_SET
+leaf_187_2002.2157=NOT_SET
+leaf_188_2002.3837=NOT_SET
+leaf_189_2002.2375=NOT_SET
+leaf_190_2002.3179=NOT_SET
+leaf_191_2002.3691=NOT_SET
+leaf_192_2002.3041=NOT_SET
+leaf_193_2002.3803=NOT_SET
+leaf_194_2002.3655=NOT_SET
+leaf_195_2002.3118=NOT_SET
+leaf_196_2002.3787=NOT_SET
+leaf_197_2002.3748=NOT_SET
+leaf_198_2002.3795=NOT_SET
+leaf_199_2002.2782=NOT_SET
+leaf_200_2002.3691=NOT_SET
+leaf_201_2002.2574=NOT_SET
+leaf_202_2002.3593=NOT_SET
+leaf_203_2002.3547=NOT_SET
+leaf_204_2002.3726=NOT_SET
+leaf_205_2002.2698=NOT_SET
+leaf_206_2002.2973=NOT_SET
+leaf_207_2002.3142=NOT_SET
+leaf_208_2002.3368=NOT_SET
+leaf_209_2002.2847=NOT_SET
+leaf_210_2002.1435=NOT_SET
+leaf_211_2002.3761=NOT_SET
+leaf_212_2002.3479=NOT_SET
+leaf_213_2002.3742=NOT_SET
+leaf_214_2002.3651=NOT_SET
+leaf_215_2002.2330=NOT_SET
+leaf_216_2002.2533=NOT_SET
+leaf_217_2002.3802=NOT_SET
+leaf_218_2002.3594=NOT_SET
+leaf_219_2002.3832=NOT_SET
+leaf_220_2002.3742=NOT_SET
+leaf_221_2002.3817=NOT_SET
+leaf_222_2002.3730=NOT_SET
+leaf_223_2002.1977=NOT_SET
+leaf_224_2002.3819=NOT_SET
+leaf_225_2002.3268=NOT_SET
+leaf_226_2002.1614=NOT_SET
+leaf_227_2002.1540=NOT_SET
+leaf_228_2002.2477=NOT_SET
+leaf_229_2002.3593=NOT_SET
+leaf_230_2002.3864=NOT_SET
+leaf_231_2002.3264=NOT_SET
+leaf_232_2002.2401=NOT_SET
+leaf_233_2002.3406=NOT_SET
+leaf_234_2002.3775=NOT_SET
+leaf_235_2002.3748=NOT_SET
+leaf_236_2002.3770=NOT_SET
+leaf_237_2002.2929=NOT_SET
+leaf_238_2002.3654=NOT_SET
+leaf_239_2002.3576=NOT_SET
+leaf_240_2002.3201=NOT_SET
+leaf_241_2002.2819=NOT_SET
+leaf_242_2002.3376=NOT_SET
+leaf_243_2002.3462=NOT_SET
+leaf_244_2002.2899=NOT_SET
+leaf_245_2002.3811=NOT_SET
+leaf_246_2002.2222=NOT_SET
+leaf_247_2002.2889=NOT_SET
+leaf_248_2002.3596=NOT_SET
+leaf_249_2002.3863=NOT_SET
+leaf_250_2002.3833=NOT_SET
+leaf_251_2002.3705=NOT_SET
+leaf_252_2002.3774=NOT_SET
+leaf_253_2002.3790=NOT_SET
+leaf_254_2002.3697=NOT_SET
+leaf_255_2002.3602=NOT_SET
+leaf_256_2002.3631=NOT_SET
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by beagle.BeagleJNIWrapper in an unnamed module (file:/cluster/home/aimolay/.beast/2.7/BEAST.base/lib/BEAST.base.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+  Ignoring ambiguities in tree likelihood.
+  Ignoring character uncertainty in tree likelihood.
+  With 19 unique site patterns.
+  Using rescaling scheme : dynamic
+Warning: removing transform class beast.base.inference.operator.kernel.Transform$LogConstrainedSumTransform because it should have at least 2 dimensions but it has 0
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/base.log
+  Ignoring ambiguities in tree likelihood.
+  Ignoring character uncertainty in tree likelihood.
+  With 19 unique site patterns.
+  Using rescaling scheme : dynamic
+Warning: removing transform class beast.base.inference.operator.kernel.Transform$LogConstrainedSumTransform because it should have at least 2 dimensions but it has 0
+leaf_0_2002.3754=2002.3754
+leaf_1_2002.3792=2002.3792
+leaf_2_2002.3435=2002.3435
+leaf_3_2002.3282=2002.3282
+leaf_4_2002.3741=2002.3741
+leaf_5_2002.3664=2002.3664
+leaf_6_2002.3388=2002.3388
+leaf_7_2002.3270=2002.3270
+leaf_8_2002.3690=2002.3690
+leaf_9_2002.3360=2002.3360
+leaf_10_2002.3707=2002.3707
+leaf_11_2002.2818=2002.2818
+leaf_12_2002.2682=2002.2682
+leaf_13_2002.3271=2002.3271
+leaf_14_2002.2224=2002.2224
+leaf_15_2002.2075=2002.2075
+leaf_16_2002.3794=2002.3794
+leaf_17_2002.2364=2002.2364
+leaf_18_2002.3722=2002.3722
+leaf_19_2002.3546=2002.3546
+leaf_20_2002.3586=2002.3586
+leaf_21_2002.3362=2002.3362
+leaf_22_2002.3635=2002.3635
+leaf_23_2002.3576=2002.3576
+leaf_24_2002.3779=2002.3779
+leaf_25_2002.3738=2002.3738
+leaf_26_2002.3651=2002.3651
+leaf_27_2002.3491=2002.3491
+leaf_28_2002.3695=2002.3695
+leaf_29_2002.2581=2002.2581
+leaf_30_2002.3729=2002.3729
+leaf_31_2002.3776=2002.3776
+leaf_32_2002.2137=2002.2137
+leaf_33_2002.3594=2002.3594
+leaf_34_2002.3478=2002.3478
+leaf_35_2002.3546=2002.3546
+leaf_36_2002.3369=2002.3369
+leaf_37_2002.2954=2002.2954
+leaf_38_2002.3084=2002.3084
+leaf_39_2002.3784=2002.3784
+leaf_40_2002.2626=2002.2626
+leaf_41_2002.2505=2002.2505
+leaf_42_2002.3803=2002.3803
+leaf_43_2002.3858=2002.3858
+leaf_44_2002.3201=2002.3201
+leaf_45_2002.3774=2002.3774
+leaf_46_2002.3851=2002.3851
+leaf_47_2002.3348=2002.3348
+leaf_48_2002.3487=2002.3487
+leaf_49_2002.3051=2002.3051
+leaf_0_2002.3754=2002.3754
+leaf_50_2002.3834=2002.3834
+leaf_51_2002.3445=2002.3445
+leaf_52_2002.3617=2002.3617
+leaf_53_2002.3051=2002.3051
+leaf_1_2002.3792=2002.3792
+leaf_54_2002.3002=2002.3002
+leaf_2_2002.3435=2002.3435
+leaf_55_2002.3226=2002.3226
+leaf_3_2002.3282=2002.3282
+leaf_56_2002.3748=2002.3748
+leaf_4_2002.3741=2002.3741
+leaf_57_2002.3813=2002.3813
+leaf_5_2002.3664=2002.3664
+leaf_58_2002.3104=2002.3104
+leaf_6_2002.3388=2002.3388
+leaf_59_2002.3770=2002.3770
+leaf_7_2002.3270=2002.3270
+leaf_60_2002.3873=2002.3873
+leaf_8_2002.3690=2002.3690
+leaf_61_2002.3856=2002.3856
+leaf_9_2002.3360=2002.3360
+leaf_62_2002.3132=2002.3132
+leaf_10_2002.3707=2002.3707
+leaf_63_2002.2496=2002.2496
+leaf_11_2002.2818=2002.2818
+leaf_64_2002.2471=2002.2471
+leaf_12_2002.2682=2002.2682
+leaf_65_2002.2959=2002.2959
+leaf_13_2002.3271=2002.3271
+leaf_66_2002.3288=2002.3288
+leaf_14_2002.2224=2002.2224
+leaf_67_2002.2144=2002.2144
+leaf_15_2002.2075=2002.2075
+leaf_68_2002.3731=2002.3731
+leaf_16_2002.3794=2002.3794
+leaf_69_2002.3126=2002.3126
+leaf_17_2002.2364=2002.2364
+leaf_70_2002.3671=2002.3671
+leaf_18_2002.3722=2002.3722
+leaf_71_2002.3620=2002.3620
+leaf_19_2002.3546=2002.3546
+leaf_72_2002.3397=2002.3397
+leaf_20_2002.3586=2002.3586
+leaf_73_2002.3585=2002.3585
+leaf_21_2002.3362=2002.3362
+leaf_22_2002.3635=2002.3635
+leaf_23_2002.3576=2002.3576
+leaf_24_2002.3779=2002.3779
+leaf_25_2002.3738=2002.3738
+leaf_26_2002.3651=2002.3651
+leaf_27_2002.3491=2002.3491
+leaf_28_2002.3695=2002.3695
+leaf_29_2002.2581=2002.2581
+leaf_30_2002.3729=2002.3729
+leaf_31_2002.3776=2002.3776
+leaf_32_2002.2137=2002.2137
+leaf_33_2002.3594=2002.3594
+leaf_34_2002.3478=2002.3478
+leaf_35_2002.3546=2002.3546
+leaf_36_2002.3369=2002.3369
+leaf_37_2002.2954=2002.2954
+leaf_38_2002.3084=2002.3084
+leaf_39_2002.3784=2002.3784
+leaf_40_2002.2626=2002.2626
+leaf_41_2002.2505=2002.2505
+leaf_42_2002.3803=2002.3803
+leaf_43_2002.3858=2002.3858
+leaf_44_2002.3201=2002.3201
+leaf_45_2002.3774=2002.3774
+leaf_46_2002.3851=2002.3851
+leaf_47_2002.3348=2002.3348
+leaf_48_2002.3487=2002.3487
+leaf_49_2002.3051=2002.3051
+leaf_50_2002.3834=2002.3834
+leaf_51_2002.3445=2002.3445
+leaf_52_2002.3617=2002.3617
+leaf_53_2002.3051=2002.3051
+leaf_54_2002.3002=2002.3002
+leaf_55_2002.3226=2002.3226
+leaf_56_2002.3748=2002.3748
+leaf_57_2002.3813=2002.3813
+leaf_58_2002.3104=2002.3104
+leaf_59_2002.3770=2002.3770
+leaf_60_2002.3873=2002.3873
+leaf_61_2002.3856=2002.3856
+leaf_62_2002.3132=2002.3132
+leaf_63_2002.2496=2002.2496
+leaf_64_2002.2471=2002.2471
+leaf_65_2002.2959=2002.2959
+leaf_66_2002.3288=2002.3288
+leaf_67_2002.2144=2002.2144
+leaf_68_2002.3731=2002.3731
+leaf_69_2002.3126=2002.3126
+leaf_70_2002.3671=2002.3671
+leaf_71_2002.3620=2002.3620
+leaf_72_2002.3397=2002.3397
+leaf_73_2002.3585=2002.3585
+leaf_74_2002.3700=2002.3700
+leaf_75_2002.3649=2002.3649
+leaf_76_2002.3296=2002.3296
+leaf_77_2002.3282=2002.3282
+leaf_78_2002.3844=2002.3844
+leaf_79_2002.3686=2002.3686
+leaf_80_2002.2536=2002.2536
+leaf_81_2002.2838=2002.2838
+leaf_82_2002.3172=2002.3172
+leaf_83_2002.3525=2002.3525
+leaf_84_2002.1939=2002.1939
+leaf_85_2002.2563=2002.2563
+leaf_86_2002.3796=2002.3796
+leaf_87_2002.3639=2002.3639
+leaf_88_2002.1959=2002.1959
+leaf_89_2002.3229=2002.3229
+leaf_90_2002.3775=2002.3775
+leaf_91_2002.3577=2002.3577
+leaf_92_2002.3332=2002.3332
+leaf_93_2002.3485=2002.3485
+leaf_94_2002.1613=2002.1613
+leaf_95_2002.1859=2002.1859
+leaf_96_2002.1840=2002.1840
+leaf_97_2002.2875=2002.2875
+leaf_98_2002.3531=2002.3531
+leaf_99_2002.3729=2002.3729
+leaf_100_2002.3367=2002.3367
+leaf_101_2002.3645=2002.3645
+leaf_102_2002.3605=2002.3605
+leaf_103_2002.3857=2002.3857
+leaf_104_2002.3047=2002.3047
+leaf_105_2002.3633=2002.3633
+leaf_106_2002.2525=2002.2525
+leaf_107_2002.3301=2002.3301
+leaf_108_2002.3311=2002.3311
+leaf_109_2002.3316=2002.3316
+leaf_110_2002.2559=2002.2559
+leaf_111_2002.3700=2002.3700
+leaf_112_2002.3751=2002.3751
+leaf_113_2002.3050=2002.3050
+leaf_114_2002.2414=2002.2414
+leaf_115_2002.2461=2002.2461
+leaf_116_2002.2722=2002.2722
+leaf_117_2002.3100=2002.3100
+leaf_118_2002.2969=2002.2969
+leaf_119_2002.3544=2002.3544
+leaf_120_2002.3547=2002.3547
+leaf_121_2002.3583=2002.3583
+leaf_122_2002.2826=2002.2826
+leaf_123_2002.3623=2002.3623
+leaf_124_2002.3781=2002.3781
+leaf_125_2002.3769=2002.3769
+leaf_126_2002.3254=2002.3254
+leaf_127_2002.3795=2002.3795
+leaf_128_2002.3748=2002.3748
+leaf_129_2002.3620=2002.3620
+leaf_130_2002.3795=2002.3795
+leaf_131_2002.3228=2002.3228
+leaf_132_2002.3425=2002.3425
+leaf_133_2002.3485=2002.3485
+leaf_134_2002.3631=2002.3631
+leaf_135_2002.3713=2002.3713
+leaf_136_2002.3289=2002.3289
+leaf_137_2002.2554=2002.2554
+leaf_138_2002.3760=2002.3760
+leaf_139_2002.3167=2002.3167
+leaf_140_2002.2693=2002.2693
+leaf_141_2002.3429=2002.3429
+leaf_142_2002.3350=2002.3350
+leaf_143_2002.3685=2002.3685
+leaf_144_2002.3565=2002.3565
+leaf_145_2002.2998=2002.2998
+leaf_146_2002.3227=2002.3227
+leaf_147_2002.3858=2002.3858
+leaf_148_2002.2933=2002.2933
+leaf_149_2002.3655=2002.3655
+leaf_150_2002.3718=2002.3718
+leaf_151_2002.3171=2002.3171
+leaf_152_2002.3723=2002.3723
+leaf_153_2002.3751=2002.3751
+leaf_154_2002.3627=2002.3627
+leaf_155_2002.3204=2002.3204
+leaf_156_2002.2540=2002.2540
+leaf_157_2002.3141=2002.3141
+leaf_158_2002.3239=2002.3239
+leaf_159_2002.3643=2002.3643
+leaf_160_2002.2464=2002.2464
+leaf_161_2002.3065=2002.3065
+leaf_162_2002.3642=2002.3642
+leaf_163_2002.3243=2002.3243
+leaf_164_2002.3819=2002.3819
+leaf_165_2002.3696=2002.3696
+leaf_166_2002.3206=2002.3206
+leaf_167_2002.2935=2002.2935
+leaf_168_2002.3239=2002.3239
+leaf_169_2002.3282=2002.3282
+leaf_170_2002.2396=2002.2396
+leaf_171_2002.3612=2002.3612
+leaf_172_2002.3193=2002.3193
+leaf_173_2002.3365=2002.3365
+leaf_174_2002.3361=2002.3361
+leaf_175_2002.3532=2002.3532
+leaf_176_2002.2935=2002.2935
+leaf_177_2002.3687=2002.3687
+leaf_178_2002.2879=2002.2879
+leaf_179_2002.3044=2002.3044
+leaf_180_2002.3838=2002.3838
+leaf_181_2002.3665=2002.3665
+leaf_182_2002.3051=2002.3051
+leaf_183_2002.3486=2002.3486
+leaf_184_2002.3379=2002.3379
+leaf_185_2002.3391=2002.3391
+leaf_186_2002.3600=2002.3600
+leaf_187_2002.2157=2002.2157
+leaf_188_2002.3837=2002.3837
+leaf_189_2002.2375=2002.2375
+leaf_190_2002.3179=2002.3179
+leaf_191_2002.3691=2002.3691
+leaf_192_2002.3041=2002.3041
+leaf_193_2002.3803=2002.3803
+leaf_194_2002.3655=2002.3655
+leaf_195_2002.3118=2002.3118
+leaf_196_2002.3787=2002.3787
+leaf_197_2002.3748=2002.3748
+leaf_198_2002.3795=2002.3795
+leaf_199_2002.2782=2002.2782
+leaf_200_2002.3691=2002.3691
+leaf_201_2002.2574=2002.2574
+leaf_202_2002.3593=2002.3593
+leaf_203_2002.3547=2002.3547
+leaf_204_2002.3726=2002.3726
+leaf_205_2002.2698=2002.2698
+leaf_206_2002.2973=2002.2973
+leaf_207_2002.3142=2002.3142
+leaf_208_2002.3368=2002.3368
+leaf_209_2002.2847=2002.2847
+leaf_210_2002.1435=2002.1435
+leaf_211_2002.3761=2002.3761
+leaf_212_2002.3479=2002.3479
+leaf_213_2002.3742=2002.3742
+leaf_214_2002.3651=2002.3651
+leaf_215_2002.2330=2002.2330
+leaf_216_2002.2533=2002.2533
+leaf_217_2002.3802=2002.3802
+leaf_218_2002.3594=2002.3594
+leaf_219_2002.3832=2002.3832
+leaf_220_2002.3742=2002.3742
+leaf_221_2002.3817=2002.3817
+leaf_222_2002.3730=2002.3730
+leaf_223_2002.1977=2002.1977
+leaf_224_2002.3819=2002.3819
+leaf_225_2002.3268=2002.3268
+leaf_226_2002.1614=2002.1614
+leaf_227_2002.1540=2002.1540
+leaf_228_2002.2477=2002.2477
+leaf_229_2002.3593=2002.3593
+leaf_230_2002.3864=2002.3864
+leaf_231_2002.3264=2002.3264
+leaf_232_2002.2401=2002.2401
+leaf_233_2002.3406=2002.3406
+leaf_234_2002.3775=2002.3775
+leaf_235_2002.3748=2002.3748
+leaf_236_2002.3770=2002.3770
+leaf_237_2002.2929=2002.2929
+leaf_238_2002.3654=2002.3654
+leaf_239_2002.3576=2002.3576
+leaf_240_2002.3201=2002.3201
+leaf_241_2002.2819=2002.2819
+leaf_242_2002.3376=2002.3376
+leaf_243_2002.3462=2002.3462
+leaf_244_2002.2899=2002.2899
+leaf_245_2002.3811=2002.3811
+leaf_246_2002.2222=2002.2222
+leaf_247_2002.2889=2002.2889
+leaf_248_2002.3596=2002.3596
+leaf_249_2002.3863=2002.3863
+leaf_250_2002.3833=2002.3833
+leaf_251_2002.3705=2002.3705
+leaf_252_2002.3774=2002.3774
+leaf_253_2002.3790=2002.3790
+leaf_254_2002.3697=2002.3697
+leaf_255_2002.3602=2002.3602
+leaf_256_2002.3631=2002.3631
+leaf_74_2002.3700=2002.3700
+leaf_75_2002.3649=2002.3649
+leaf_76_2002.3296=2002.3296
+leaf_77_2002.3282=2002.3282
+leaf_78_2002.3844=2002.3844
+leaf_79_2002.3686=2002.3686
+leaf_80_2002.2536=2002.2536
+leaf_81_2002.2838=2002.2838
+leaf_82_2002.3172=2002.3172
+leaf_83_2002.3525=2002.3525
+leaf_84_2002.1939=2002.1939
+leaf_85_2002.2563=2002.2563
+leaf_86_2002.3796=2002.3796
+leaf_87_2002.3639=2002.3639
+leaf_88_2002.1959=2002.1959
+leaf_89_2002.3229=2002.3229
+leaf_90_2002.3775=2002.3775
+leaf_91_2002.3577=2002.3577
+leaf_92_2002.3332=2002.3332
+leaf_93_2002.3485=2002.3485
+leaf_94_2002.1613=2002.1613
+leaf_95_2002.1859=2002.1859
+leaf_96_2002.1840=2002.1840
+leaf_97_2002.2875=2002.2875
+leaf_98_2002.3531=2002.3531
+leaf_99_2002.3729=2002.3729
+leaf_100_2002.3367=2002.3367
+leaf_101_2002.3645=2002.3645
+leaf_102_2002.3605=2002.3605
+leaf_103_2002.3857=2002.3857
+leaf_104_2002.3047=2002.3047
+leaf_105_2002.3633=2002.3633
+leaf_106_2002.2525=2002.2525
+leaf_107_2002.3301=2002.3301
+leaf_108_2002.3311=2002.3311
+leaf_109_2002.3316=2002.3316
+leaf_110_2002.2559=2002.2559
+leaf_111_2002.3700=2002.3700
+leaf_112_2002.3751=2002.3751
+leaf_113_2002.3050=2002.3050
+leaf_114_2002.2414=2002.2414
+leaf_115_2002.2461=2002.2461
+leaf_116_2002.2722=2002.2722
+leaf_117_2002.3100=2002.3100
+leaf_118_2002.2969=2002.2969
+leaf_119_2002.3544=2002.3544
+leaf_120_2002.3547=2002.3547
+leaf_121_2002.3583=2002.3583
+leaf_122_2002.2826=2002.2826
+leaf_123_2002.3623=2002.3623
+leaf_124_2002.3781=2002.3781
+leaf_125_2002.3769=2002.3769
+leaf_126_2002.3254=2002.3254
+leaf_127_2002.3795=2002.3795
+leaf_128_2002.3748=2002.3748
+leaf_129_2002.3620=2002.3620
+leaf_130_2002.3795=2002.3795
+leaf_131_2002.3228=2002.3228
+leaf_132_2002.3425=2002.3425
+leaf_133_2002.3485=2002.3485
+leaf_134_2002.3631=2002.3631
+leaf_135_2002.3713=2002.3713
+leaf_136_2002.3289=2002.3289
+leaf_137_2002.2554=2002.2554
+leaf_138_2002.3760=2002.3760
+leaf_139_2002.3167=2002.3167
+leaf_140_2002.2693=2002.2693
+leaf_141_2002.3429=2002.3429
+leaf_142_2002.3350=2002.3350
+leaf_143_2002.3685=2002.3685
+leaf_144_2002.3565=2002.3565
+leaf_145_2002.2998=2002.2998
+leaf_146_2002.3227=2002.3227
+leaf_147_2002.3858=2002.3858
+leaf_148_2002.2933=2002.2933
+leaf_149_2002.3655=2002.3655
+leaf_150_2002.3718=2002.3718
+leaf_151_2002.3171=2002.3171
+leaf_152_2002.3723=2002.3723
+leaf_153_2002.3751=2002.3751
+leaf_154_2002.3627=2002.3627
+leaf_155_2002.3204=2002.3204
+leaf_156_2002.2540=2002.2540
+leaf_157_2002.3141=2002.3141
+leaf_158_2002.3239=2002.3239
+leaf_159_2002.3643=2002.3643
+leaf_160_2002.2464=2002.2464
+leaf_161_2002.3065=2002.3065
+leaf_162_2002.3642=2002.3642
+leaf_163_2002.3243=2002.3243
+leaf_164_2002.3819=2002.3819
+leaf_165_2002.3696=2002.3696
+leaf_166_2002.3206=2002.3206
+leaf_167_2002.2935=2002.2935
+leaf_168_2002.3239=2002.3239
+leaf_169_2002.3282=2002.3282
+leaf_170_2002.2396=2002.2396
+leaf_171_2002.3612=2002.3612
+leaf_172_2002.3193=2002.3193
+leaf_173_2002.3365=2002.3365
+leaf_174_2002.3361=2002.3361
+leaf_175_2002.3532=2002.3532
+leaf_176_2002.2935=2002.2935
+leaf_177_2002.3687=2002.3687
+leaf_178_2002.2879=2002.2879
+leaf_179_2002.3044=2002.3044
+leaf_180_2002.3838=2002.3838
+leaf_181_2002.3665=2002.3665
+leaf_182_2002.3051=2002.3051
+leaf_183_2002.3486=2002.3486
+leaf_184_2002.3379=2002.3379
+leaf_185_2002.3391=2002.3391
+leaf_186_2002.3600=2002.3600
+leaf_187_2002.2157=2002.2157
+leaf_188_2002.3837=2002.3837
+leaf_189_2002.2375=2002.2375
+leaf_190_2002.3179=2002.3179
+leaf_191_2002.3691=2002.3691
+leaf_192_2002.3041=2002.3041
+leaf_193_2002.3803=2002.3803
+leaf_194_2002.3655=2002.3655
+leaf_195_2002.3118=2002.3118
+leaf_196_2002.3787=2002.3787
+leaf_197_2002.3748=2002.3748
+leaf_198_2002.3795=2002.3795
+leaf_199_2002.2782=2002.2782
+leaf_200_2002.3691=2002.3691
+leaf_201_2002.2574=2002.2574
+leaf_202_2002.3593=2002.3593
+leaf_203_2002.3547=2002.3547
+leaf_204_2002.3726=2002.3726
+leaf_205_2002.2698=2002.2698
+leaf_206_2002.2973=2002.2973
+leaf_207_2002.3142=2002.3142
+leaf_208_2002.3368=2002.3368
+leaf_209_2002.2847=2002.2847
+leaf_210_2002.1435=2002.1435
+leaf_211_2002.3761=2002.3761
+leaf_212_2002.3479=2002.3479
+leaf_213_2002.3742=2002.3742
+leaf_214_2002.3651=2002.3651
+leaf_215_2002.2330=2002.2330
+leaf_216_2002.2533=2002.2533
+leaf_217_2002.3802=2002.3802
+leaf_218_2002.3594=2002.3594
+leaf_219_2002.3832=2002.3832
+leaf_220_2002.3742=2002.3742
+leaf_221_2002.3817=2002.3817
+leaf_222_2002.3730=2002.3730
+leaf_223_2002.1977=2002.1977
+leaf_224_2002.3819=2002.3819
+leaf_225_2002.3268=2002.3268
+leaf_226_2002.1614=2002.1614
+leaf_227_2002.1540=2002.1540
+leaf_228_2002.2477=2002.2477
+leaf_229_2002.3593=2002.3593
+leaf_230_2002.3864=2002.3864
+leaf_231_2002.3264=2002.3264
+leaf_232_2002.2401=2002.2401
+leaf_233_2002.3406=2002.3406
+leaf_234_2002.3775=2002.3775
+leaf_235_2002.3748=2002.3748
+leaf_236_2002.3770=2002.3770
+leaf_237_2002.2929=2002.2929
+leaf_238_2002.3654=2002.3654
+leaf_239_2002.3576=2002.3576
+leaf_240_2002.3201=2002.3201
+leaf_241_2002.2819=2002.2819
+leaf_242_2002.3376=2002.3376
+leaf_243_2002.3462=2002.3462
+leaf_244_2002.2899=2002.2899
+leaf_245_2002.3811=2002.3811
+leaf_246_2002.2222=2002.2222
+leaf_247_2002.2889=2002.2889
+leaf_248_2002.3596=2002.3596
+leaf_249_2002.3863=2002.3863
+leaf_250_2002.3833=2002.3833
+leaf_251_2002.3705=2002.3705
+leaf_252_2002.3774=2002.3774
+leaf_253_2002.3790=2002.3790
+leaf_254_2002.3697=2002.3697
+leaf_255_2002.3602=2002.3602
+leaf_256_2002.3631=2002.3631
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/whole_period.log
+leaf_0_2002.3754=NOT_SET
+leaf_1_2002.3792=NOT_SET
+leaf_2_2002.3435=NOT_SET
+leaf_3_2002.3282=NOT_SET
+leaf_4_2002.3741=NOT_SET
+leaf_5_2002.3664=NOT_SET
+leaf_6_2002.3388=NOT_SET
+leaf_7_2002.3270=NOT_SET
+leaf_8_2002.3690=NOT_SET
+leaf_9_2002.3360=NOT_SET
+leaf_10_2002.3707=NOT_SET
+leaf_11_2002.2818=NOT_SET
+leaf_12_2002.2682=NOT_SET
+leaf_13_2002.3271=NOT_SET
+leaf_14_2002.2224=NOT_SET
+leaf_15_2002.2075=NOT_SET
+leaf_16_2002.3794=NOT_SET
+leaf_17_2002.2364=NOT_SET
+leaf_18_2002.3722=NOT_SET
+leaf_19_2002.3546=NOT_SET
+leaf_20_2002.3586=NOT_SET
+leaf_21_2002.3362=NOT_SET
+leaf_22_2002.3635=NOT_SET
+leaf_23_2002.3576=NOT_SET
+leaf_24_2002.3779=NOT_SET
+leaf_25_2002.3738=NOT_SET
+leaf_26_2002.3651=NOT_SET
+leaf_27_2002.3491=NOT_SET
+leaf_0_2002.3754=NOT_SET
+leaf_28_2002.3695=NOT_SET
+leaf_29_2002.2581=NOT_SET
+leaf_30_2002.3729=NOT_SET
+leaf_1_2002.3792=NOT_SET
+leaf_31_2002.3776=NOT_SET
+leaf_2_2002.3435=NOT_SET
+leaf_32_2002.2137=NOT_SET
+leaf_3_2002.3282=NOT_SET
+leaf_33_2002.3594=NOT_SET
+leaf_4_2002.3741=NOT_SET
+leaf_34_2002.3478=NOT_SET
+leaf_5_2002.3664=NOT_SET
+leaf_35_2002.3546=NOT_SET
+leaf_6_2002.3388=NOT_SET
+leaf_36_2002.3369=NOT_SET
+leaf_7_2002.3270=NOT_SET
+leaf_37_2002.2954=NOT_SET
+leaf_8_2002.3690=NOT_SET
+leaf_38_2002.3084=NOT_SET
+leaf_9_2002.3360=NOT_SET
+leaf_39_2002.3784=NOT_SET
+leaf_10_2002.3707=NOT_SET
+leaf_11_2002.2818=NOT_SET
+leaf_12_2002.2682=NOT_SET
+leaf_13_2002.3271=NOT_SET
+leaf_14_2002.2224=NOT_SET
+leaf_15_2002.2075=NOT_SET
+leaf_40_2002.2626=NOT_SET
+leaf_16_2002.3794=NOT_SET
+leaf_17_2002.2364=NOT_SET
+leaf_41_2002.2505=NOT_SET
+leaf_18_2002.3722=NOT_SET
+leaf_42_2002.3803=NOT_SET
+leaf_19_2002.3546=NOT_SET
+leaf_43_2002.3858=NOT_SET
+leaf_20_2002.3586=NOT_SET
+leaf_44_2002.3201=NOT_SET
+leaf_21_2002.3362=NOT_SET
+leaf_45_2002.3774=NOT_SET
+leaf_22_2002.3635=NOT_SET
+leaf_46_2002.3851=NOT_SET
+leaf_23_2002.3576=NOT_SET
+leaf_47_2002.3348=NOT_SET
+leaf_24_2002.3779=NOT_SET
+leaf_48_2002.3487=NOT_SET
+leaf_25_2002.3738=NOT_SET
+leaf_49_2002.3051=NOT_SET
+leaf_26_2002.3651=NOT_SET
+leaf_50_2002.3834=NOT_SET
+leaf_27_2002.3491=NOT_SET
+leaf_51_2002.3445=NOT_SET
+leaf_28_2002.3695=NOT_SET
+leaf_52_2002.3617=NOT_SET
+leaf_29_2002.2581=NOT_SET
+leaf_53_2002.3051=NOT_SET
+leaf_30_2002.3729=NOT_SET
+leaf_54_2002.3002=NOT_SET
+leaf_31_2002.3776=NOT_SET
+leaf_55_2002.3226=NOT_SET
+leaf_32_2002.2137=NOT_SET
+leaf_56_2002.3748=NOT_SET
+leaf_33_2002.3594=NOT_SET
+leaf_57_2002.3813=NOT_SET
+leaf_34_2002.3478=NOT_SET
+leaf_58_2002.3104=NOT_SET
+leaf_35_2002.3546=NOT_SET
+leaf_59_2002.3770=NOT_SET
+leaf_36_2002.3369=NOT_SET
+leaf_60_2002.3873=NOT_SET
+leaf_37_2002.2954=NOT_SET
+leaf_61_2002.3856=NOT_SET
+leaf_38_2002.3084=NOT_SET
+leaf_62_2002.3132=NOT_SET
+leaf_39_2002.3784=NOT_SET
+leaf_63_2002.2496=NOT_SET
+leaf_40_2002.2626=NOT_SET
+leaf_64_2002.2471=NOT_SET
+leaf_41_2002.2505=NOT_SET
+leaf_42_2002.3803=NOT_SET
+leaf_43_2002.3858=NOT_SET
+leaf_44_2002.3201=NOT_SET
+leaf_45_2002.3774=NOT_SET
+leaf_65_2002.2959=NOT_SET
+leaf_46_2002.3851=NOT_SET
+leaf_47_2002.3348=NOT_SET
+leaf_48_2002.3487=NOT_SET
+leaf_49_2002.3051=NOT_SET
+leaf_50_2002.3834=NOT_SET
+leaf_51_2002.3445=NOT_SET
+leaf_52_2002.3617=NOT_SET
+leaf_53_2002.3051=NOT_SET
+leaf_54_2002.3002=NOT_SET
+leaf_55_2002.3226=NOT_SET
+leaf_56_2002.3748=NOT_SET
+leaf_57_2002.3813=NOT_SET
+leaf_58_2002.3104=NOT_SET
+leaf_59_2002.3770=NOT_SET
+leaf_60_2002.3873=NOT_SET
+leaf_61_2002.3856=NOT_SET
+leaf_62_2002.3132=NOT_SET
+leaf_63_2002.2496=NOT_SET
+leaf_64_2002.2471=NOT_SET
+leaf_65_2002.2959=NOT_SET
+leaf_66_2002.3288=NOT_SET
+leaf_67_2002.2144=NOT_SET
+leaf_68_2002.3731=NOT_SET
+leaf_69_2002.3126=NOT_SET
+leaf_70_2002.3671=NOT_SET
+leaf_71_2002.3620=NOT_SET
+leaf_72_2002.3397=NOT_SET
+leaf_73_2002.3585=NOT_SET
+leaf_74_2002.3700=NOT_SET
+leaf_75_2002.3649=NOT_SET
+leaf_76_2002.3296=NOT_SET
+leaf_77_2002.3282=NOT_SET
+leaf_78_2002.3844=NOT_SET
+leaf_79_2002.3686=NOT_SET
+leaf_80_2002.2536=NOT_SET
+leaf_81_2002.2838=NOT_SET
+leaf_82_2002.3172=NOT_SET
+leaf_83_2002.3525=NOT_SET
+leaf_84_2002.1939=NOT_SET
+leaf_85_2002.2563=NOT_SET
+leaf_86_2002.3796=NOT_SET
+leaf_87_2002.3639=NOT_SET
+leaf_88_2002.1959=NOT_SET
+leaf_89_2002.3229=NOT_SET
+leaf_90_2002.3775=NOT_SET
+leaf_91_2002.3577=NOT_SET
+leaf_92_2002.3332=NOT_SET
+leaf_93_2002.3485=NOT_SET
+leaf_94_2002.1613=NOT_SET
+leaf_95_2002.1859=NOT_SET
+leaf_96_2002.1840=NOT_SET
+leaf_97_2002.2875=NOT_SET
+leaf_98_2002.3531=NOT_SET
+leaf_99_2002.3729=NOT_SET
+leaf_100_2002.3367=NOT_SET
+leaf_101_2002.3645=NOT_SET
+leaf_102_2002.3605=NOT_SET
+leaf_103_2002.3857=NOT_SET
+leaf_104_2002.3047=NOT_SET
+leaf_105_2002.3633=NOT_SET
+leaf_106_2002.2525=NOT_SET
+leaf_107_2002.3301=NOT_SET
+leaf_108_2002.3311=NOT_SET
+leaf_109_2002.3316=NOT_SET
+leaf_110_2002.2559=NOT_SET
+leaf_111_2002.3700=NOT_SET
+leaf_66_2002.3288=NOT_SET
+leaf_67_2002.2144=NOT_SET
+leaf_68_2002.3731=NOT_SET
+leaf_69_2002.3126=NOT_SET
+leaf_70_2002.3671=NOT_SET
+leaf_71_2002.3620=NOT_SET
+leaf_72_2002.3397=NOT_SET
+leaf_73_2002.3585=NOT_SET
+leaf_74_2002.3700=NOT_SET
+leaf_75_2002.3649=NOT_SET
+leaf_76_2002.3296=NOT_SET
+leaf_77_2002.3282=NOT_SET
+leaf_78_2002.3844=NOT_SET
+leaf_79_2002.3686=NOT_SET
+leaf_80_2002.2536=NOT_SET
+leaf_81_2002.2838=NOT_SET
+leaf_82_2002.3172=NOT_SET
+leaf_83_2002.3525=NOT_SET
+leaf_84_2002.1939=NOT_SET
+leaf_85_2002.2563=NOT_SET
+leaf_86_2002.3796=NOT_SET
+leaf_87_2002.3639=NOT_SET
+leaf_88_2002.1959=NOT_SET
+leaf_89_2002.3229=NOT_SET
+leaf_90_2002.3775=NOT_SET
+leaf_91_2002.3577=NOT_SET
+leaf_92_2002.3332=NOT_SET
+leaf_93_2002.3485=NOT_SET
+leaf_94_2002.1613=NOT_SET
+leaf_95_2002.1859=NOT_SET
+leaf_96_2002.1840=NOT_SET
+leaf_97_2002.2875=NOT_SET
+leaf_98_2002.3531=NOT_SET
+leaf_99_2002.3729=NOT_SET
+leaf_100_2002.3367=NOT_SET
+leaf_101_2002.3645=NOT_SET
+leaf_102_2002.3605=NOT_SET
+leaf_103_2002.3857=NOT_SET
+leaf_104_2002.3047=NOT_SET
+leaf_105_2002.3633=NOT_SET
+leaf_106_2002.2525=NOT_SET
+leaf_107_2002.3301=NOT_SET
+leaf_108_2002.3311=NOT_SET
+leaf_109_2002.3316=NOT_SET
+leaf_110_2002.2559=NOT_SET
+leaf_111_2002.3700=NOT_SET
+leaf_112_2002.3751=NOT_SET
+leaf_113_2002.3050=NOT_SET
+leaf_114_2002.2414=NOT_SET
+leaf_115_2002.2461=NOT_SET
+leaf_112_2002.3751=NOT_SET
+leaf_113_2002.3050=NOT_SET
+leaf_114_2002.2414=NOT_SET
+leaf_116_2002.2722=NOT_SET
+leaf_115_2002.2461=NOT_SET
+leaf_116_2002.2722=NOT_SET
+leaf_117_2002.3100=NOT_SET
+leaf_117_2002.3100=NOT_SET
+leaf_118_2002.2969=NOT_SET
+leaf_118_2002.2969=NOT_SET
+leaf_119_2002.3544=NOT_SET
+leaf_119_2002.3544=NOT_SET
+leaf_120_2002.3547=NOT_SET
+leaf_120_2002.3547=NOT_SET
+leaf_121_2002.3583=NOT_SET
+leaf_121_2002.3583=NOT_SET
+leaf_122_2002.2826=NOT_SET
+leaf_122_2002.2826=NOT_SET
+leaf_123_2002.3623=NOT_SET
+leaf_124_2002.3781=NOT_SET
+leaf_125_2002.3769=NOT_SET
+leaf_126_2002.3254=NOT_SET
+leaf_127_2002.3795=NOT_SET
+leaf_128_2002.3748=NOT_SET
+leaf_129_2002.3620=NOT_SET
+leaf_130_2002.3795=NOT_SET
+leaf_131_2002.3228=NOT_SET
+leaf_132_2002.3425=NOT_SET
+leaf_133_2002.3485=NOT_SET
+leaf_134_2002.3631=NOT_SET
+leaf_135_2002.3713=NOT_SET
+leaf_136_2002.3289=NOT_SET
+leaf_137_2002.2554=NOT_SET
+leaf_138_2002.3760=NOT_SET
+leaf_139_2002.3167=NOT_SET
+leaf_140_2002.2693=NOT_SET
+leaf_141_2002.3429=NOT_SET
+leaf_142_2002.3350=NOT_SET
+leaf_143_2002.3685=NOT_SET
+leaf_144_2002.3565=NOT_SET
+leaf_145_2002.2998=NOT_SET
+leaf_146_2002.3227=NOT_SET
+leaf_147_2002.3858=NOT_SET
+leaf_148_2002.2933=NOT_SET
+leaf_149_2002.3655=NOT_SET
+leaf_150_2002.3718=NOT_SET
+leaf_151_2002.3171=NOT_SET
+leaf_152_2002.3723=NOT_SET
+leaf_153_2002.3751=NOT_SET
+leaf_154_2002.3627=NOT_SET
+leaf_155_2002.3204=NOT_SET
+leaf_156_2002.2540=NOT_SET
+leaf_157_2002.3141=NOT_SET
+leaf_158_2002.3239=NOT_SET
+leaf_159_2002.3643=NOT_SET
+leaf_160_2002.2464=NOT_SET
+leaf_161_2002.3065=NOT_SET
+leaf_162_2002.3642=NOT_SET
+leaf_163_2002.3243=NOT_SET
+leaf_164_2002.3819=NOT_SET
+leaf_165_2002.3696=NOT_SET
+leaf_166_2002.3206=NOT_SET
+leaf_167_2002.2935=NOT_SET
+leaf_168_2002.3239=NOT_SET
+leaf_169_2002.3282=NOT_SET
+leaf_170_2002.2396=NOT_SET
+leaf_171_2002.3612=NOT_SET
+leaf_172_2002.3193=NOT_SET
+leaf_173_2002.3365=NOT_SET
+leaf_174_2002.3361=NOT_SET
+leaf_175_2002.3532=NOT_SET
+leaf_176_2002.2935=NOT_SET
+leaf_177_2002.3687=NOT_SET
+leaf_178_2002.2879=NOT_SET
+leaf_179_2002.3044=NOT_SET
+leaf_180_2002.3838=NOT_SET
+leaf_181_2002.3665=NOT_SET
+leaf_182_2002.3051=NOT_SET
+leaf_183_2002.3486=NOT_SET
+leaf_184_2002.3379=NOT_SET
+leaf_185_2002.3391=NOT_SET
+leaf_186_2002.3600=NOT_SET
+leaf_187_2002.2157=NOT_SET
+leaf_188_2002.3837=NOT_SET
+leaf_189_2002.2375=NOT_SET
+leaf_190_2002.3179=NOT_SET
+leaf_191_2002.3691=NOT_SET
+leaf_192_2002.3041=NOT_SET
+leaf_193_2002.3803=NOT_SET
+leaf_194_2002.3655=NOT_SET
+leaf_195_2002.3118=NOT_SET
+leaf_196_2002.3787=NOT_SET
+leaf_197_2002.3748=NOT_SET
+leaf_198_2002.3795=NOT_SET
+leaf_199_2002.2782=NOT_SET
+leaf_200_2002.3691=NOT_SET
+leaf_201_2002.2574=NOT_SET
+leaf_202_2002.3593=NOT_SET
+leaf_203_2002.3547=NOT_SET
+leaf_204_2002.3726=NOT_SET
+leaf_205_2002.2698=NOT_SET
+leaf_206_2002.2973=NOT_SET
+leaf_207_2002.3142=NOT_SET
+leaf_208_2002.3368=NOT_SET
+leaf_209_2002.2847=NOT_SET
+leaf_210_2002.1435=NOT_SET
+leaf_211_2002.3761=NOT_SET
+leaf_212_2002.3479=NOT_SET
+leaf_213_2002.3742=NOT_SET
+leaf_214_2002.3651=NOT_SET
+leaf_215_2002.2330=NOT_SET
+leaf_216_2002.2533=NOT_SET
+leaf_217_2002.3802=NOT_SET
+leaf_218_2002.3594=NOT_SET
+leaf_219_2002.3832=NOT_SET
+leaf_220_2002.3742=NOT_SET
+leaf_221_2002.3817=NOT_SET
+leaf_222_2002.3730=NOT_SET
+leaf_223_2002.1977=NOT_SET
+leaf_224_2002.3819=NOT_SET
+leaf_225_2002.3268=NOT_SET
+leaf_226_2002.1614=NOT_SET
+leaf_227_2002.1540=NOT_SET
+leaf_228_2002.2477=NOT_SET
+leaf_229_2002.3593=NOT_SET
+leaf_230_2002.3864=NOT_SET
+leaf_231_2002.3264=NOT_SET
+leaf_232_2002.2401=NOT_SET
+leaf_233_2002.3406=NOT_SET
+leaf_234_2002.3775=NOT_SET
+leaf_235_2002.3748=NOT_SET
+leaf_236_2002.3770=NOT_SET
+leaf_237_2002.2929=NOT_SET
+leaf_238_2002.3654=NOT_SET
+leaf_239_2002.3576=NOT_SET
+leaf_240_2002.3201=NOT_SET
+leaf_241_2002.2819=NOT_SET
+leaf_242_2002.3376=NOT_SET
+leaf_243_2002.3462=NOT_SET
+leaf_244_2002.2899=NOT_SET
+leaf_245_2002.3811=NOT_SET
+leaf_246_2002.2222=NOT_SET
+leaf_247_2002.2889=NOT_SET
+leaf_248_2002.3596=NOT_SET
+leaf_249_2002.3863=NOT_SET
+leaf_250_2002.3833=NOT_SET
+leaf_251_2002.3705=NOT_SET
+leaf_252_2002.3774=NOT_SET
+leaf_253_2002.3790=NOT_SET
+leaf_254_2002.3697=NOT_SET
+leaf_255_2002.3602=NOT_SET
+leaf_256_2002.3631=NOT_SET
+leaf_123_2002.3623=NOT_SET
+leaf_124_2002.3781=NOT_SET
+leaf_125_2002.3769=NOT_SET
+leaf_126_2002.3254=NOT_SET
+leaf_127_2002.3795=NOT_SET
+leaf_128_2002.3748=NOT_SET
+leaf_129_2002.3620=NOT_SET
+leaf_130_2002.3795=NOT_SET
+leaf_131_2002.3228=NOT_SET
+leaf_132_2002.3425=NOT_SET
+leaf_133_2002.3485=NOT_SET
+leaf_134_2002.3631=NOT_SET
+leaf_135_2002.3713=NOT_SET
+leaf_136_2002.3289=NOT_SET
+leaf_137_2002.2554=NOT_SET
+leaf_138_2002.3760=NOT_SET
+leaf_139_2002.3167=NOT_SET
+leaf_140_2002.2693=NOT_SET
+leaf_141_2002.3429=NOT_SET
+leaf_142_2002.3350=NOT_SET
+leaf_143_2002.3685=NOT_SET
+leaf_144_2002.3565=NOT_SET
+leaf_145_2002.2998=NOT_SET
+leaf_146_2002.3227=NOT_SET
+leaf_147_2002.3858=NOT_SET
+leaf_148_2002.2933=NOT_SET
+leaf_149_2002.3655=NOT_SET
+leaf_150_2002.3718=NOT_SET
+leaf_151_2002.3171=NOT_SET
+leaf_152_2002.3723=NOT_SET
+leaf_153_2002.3751=NOT_SET
+leaf_154_2002.3627=NOT_SET
+leaf_155_2002.3204=NOT_SET
+leaf_156_2002.2540=NOT_SET
+leaf_157_2002.3141=NOT_SET
+leaf_158_2002.3239=NOT_SET
+leaf_159_2002.3643=NOT_SET
+leaf_160_2002.2464=NOT_SET
+leaf_161_2002.3065=NOT_SET
+leaf_162_2002.3642=NOT_SET
+leaf_163_2002.3243=NOT_SET
+leaf_164_2002.3819=NOT_SET
+leaf_165_2002.3696=NOT_SET
+leaf_166_2002.3206=NOT_SET
+leaf_167_2002.2935=NOT_SET
+leaf_168_2002.3239=NOT_SET
+leaf_169_2002.3282=NOT_SET
+leaf_170_2002.2396=NOT_SET
+leaf_171_2002.3612=NOT_SET
+leaf_172_2002.3193=NOT_SET
+leaf_173_2002.3365=NOT_SET
+leaf_174_2002.3361=NOT_SET
+leaf_175_2002.3532=NOT_SET
+leaf_176_2002.2935=NOT_SET
+leaf_177_2002.3687=NOT_SET
+leaf_178_2002.2879=NOT_SET
+leaf_179_2002.3044=NOT_SET
+leaf_180_2002.3838=NOT_SET
+leaf_181_2002.3665=NOT_SET
+leaf_182_2002.3051=NOT_SET
+leaf_183_2002.3486=NOT_SET
+leaf_184_2002.3379=NOT_SET
+leaf_185_2002.3391=NOT_SET
+leaf_186_2002.3600=NOT_SET
+leaf_187_2002.2157=NOT_SET
+leaf_188_2002.3837=NOT_SET
+leaf_189_2002.2375=NOT_SET
+leaf_190_2002.3179=NOT_SET
+leaf_191_2002.3691=NOT_SET
+leaf_192_2002.3041=NOT_SET
+leaf_193_2002.3803=NOT_SET
+leaf_194_2002.3655=NOT_SET
+leaf_195_2002.3118=NOT_SET
+leaf_196_2002.3787=NOT_SET
+leaf_197_2002.3748=NOT_SET
+leaf_198_2002.3795=NOT_SET
+leaf_199_2002.2782=NOT_SET
+leaf_200_2002.3691=NOT_SET
+leaf_201_2002.2574=NOT_SET
+leaf_202_2002.3593=NOT_SET
+leaf_203_2002.3547=NOT_SET
+leaf_204_2002.3726=NOT_SET
+leaf_205_2002.2698=NOT_SET
+leaf_206_2002.2973=NOT_SET
+leaf_207_2002.3142=NOT_SET
+leaf_208_2002.3368=NOT_SET
+leaf_209_2002.2847=NOT_SET
+leaf_210_2002.1435=NOT_SET
+leaf_211_2002.3761=NOT_SET
+leaf_212_2002.3479=NOT_SET
+leaf_213_2002.3742=NOT_SET
+leaf_214_2002.3651=NOT_SET
+leaf_215_2002.2330=NOT_SET
+leaf_216_2002.2533=NOT_SET
+leaf_217_2002.3802=NOT_SET
+leaf_218_2002.3594=NOT_SET
+leaf_219_2002.3832=NOT_SET
+leaf_220_2002.3742=NOT_SET
+leaf_221_2002.3817=NOT_SET
+leaf_222_2002.3730=NOT_SET
+leaf_223_2002.1977=NOT_SET
+leaf_224_2002.3819=NOT_SET
+leaf_225_2002.3268=NOT_SET
+leaf_226_2002.1614=NOT_SET
+leaf_227_2002.1540=NOT_SET
+leaf_228_2002.2477=NOT_SET
+leaf_229_2002.3593=NOT_SET
+leaf_230_2002.3864=NOT_SET
+leaf_231_2002.3264=NOT_SET
+leaf_232_2002.2401=NOT_SET
+leaf_233_2002.3406=NOT_SET
+leaf_234_2002.3775=NOT_SET
+leaf_235_2002.3748=NOT_SET
+leaf_236_2002.3770=NOT_SET
+leaf_237_2002.2929=NOT_SET
+leaf_238_2002.3654=NOT_SET
+leaf_239_2002.3576=NOT_SET
+leaf_240_2002.3201=NOT_SET
+leaf_241_2002.2819=NOT_SET
+leaf_242_2002.3376=NOT_SET
+leaf_243_2002.3462=NOT_SET
+leaf_244_2002.2899=NOT_SET
+leaf_245_2002.3811=NOT_SET
+leaf_246_2002.2222=NOT_SET
+leaf_247_2002.2889=NOT_SET
+leaf_248_2002.3596=NOT_SET
+leaf_249_2002.3863=NOT_SET
+leaf_250_2002.3833=NOT_SET
+leaf_251_2002.3705=NOT_SET
+leaf_252_2002.3774=NOT_SET
+leaf_253_2002.3790=NOT_SET
+leaf_254_2002.3697=NOT_SET
+leaf_255_2002.3602=NOT_SET
+leaf_256_2002.3631=NOT_SET
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by beagle.BeagleJNIWrapper in an unnamed module (file:/cluster/home/aimolay/.beast/2.7/BEAST.base/lib/BEAST.base.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by beagle.BeagleJNIWrapper in an unnamed module (file:/cluster/home/aimolay/.beast/2.7/BEAST.base/lib/BEAST.base.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/base-sequences.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/base.sequences.typed.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/base.sequences.typed.node.trees
+  Ignoring ambiguities in tree likelihood.
+  Ignoring character uncertainty in tree likelihood.
+  With 19 unique site patterns.
+  Using rescaling scheme : dynamic
+Warning: removing transform class beast.base.inference.operator.kernel.Transform$LogConstrainedSumTransform because it should have at least 2 dimensions but it has 0
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/sections.log
+  Ignoring ambiguities in tree likelihood.
+  Ignoring character uncertainty in tree likelihood.
+  With 19 unique site patterns.
+  Using rescaling scheme : dynamic
+Warning: removing transform class beast.base.inference.operator.kernel.Transform$LogConstrainedSumTransform because it should have at least 2 dimensions but it has 0
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/whole_period-sequences.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/true_values.log
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/whole_period.sequences.typed.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/whole_period.sequences.typed.node.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/sections-sequences.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/sections.sequences.typed.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/sections.sequences.typed.node.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/true_values-sequences.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/true_values.sequences.typed.trees
+Writing file /cluster/scratch/aimolay/thesis/tree_simulation/data/beast_reconstructions/tree_0/true_values.sequences.typed.node.trees
+End likelihood: -464.47163940792495
+[Tue Oct 20 17:17:05 2026]
+Finished jobid: 31 (Rule: run_beast)
+25 of 33 steps (76%) done
+End likelihood: -506.66622525876437
+[Tue Oct 20 17:17:08 2026]
+Finished jobid: 32 (Rule: run_beast)
+26 of 33 steps (79%) done
+End likelihood: -489.3291930294881
+[Tue Oct 20 17:17:16 2026]
+Finished jobid: 29 (Rule: run_beast)
+27 of 33 steps (82%) done
+End likelihood: -450.8344822848928
+[Tue Oct 20 17:17:34 2026]
+Finished jobid: 30 (Rule: run_beast)
+28 of 33 steps (85%) done
+End likelihood: -541.2497775335784
+[Tue Oct 20 17:28:03 2026]
+Finished jobid: 27 (Rule: run_beast)
+29 of 33 steps (88%) done

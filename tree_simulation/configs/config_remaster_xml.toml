@@ -1,5 +1,5 @@
 # Biological & Rate Parameters
-birth_rate = [52]
+birth_rate = [47]
 death_rate = [29.63]
 sampling_rate = [0.79] # Target sampling proportion: 0.025
 

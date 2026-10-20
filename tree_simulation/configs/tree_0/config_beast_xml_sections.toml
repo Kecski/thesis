@@ -18,9 +18,9 @@ date_regex = '_(\d{4}(?:\.\d+)?)$'
 # dates_csv = "dates.csv"
 
 [mcmc]
-chain_length = 20000000
-store_every  = 5000
-log_every    = 5000
+chain_length = 20_000_000
+store_every  = 10_000
+log_every    = 1_000_000
 
 [model]
 # Rate of becoming uninfectious, per YEAR (30.42 = 365/12 -> 12-day infectious period)
@@ -57,9 +57,9 @@ re_change_times = [0.133333, 0.266667]
 [re_prior]
 distribution       = "LogNormal"
 mean_in_real_space = true
-mean    = [1.0171, 1.1852, 1.1675]
-sigma   = [0.0352, 0.0157, 0.0228]     # or just: sigma = 0.3
-initial = [1.0171, 1.1852, 1.1675]
+mean    = [1.1109, 1.1451, 1.1538]
+sigma   = [0.0256, 0.0156, 0.0224]     # or just: sigma = 0.3
+initial = [1.1109, 1.1451, 1.1538]
 
 [sampling]
 initial = 0.1
