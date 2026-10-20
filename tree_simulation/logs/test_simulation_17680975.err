@@ -3468,3 +3468,29 @@ End likelihood: -541.2497775335784
 [Tue Oct 20 17:28:03 2026]
 Finished jobid: 27 (Rule: run_beast)
 29 of 33 steps (88%) done
+End likelihood: -647.8740968804111
+[Tue Oct 20 17:28:52 2026]
+Finished jobid: 28 (Rule: run_beast)
+30 of 33 steps (91%) done
+End likelihood: -787.0284465270664
+[Tue Oct 20 17:29:15 2026]
+Finished jobid: 25 (Rule: run_beast)
+31 of 33 steps (94%) done
+End likelihood: -482.33141021654654
+[Tue Oct 20 17:29:50 2026]
+Finished jobid: 26 (Rule: run_beast)
+32 of 33 steps (97%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Tue Oct 20 17:29:50 2026]
+localrule all:
+    input: data/simulated_sequences/tree_0/sequences.fasta, data/wastewater/tree_0/measurements.csv, data/wastewater/tree_0/episewer_summary.csv, configs/tree_0/config_beast_xml_sections.toml, configs/tree_1/config_beast_xml_sections.toml, data/beast_reconstructions/tree_0/base.xml, data/beast_reconstructions/tree_0/sections.xml, data/beast_reconstructions/tree_0/whole_period.xml, data/beast_reconstructions/tree_0/true_values.xml, data/beast_reconstructions/tree_1/base.xml, data/beast_reconstructions/tree_1/sections.xml, data/beast_reconstructions/tree_1/whole_period.xml, data/beast_reconstructions/tree_1/true_values.xml, data/beast_reconstructions/tree_0/base.log, data/beast_reconstructions/tree_0/sections.log, data/beast_reconstructions/tree_0/whole_period.log, data/beast_reconstructions/tree_0/true_values.log, data/beast_reconstructions/tree_1/base.log, data/beast_reconstructions/tree_1/sections.log, data/beast_reconstructions/tree_1/whole_period.log, data/beast_reconstructions/tree_1/true_values.log
+    jobid: 0
+    reason: Input files updated by another job: data/wastewater/tree_0/measurements.csv, data/beast_reconstructions/tree_0/base.log, data/beast_reconstructions/tree_1/base.log, data/beast_reconstructions/tree_1/whole_period.xml, data/beast_reconstructions/tree_1/true_values.log, configs/tree_0/config_beast_xml_sections.toml, data/simulated_sequences/tree_0/sequences.fasta, data/beast_reconstructions/tree_0/true_values.xml, data/beast_reconstructions/tree_1/true_values.xml, configs/tree_1/config_beast_xml_sections.toml, data/beast_reconstructions/tree_0/sections.xml, data/beast_reconstructions/tree_0/sections.log, data/beast_reconstructions/tree_0/whole_period.xml, data/wastewater/tree_0/episewer_summary.csv, data/beast_reconstructions/tree_1/base.xml, data/beast_reconstructions/tree_0/whole_period.log, data/beast_reconstructions/tree_0/base.xml, data/beast_reconstructions/tree_1/whole_period.log, data/beast_reconstructions/tree_1/sections.xml, data/beast_reconstructions/tree_1/sections.log, data/beast_reconstructions/tree_0/true_values.log
+    resources: tmpdir=/scratch/tmp.17680975.aimolay
+[Tue Oct 20 17:29:50 2026]
+Finished jobid: 0 (Rule: all)
+33 of 33 steps (100%) done
+Complete log(s): /cluster/scratch/aimolay/thesis/tree_simulation/.snakemake/log/2026-10-20T170004.616393.snakemake.log
+Elapsed time: 0:29:45.640509

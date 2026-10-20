@@ -1524,3 +1524,79 @@ ScaleOperator(samplingProportionEpiScaler.t:sequences)                          
 Total calculation time: 1096.571 seconds
 Done!
        19000000      -915.9166      -859.7387       -56.1778 58s/Msamples
+       19000000      -480.6681      -864.5590       383.8909 1m0s/Msamples
+       20000000      -647.8740      -867.4921       219.6180 57s/Msamples
+
+Operator                                                                            Tuning    #accept    #reject      Pr(m)  Pr(acc|m)
+AdaptableOperatorSampler(StrictClockRateScaler.c:sequences)                              -     114567     280359    0.01974    0.29010 
+AdaptableOperatorSampler(strictClockUpDownOperator.c:sequences)                          -         20     395341    0.01974    0.00005 
+sa.evolution.operators.LeafToSampledAncestorJump(BDMMPrimeLeafToSA.t:sequences)          -          0    2632397    0.13158    0.00000 
+sa.evolution.operators.SAWilsonBalding(BDMMPrimeSAWilsonBalding.t:sequences)             -     857039    1773964    0.13158    0.32575 
+sa.evolution.operators.SAExchange(BDMMPrimeSAWide.t:sequences)                           -     719682    1909923    0.13158    0.27368 
+sa.evolution.operators.SAExchange(BDMMPrimeSANarrow.t:sequences)                         -    1485084    1144988    0.13158    0.56466 
+sa.evolution.operators.SAUniform(BDMMPrimeSAUniformOperator.t:sequences)                 -    4490229     774702    0.26316    0.85286 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeRootScaler.t:sequences)      0.68581      33769     230270    0.01316    0.12789 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeScaler.t:sequences)          0.88847      13229     776324    0.03947    0.01676 Try setting scaleFactor to about 0.943
+ScaleOperator(originBDMMPrimeScaler.t:sequences)                                   0.73350     198288     591145    0.03947    0.25118 
+ScaleOperator(ReEpiScaler.t:sequences)                                             0.83118     178981     610754    0.03947    0.22663 
+ScaleOperator(samplingProportionEpiScaler.t:sequences)                             0.55176     197021     591925    0.03947    0.24973 
+
+     Tuning: The value of the operator's tuning parameter, or '-' if the operator can't be optimized.
+    #accept: The total number of times a proposal by this operator has been accepted.
+    #reject: The total number of times a proposal by this operator has been rejected.
+      Pr(m): The probability this operator is chosen in a step of the MCMC (i.e. the normalized weight).
+  Pr(acc|m): The acceptance probability (#accept as a fraction of the total proposals for this operator).
+
+
+Total calculation time: 1145.762 seconds
+Done!
+       20000000      -787.0284      -874.1749        87.1465 58s/Msamples
+
+Operator                                                                            Tuning    #accept    #reject      Pr(m)  Pr(acc|m)
+AdaptableOperatorSampler(StrictClockRateScaler.c:sequences)                              -     113116     280628    0.01974    0.28728 
+AdaptableOperatorSampler(strictClockUpDownOperator.c:sequences)                          -         37     394601    0.01974    0.00009 
+sa.evolution.operators.LeafToSampledAncestorJump(BDMMPrimeLeafToSA.t:sequences)          -          0    2631351    0.13158    0.00000 
+sa.evolution.operators.SAWilsonBalding(BDMMPrimeSAWilsonBalding.t:sequences)             -     841235    1791517    0.13158    0.31953 
+sa.evolution.operators.SAExchange(BDMMPrimeSAWide.t:sequences)                           -     706091    1924592    0.13158    0.26841 
+sa.evolution.operators.SAExchange(BDMMPrimeSANarrow.t:sequences)                         -    1481880    1147745    0.13158    0.56353 
+sa.evolution.operators.SAUniform(BDMMPrimeSAUniformOperator.t:sequences)                 -    4476203     788324    0.26316    0.85026 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeRootScaler.t:sequences)      0.66657      29854     234097    0.01316    0.11310 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeScaler.t:sequences)          0.90126      14541     774972    0.03947    0.01842 Try setting scaleFactor to about 0.949
+ScaleOperator(originBDMMPrimeScaler.t:sequences)                                   0.73659     197912     591176    0.03947    0.25081 
+ScaleOperator(ReEpiScaler.t:sequences)                                             0.77784     159324     631010    0.03947    0.20159 
+ScaleOperator(samplingProportionEpiScaler.t:sequences)                             0.54527     191295     598500    0.03947    0.24221 
+
+     Tuning: The value of the operator's tuning parameter, or '-' if the operator can't be optimized.
+    #accept: The total number of times a proposal by this operator has been accepted.
+    #reject: The total number of times a proposal by this operator has been rejected.
+      Pr(m): The probability this operator is chosen in a step of the MCMC (i.e. the normalized weight).
+  Pr(acc|m): The acceptance probability (#accept as a fraction of the total proposals for this operator).
+
+
+Total calculation time: 1169.322 seconds
+Done!
+       20000000      -482.3314      -858.1870       375.8556 1m0s/Msamples
+
+Operator                                                                            Tuning    #accept    #reject      Pr(m)  Pr(acc|m)
+AdaptableOperatorSampler(StrictClockRateScaler.c:sequences)                              -     112244     282426    0.01974    0.28440 
+AdaptableOperatorSampler(strictClockUpDownOperator.c:sequences)                          -         14     394504    0.01974    0.00004 
+sa.evolution.operators.LeafToSampledAncestorJump(BDMMPrimeLeafToSA.t:sequences)          -          0    2631632    0.13158    0.00000 
+sa.evolution.operators.SAWilsonBalding(BDMMPrimeSAWilsonBalding.t:sequences)             -     593930    2037647    0.13158    0.22569 
+sa.evolution.operators.SAExchange(BDMMPrimeSAWide.t:sequences)                           -     471602    2159771    0.13158    0.17922 
+sa.evolution.operators.SAExchange(BDMMPrimeSANarrow.t:sequences)                         -    1407799    1221743    0.13158    0.53538 
+sa.evolution.operators.SAUniform(BDMMPrimeSAUniformOperator.t:sequences)                 -    4273606     988613    0.26316    0.81213 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeRootScaler.t:sequences)      0.74170      28390     235511    0.01316    0.10758 
+sa.evolution.operators.SAScaleOperator(BDMMPrimeSATreeScaler.t:sequences)          0.92291       9940     779963    0.03947    0.01258 Try setting scaleFactor to about 0.961
+ScaleOperator(originBDMMPrimeScaler.t:sequences)                                   0.78619     176907     613999    0.03947    0.22368 
+ScaleOperator(ReEpiScaler.t:sequences)                                             0.84885     151367     638010    0.03947    0.19176 
+ScaleOperator(samplingProportionEpiScaler.t:sequences)                             0.36847      92706     697677    0.03947    0.11729 
+
+     Tuning: The value of the operator's tuning parameter, or '-' if the operator can't be optimized.
+    #accept: The total number of times a proposal by this operator has been accepted.
+    #reject: The total number of times a proposal by this operator has been rejected.
+      Pr(m): The probability this operator is chosen in a step of the MCMC (i.e. the normalized weight).
+  Pr(acc|m): The acceptance probability (#accept as a fraction of the total proposals for this operator).
+
+
+Total calculation time: 1203.246 seconds
+Done!
