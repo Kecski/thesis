@@ -9,7 +9,7 @@ kappa = 3.77
 frequencies = [0.30, 0.18, 0.20, 0.32]   # [A, C, G, T]
 clock_rate = 1.12e-3                       # Substitutions/site/unit time
 gamma_shape = 0.5                          # Alpha parameter for site heterogeneity
-gamma_categories = 6                       # Discrete gamma categories
+gamma_categories = 1                       # Discrete gamma categories
 root_date = 2002.0                         # Root calendar year
 
 # Optional Settings

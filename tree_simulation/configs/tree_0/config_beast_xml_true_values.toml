@@ -18,8 +18,8 @@ date_regex = '_(\d{4}(?:\.\d+)?)$'
 # dates_csv = "dates.csv"
 
 [mcmc]
-chain_length = 20_000_000
-store_every  = 10_000
+chain_length = 50_000_000
+store_every  = 100_000
 log_every    = 1_000_000
 
 [model]
@@ -30,7 +30,7 @@ origin_initial = 5.0
 re_upper = 10.0
 # Re change times as AGES (years back from the most recent sample), strictly increasing.
 # n intervals need n-1 change times.
-re_change_times = []
+re_change_times = [0.25]
 # CONSTANT Re (no change over time): use a single value in [re_prior] (mean = 1.2,
 # sigma = 0.4, ...) or length-1 vectors, and set re_change_times = [] (or delete the line).
 # ...or, instead of re_change_times, equally long intervals (here 0.1 yr each);
@@ -57,9 +57,9 @@ re_change_times = []
 [re_prior]
 distribution       = "LogNormal"
 mean_in_real_space = true
-mean    = 1.545
-sigma   = 0.05     # or just: sigma = 0.3
-initial = 1.545
+mean    = [1.4135, 0.9862]
+sigma   = [0.05, 0.05]     # or just: sigma = 0.3
+initial = [1.4135, 0.9862]
 
 [sampling]
 initial = 0.1

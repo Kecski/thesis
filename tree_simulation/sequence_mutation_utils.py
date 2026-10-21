@@ -50,6 +50,7 @@ def add_dates(tree, input_fasta: str, root_date: float=2002.0) -> None:
     SeqIO.write(records, input_fasta, "fasta")
 
 def simulate_sequences_on_tree(tree_file: str,
+                               tree_id: int,
                                root_sequence: str,
                                sub_model: str="HKY",
                                clock_rate: float=1.0,
@@ -80,7 +81,7 @@ def simulate_sequences_on_tree(tree_file: str,
     
     if sub_model == "HKY":
         model = pyvolve.Model("nucleotide",
-                              {"kappa": kappa, "state_frequs": frequencies},
+                              {"kappa": kappa, "state_freqs": frequencies},
                               alpha=gamma_dist["alpha"],
                               num_categories=gamma_dist["num_categories"])
     elif sub_model == "GTR":
@@ -112,43 +113,43 @@ def simulate_sequences_on_tree(tree_file: str,
         
     # partition = pyvolve.Partition(models=model, root_sequence=root_sequence)
         
-    trees = dendropy.TreeList.get(path=tree_file, schema="nexus")
-    for i, dp_tree in enumerate(trees):
-        tree = pyvolve.read_tree(tree=dp_tree.as_string(schema="newick"), scale_tree=clock_rate)
-        evolver = pyvolve.Evolver(partitions=partitions, tree=tree)
+    dp_trees = dendropy.TreeList.get(path=tree_file, schema="nexus")
+    
+    tree = pyvolve.read_tree(tree=dp_trees[tree_id].as_string(schema="newick"), scale_tree=clock_rate)
+    evolver = pyvolve.Evolver(partitions=partitions, tree=tree)
+    
+    # Output files for each tree
+    tree_dir = Path(output_dir) / f"tree_{tree_id}"
+    tree_dir.mkdir(parents=True, exist_ok=True)
+    
+    fasta_file = tree_dir / "sequences.fasta"
+    info_file = tree_dir / "sequences_info.txt"
+    rates_file = tree_dir / "sequences_rates.txt"
+
+    evolver(seqfile=None, infofile=None, ratefile=None)
+    raw_seqs = evolver.get_sequences()
+    
+    final_seqs = {}
+    for taxon, seq in raw_seqs.items():
+        ordered = [None] * n_sites
+        for col_pos, orig_pos in enumerate(site_order):
+            ordered[orig_pos] = seq[col_pos]
+        final_seqs[taxon] = "".join(ordered)
         
-        # Output files for each tree
-        tree_dir = Path(output_dir) / f"tree_{i}"
-        tree_dir.mkdir(parents=True, exist_ok=True)
-        
-        fasta_file = tree_dir / "sequences.fasta"
-        info_file = tree_dir / "sequences_info.txt"
-        rates_file = tree_dir / "sequences_rates.txt"
+    records = [SeqRecord(Seq(seq), id=taxon, description="") 
+            for taxon, seq in final_seqs.items()]
 
-        evolver(seqfile=None, infofile=None, ratefile=None)
-        raw_seqs = evolver.get_sequences()
-        
-        final_seqs = {}
-        for taxon, seq in raw_seqs.items():
-            ordered = [None] * n_sites
-            for col_pos, orig_pos in enumerate(site_order):
-                ordered[orig_pos] = seq[col_pos]
-            final_seqs[taxon] = "".join(ordered)
-            
-        records = [SeqRecord(Seq(seq), id=taxon, description="") 
-                for taxon, seq in final_seqs.items()]
+    SeqIO.write(records, fasta_file, "fasta")
+    add_dates(dp_trees[tree_id], fasta_file, root_date)
 
-        SeqIO.write(records, fasta_file, "fasta")
-        add_dates(dp_tree, fasta_file, root_date)
+    with open(rates_file, "w") as f:
+        f.write("Site_Index\tPartition_Index\tRate_Category\n")
+        for site_idx in range(n_sites):
+            category = int(site_categories[site_idx]) + 1  # pyvolve uses 1-based indexing
+            f.write(f"{site_idx + 1}\t1\t{category}\n")
 
-        with open(rates_file, "w") as f:
-            f.write("Site_Index\tPartition_Index\tRate_Category\n")
-            for site_idx in range(n_sites):
-                category = int(site_categories[site_idx]) + 1  # pyvolve uses 1-based indexing
-                f.write(f"{site_idx + 1}\t1\t{category}\n")
-
-        # site_rates_info.txt  — one row per rate category
-        with open(info_file, "w") as f:
-            f.write("Partition_Index\tModel_Name\tRate_Category\tRate_Probability\tRate_Factor\n")
-            for k in range(gamma_dist["num_categories"]):
-                f.write(f"1\tnucleotide\t{k + 1}\t{rate_probs[k]}\t{rate_factors[k]}\n")
+    # site_rates_info.txt  — one row per rate category
+    with open(info_file, "w") as f:
+        f.write("Partition_Index\tModel_Name\tRate_Category\tRate_Probability\tRate_Factor\n")
+        for k in range(gamma_dist["num_categories"]):
+            f.write(f"1\tnucleotide\t{k + 1}\t{rate_probs[k]}\t{rate_factors[k]}\n")

@@ -49,6 +49,13 @@ def parse_args():
         required=True,
         help="Path to the phylogenetic tree file (default: 'data/remaster_trees/logs/sim.sampled.trees').",
     )
+    p.add_argument(
+        "--tree_id",
+        "-i",
+        type=int,
+        required=True,
+        help="ID ([0, N-1]) of the tree in the trees file containing N trees."
+    )
     return p.parse_args()
 
 
@@ -102,6 +109,7 @@ def main():
     cfg["output_dir"] = cli_args.output_dir
     cfg["root_sequence_file"] = cli_args.root_sequence_file
     cfg["tree_file"] = cli_args.tree_file
+    cfg["tree_id"] = cli_args.tree_id
     validate_config(cfg)
 
     if cfg["seed"] is not None:
@@ -143,6 +151,7 @@ def main():
 
     simulate_sequences_on_tree(
         tree_file=cfg["tree_file"],
+        tree_id=cfg["tree_id"],
         root_sequence=root_sequence,
         sub_model=cfg["sub_model"],
         clock_rate=cfg["clock_rate"],

@@ -150,6 +150,8 @@ def main():
                          "(omit when giving --re-means etc. manually)")
     ap.add_argument("--output_dir", "--output-dir", required=True,
                     help="folder in which tree_<i>/ with the new configs is created")
+    ap.add_argument("--tree_id", "--tree-id", type=int, default=0,
+                    help="ID ([0, N-1]) of the tree if there are N trees in total.")
     ap.add_argument("--config", required=True, help="template config toml")
     ap.add_argument("--re-means", type=float, nargs="+", default=None, metavar="X",
                     help="MANUAL MODE: Re prior means, one per interval")
@@ -257,45 +259,46 @@ def main():
         return [o[0] for o in out], [o[1] for o in out]
 
     n_done = 0
-    for idx, tree_dir in trees:
-        csv_path = tree_dir / args.summary_name
-        if not csv_path.exists():
-            print(f"[tree_{idx}] skipped: {csv_path} not found", file=sys.stderr)
-            continue
-        secs, whole = read_R_rows(csv_path)
-        if args.reverse_sections:
-            secs = secs[::-1]
+    # for idx, tree_dir in trees:
+    tree_dir = trees[args.tree_id][1]
+    csv_path = tree_dir / args.summary_name
+    # if not csv_path.exists():
+    #     print(f"[tree_{idx}] skipped: {csv_path} not found", file=sys.stderr)
+    #     continue
+    secs, whole = read_R_rows(csv_path)
+    if args.reverse_sections:
+        secs = secs[::-1]
 
-        if args.simulation_length is not None:
-            change_times_sections, ts = even_change_times(len(secs), args.simulation_length)
-            if ts and og and ts[-1] >= float(og.group(1)):
-                print(f"[tree_{idx}] Warning: last change time {ts[-1]} >= origin_initial "
-                      f"{og.group(1)}; origin_initial must be larger.", file=sys.stderr)
-        else:
-            n_template = len([x for x in ct.group(1).split(",") if x.strip()]) + 1
-            if n_template != len(secs):
-                sys.exit(f"[tree_{idx}] The csv has {len(secs)} sections for R but the "
-                         f"template defines {n_template} intervals (re_change_times). "
-                         "Adjust one of them or pass --simulation-length.")
-            change_times_sections = "[" + ct.group(1).strip() + "]"
+    if args.simulation_length is not None:
+        change_times_sections, ts = even_change_times(len(secs), args.simulation_length)
+        if ts and og and ts[-1] >= float(og.group(1)):
+            print(f"[tree_{args.tree_id}] Warning: last change time {ts[-1]} >= origin_initial "
+                    f"{og.group(1)}; origin_initial must be larger.", file=sys.stderr)
+    else:
+        n_template = len([x for x in ct.group(1).split(",") if x.strip()]) + 1
+        if n_template != len(secs):
+            sys.exit(f"[tree_{args.tree_id}] The csv has {len(secs)} sections for R but the "
+                        f"template defines {n_template} intervals (re_change_times). "
+                        "Adjust one of them or pass --simulation-length.")
+        change_times_sections = "[" + ct.group(1).strip() + "]"
 
-        new_dir = Path(args.output_dir) / f"tree_{idx}"
-        new_dir.mkdir(parents=True, exist_ok=True)
+    new_dir = Path(args.output_dir) / f"tree_{args.tree_id}"
+    new_dir.mkdir(parents=True, exist_ok=True)
 
-        variants = [
-            ("sections", params(secs), change_times_sections),
-            ("whole_period", params([whole]), "[]"),
-        ]
-        for tag, (means, sigmas), change_times in variants:
-            text, out_xml, fasta = build(template, template_dir, new_dir, idx, tag,
-                                         means, sigmas, change_times,
-                                         set_initial=not args.keep_initial,
-                                         relocate_paths=not args.keep_paths)
-            dest = new_dir / f"config_beast_xml_{tag}.toml"
-            dest.write_text(text)
-            print(f"{dest}: mean={fmt(means)} sigma={fmt(sigmas)} "
-                  f"change_times={change_times} fasta={fasta}")
-        n_done += 1
+    variants = [
+        ("sections", params(secs), change_times_sections),
+        ("whole_period", params([whole]), "[]"),
+    ]
+    for tag, (means, sigmas), change_times in variants:
+        text, out_xml, fasta = build(template, template_dir, new_dir, args.tree_id, tag,
+                                        means, sigmas, change_times,
+                                        set_initial=not args.keep_initial,
+                                        relocate_paths=not args.keep_paths)
+        dest = new_dir / f"config_beast_xml_{tag}.toml"
+        dest.write_text(text)
+        print(f"{dest}: mean={fmt(means)} sigma={fmt(sigmas)} "
+                f"change_times={change_times} fasta={fasta}")
+    n_done += 1
 
     print(f"Done: {n_done} of {len(trees)} trees written to {args.output_dir}")
 

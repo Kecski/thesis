@@ -19,10 +19,10 @@ beast_dir = "data/beast_reconstructions"
 
 # OTHER GENERAL PARAMETERS
 seed = 42
-n_sims = 2
-simulation_length = 0.4 # years
+n_sims = 10
+simulation_length = 0.5 # years
 sequencing_delay = 14 # days
-num_segments = 3 # number of segments for episewer analysis
+num_segments = 4 # number of segments for episewer analysis
 
 with open("configs/config_remaster_xml.toml", "rb") as f:
     config_remaster = tomllib.load(f)
@@ -34,7 +34,7 @@ real_change_times = list(map(str, config_remaster["change_times_birth"]))
 sampled_trees_file = f"{remaster_output_dir}/logs/{remaster_output_name}.sampled.trees"
 full_trees_file = f"{remaster_output_dir}/logs/{remaster_output_name}.full.trees"
 
-TREE_IDS = [f"tree_{i}" for i in range(n_sims)]
+TREE_IDS = [i for i in range(n_sims)]
 CONFIG_TYPES = ["base", "sections", "whole_period", "true_values"]
 
 
@@ -70,17 +70,17 @@ rule all:
         f"{wastewater_output_dir}/tree_0/measurements.csv",
         f"{wastewater_output_dir}/tree_0/episewer_summary.csv",
         expand(
-            "configs/{tree_id}/config_beast_xml_sections.toml", 
+            "configs/tree_{tree_id}/config_beast_xml_sections.toml", 
             tree_id=TREE_IDS
         ),
         # expand("data/beast_reconstructions/{tree_id}/", tree_id=TREE_IDS)
         expand(
-            "data/beast_reconstructions/{tree_id}/{config_type}.xml",
+            "data/beast_reconstructions/tree_{tree_id}/{config_type}.xml",
             tree_id=TREE_IDS,
             config_type=CONFIG_TYPES
         ),
         expand(
-            f"{beast_dir}/{{tree_id}}/{{config_type}}.log",
+            f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.log",
             tree_id=TREE_IDS,
             config_type=CONFIG_TYPES
         )
@@ -137,9 +137,9 @@ rule mutate_sequences:
         tree_file = sampled_trees_file,
         root_sequence_file = sequence_mutation_root_sequence_file
     output:
-        seq_info = f"{sequence_mutation_output_dir}/{{tree_id}}/sequences_info.txt",
-        seq_rates = f"{sequence_mutation_output_dir}/{{tree_id}}/sequences_rates.txt",
-        seq_fasta = f"{sequence_mutation_output_dir}/{{tree_id}}/sequences.fasta"
+        seq_info = f"{sequence_mutation_output_dir}/tree_{{tree_id}}/sequences_info.txt",
+        seq_rates = f"{sequence_mutation_output_dir}/tree_{{tree_id}}/sequences_rates.txt",
+        seq_fasta = f"{sequence_mutation_output_dir}/tree_{{tree_id}}/sequences.fasta"
     params:
         output_dir = sequence_mutation_output_dir
     shell:
@@ -148,7 +148,8 @@ rule mutate_sequences:
             -c {input.config} \
             --output_dir {params.output_dir} \
             --tree_file {input.tree_file} \
-            --root_sequence_file {input.root_sequence_file} \
+            --tree_id {wildcards.tree_id} \
+            --root_sequence_file {input.root_sequence_file}
         """
     
 # Simulate wastewater data from the full remaster trees
@@ -158,9 +159,9 @@ rule simulate_wastewater_data:
         config = "configs/config_wastewater_data.toml",
         tree_file = full_trees_file
     output:
-        measurements = f"{wastewater_output_dir}/{{tree_id}}/measurements.csv",
-        flows = f"{wastewater_output_dir}/{{tree_id}}/flows.csv",
-        full_data = f"{wastewater_output_dir}/{{tree_id}}/full_data.csv"
+        measurements = f"{wastewater_output_dir}/tree_{{tree_id}}/measurements.csv",
+        flows = f"{wastewater_output_dir}/tree_{{tree_id}}/flows.csv",
+        full_data = f"{wastewater_output_dir}/tree_{{tree_id}}/full_data.csv"
     params:
         output_dir = wastewater_output_dir,
         tree_format = wastewater_tree_format,
@@ -173,6 +174,7 @@ rule simulate_wastewater_data:
             --output_dir {params.output_dir} \
             --tree {input.tree_file} \
             --tree_format {params.tree_format} \
+            --tree_id {wildcards.tree_id} \
             --sequencing_delay {params.sequencing_delay} \
             --n_days {params.n_days}
         """
@@ -180,13 +182,12 @@ rule simulate_wastewater_data:
 rule run_episewer:
     input:
         script = "episewer.R",
-        wastewater_measurements = f"{wastewater_output_dir}/{{tree_id}}/measurements.csv",
-        wastewater_flows = f"{wastewater_output_dir}/{{tree_id}}/flows.csv"
+        wastewater_measurements = f"{wastewater_output_dir}/tree_{{tree_id}}/measurements.csv",
+        wastewater_flows = f"{wastewater_output_dir}/tree_{{tree_id}}/flows.csv"
     output:
-        summary = f"{wastewater_output_dir}/{{tree_id}}/episewer_summary.csv"
+        summary = f"{wastewater_output_dir}/tree_{{tree_id}}/episewer_summary.csv"
     params:
         output_dir = wastewater_output_dir,
-        n_sims = n_sims,
         sequencing_delay = sequencing_delay,
         seed = seed,
         num_segments = num_segments
@@ -194,7 +195,7 @@ rule run_episewer:
         """
         Rscript {input.script} \
             --data-dir {params.output_dir} \
-            --n-sims {params.n_sims} \
+            --tree-id {wildcards.tree_id} \
             --sequencing-delay {params.sequencing_delay} \
             --seed {params.seed} \
             --num-segments {params.num_segments}
@@ -204,9 +205,9 @@ rule make_beast_configs:
     input:
         script = "make_beast_configs.py",
         config = "configs/config_beast_xml_template.toml",
-        summaries = f"{wastewater_output_dir}/{{tree_id}}/episewer_summary.csv"
+        summaries = f"{wastewater_output_dir}/tree_{{tree_id}}/episewer_summary.csv"
     output:
-        configs = "configs/{tree_id}/config_beast_xml_{config_type}.toml"
+        configs = expand("configs/tree_{{tree_id}}/config_beast_xml_{config_type}.toml", config_type=CONFIG_TYPES)
         # config_base = "configs/{tree_id}/config_beast_xml_base.toml",
         # config_sections = "configs/{tree_id}/config_beast_xml_sections.toml",
         # config_whole = "configs/{tree_id}/config_beast_xml_whole_period.toml"
@@ -215,6 +216,7 @@ rule make_beast_configs:
         input_dir_csv = wastewater_output_dir,
         output_dir_csv = "configs",
         simulation_length = simulation_length,
+        output_name_base = "config_beast_xml_base.toml",
         output_name_manual = "config_beast_xml_true_values.toml",
         real_Re_str = " ".join(real_Re.astype(str)),
         real_change_times_str = " ".join(real_change_times) if real_change_times else -1,
@@ -223,15 +225,16 @@ rule make_beast_configs:
         """
         uv run {input.script} \
             --input_dir {params.input_dir_csv} \
+            --tree_id {wildcards.tree_id} \
             --output_dir {params.output_dir_csv} \
             --config {input.config} \
             --simulation_length {params.simulation_length} \
             --reverse-sections
         
-        cp configs/config_beast_xml_template.toml configs/{wildcards.tree_id}/config_beast_xml_base.toml
+        cp configs/config_beast_xml_template.toml configs/tree_{wildcards.tree_id}/{params.output_name_base}
 
         uv run {input.script} \
-            --output_dir configs/{wildcards.tree_id} \
+            --output_dir configs/tree_{wildcards.tree_id} \
             --output_name {params.output_name_manual} \
             --config {input.config} \
             --re-means {params.real_Re_str} \
@@ -249,15 +252,15 @@ rule make_beast_configs:
 rule make_beast_xml:
     input:
         script = "make_beast_xml.py",
-        sequences = f"{sequence_mutation_output_dir}/{{tree_id}}/sequences.fasta",
-        configs = "configs/{tree_id}/config_beast_xml_{config_type}.toml",
+        sequences = f"{sequence_mutation_output_dir}/tree_{{tree_id}}/sequences.fasta",
+        configs = "configs/tree_{tree_id}/config_beast_xml_{config_type}.toml",
         template = "templates/beast_xmls/template.xml"
         # config_base = "configs/config_beast_xml_template.toml",
         # config_sections = "configs/{tree_id}/config_beast_xml_sections.toml",
         # config_whole = "configs/{tree_id}/config_beast_xml_whole_period.toml"
         # config_true_values = "configs/{}"
     output:
-        output_file = f"{beast_dir}/{{tree_id}}/{{config_type}}.xml"
+        output_file = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.xml"
     shell:
         """
         uv run {input.script} {input.configs} \
@@ -268,13 +271,13 @@ rule make_beast_xml:
 
 rule run_beast:
     input:
-        xml = f"{beast_dir}/{{tree_id}}/{{config_type}}.xml"
+        xml = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.xml"
     output:
-        trees = f"{beast_dir}/{{tree_id}}/{{config_type}}-sequences.trees",
-        log = f"{beast_dir}/{{tree_id}}/{{config_type}}.log",
-        typed_trees = f"{beast_dir}/{{tree_id}}/{{config_type}}.sequences.typed.trees",
-        typed_node_trees = f"{beast_dir}/{{tree_id}}/{{config_type}}.sequences.typed.node.trees",
-        state = f"{beast_dir}/{{tree_id}}/{{config_type}}.xml.state"
+        trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}-sequences.trees",
+        log = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.log",
+        typed_trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.sequences.typed.trees",
+        typed_node_trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.sequences.typed.node.trees",
+        state = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.xml.state"
     params:
         beast_dir = beast_dir,
         seed = seed
@@ -284,7 +287,7 @@ rule run_beast:
             -overwrite \
             -seed {params.seed} \
             -working \
-            {params.beast_dir}/{wildcards.tree_id}/{wildcards.config_type}.xml
+            {params.beast_dir}/tree_{wildcards.tree_id}/{wildcards.config_type}.xml
         """
 
 
