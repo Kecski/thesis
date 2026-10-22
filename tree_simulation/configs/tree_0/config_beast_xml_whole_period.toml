@@ -19,7 +19,7 @@ date_regex = '_(\d{4}(?:\.\d+)?)$'
 
 [mcmc]
 chain_length = 20_000_000
-store_every  = 1_000
+store_every  = 2_000
 log_every    = 5_000
 
 [model]
@@ -57,9 +57,9 @@ re_change_times = []
 [re_prior]
 distribution       = "LogNormal"
 mean_in_real_space = true
-mean    = 1.0424
-sigma   = 0.0133     # or just: sigma = 0.3
-initial = 1.0424
+mean    = 1.034
+sigma   = 0.0272     # or just: sigma = 0.3
+initial = 1.034
 
 [sampling]
 initial = 0.1

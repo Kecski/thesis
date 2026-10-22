@@ -1,51 +1,127 @@
 #!/usr/bin/env Rscript
 # Run EpiSewer on the CSV files written by run_simulation.py.
 #
-# Usage (all arguments optional, "--key value" pairs):
-#   Rscript run_episewer.R --prefix sim_ep --outdir results \
-#       --shed_mean 8 --shed_sd 5 --gen_mean 3 --gen_sd 2.4 \
-#       --iter_warmup 500 --iter_sampling 500 --chains 4 --cores 4 --seed 42
+# Usage:
+#   Rscript episewer.R config.yml [--data_dir data/wastewater] [--tree_id 3] \
+#       [--sequencing_delay 5]
 #
-# --prefix        prefix of <prefix>_measurements.csv and <prefix>_flows.csv
-# --outdir        folder for results (created if missing)
-# --shed_mean/sd  mean and sd (days) of the shedding distribution; use the
-#                 same values as in the simulation
-# --gen_mean/sd   mean and sd (days) of the generation time distribution
-#                 (placeholders: use the one matching your tree)
-# --iter_warmup, --iter_sampling, --chains, --cores, --seed  Stan settings
+# Most parameters come from the YAML config file (first argument). All config
+# keys are optional and fall back to the defaults defined in this script;
+# unknown keys cause an error. See config_example.yml.
+#
+# Config file keys:
+#   shed_mean/sd    mean and sd (days) of the shedding distribution; use the
+#                   same values as in the simulation
+#   gen_mean/sd     mean and sd (days) of the generation time distribution
+#   incub_mean/sd   mean and sd (days) of the incubation period distribution
+#   load_per_case   particles shed by a single infected
+#   iter_warmup, iter_sampling, chains, cores, seed   Stan settings
+#   num_segments    number of equally long sections (used if breakpoints is empty)
+#   breakpoints     list of dates (or comma-separated string) defining the sections
+#
+# Command-line arguments (these are NOT read from the config file):
+#   --data_dir         folder containing the tree_<id> subfolders; results are
+#                      written into <data_dir>/tree_<id> (default data/wastewater)
+#   --tree_id          which tree_<id> folder to analyse (default 0)
+#   --sequencing_delay days to skip at the start when building equal sections
+#                      (default 0)
+
+# ----- EpiSewer base parameters -----
+# measurements:
+#     concentrations - observe from data
+#     noise - estimate from data
+#     LOD - none
+# sampling:
+#     outliers - estimate from data
+#     sample_effects - none
+# sewage:
+#     flows - observe from data
+#     residence_dist - assumes that particles arrive at the sampling site within the day of shedding
+# shedding:
+#     incubation_dist - assumes discrete gamma distribution with mean=3.4, sd=1.17 (alpha=8.5, beta=0.4)
+#     shedding_dist - assumes discrete gamma distribution with mean=8, sd=5 (alpha=2.56, beta=3.125)
+#     load_per_case - assumes 1e12 particles shed by a single infected
+#     load_variation - estimate from data
+# infections:
+#     generation_dist - assumes discrete gamma distribution with mean=3, sd=2.4 (alpha=1.6525, beta=1.92)
+#     R - estimate R from data using Gaussian proccesses
+#     seeding - estimate initial infections with geometric random walk
+#     infection_noise - estimate from data
 
 suppressPackageStartupMessages({
     library(EpiSewer)
     library(data.table)
     library(ggplot2)
+    library(yaml)
 })
 
-# ---- minimal argument parser (base R, no extra dependencies) --------------
-# breakpoints: comma-separated dates defining n sections. n+1 dates give n
-# half-open sections [breakpoints[i], breakpoints[i+1]). Example for 3
-# sections of unequal length: "2020-03-01,2020-04-01,2020-05-15,2020-07-01"
-defaults <- list(data_dir = "data/wastewater", tree_id = 0,
-                 shed_mean = 8, shed_sd = 5, gen_mean = 3, gen_sd = 2.4,
-                 iter_warmup = 500, iter_sampling = 500, chains = 4,
-                 cores = 4, seed = 42, num_segments = 1, sequencing_delay = 0,
-                 breakpoints = "") # format for breakpoints: "YYYY-MM-DD,YYYY-MM-DD,..." 
+# ---- config + command-line parsing ----------------------------------------
+# breakpoints: dates defining n sections. n+1 dates give n half-open sections
+# [breakpoints[i], breakpoints[i+1]). Either a YAML list of dates or a
+# comma-separated string, e.g. "2020-03-01,2020-04-01,2020-05-15,2020-07-01"
+config_defaults <- list(shed_mean = 8, shed_sd = 5, gen_mean = 3, gen_sd = 2.4,
+                        incub_mean = 3.4, incub_sd = 1.17, load_per_case = 1e10,
+                        iter_warmup = 500, iter_sampling = 500, chains = 4,
+                        cores = 4, seed = 42, num_segments = 1,
+                        breakpoints = "")
+cli_defaults <- list(data_dir = "data/wastewater", tree_id = 0,
+                     sequencing_delay = 0)
 
-parse_cli <- function(defaults) {
-    args <- commandArgs(trailingOnly = TRUE)
+read_config <- function(config_file, defaults, cli_keys) {
+    if (!file.exists(config_file))
+        stop("Config file not found: ", config_file)
+    cfg <- yaml::read_yaml(config_file)
+    if (is.null(cfg)) cfg <- list()  # empty file -> all defaults
+    
+    misplaced <- intersect(names(cfg), cli_keys)
+    if (length(misplaced) > 0)
+        stop("These keys must be given on the command line, not in the config ",
+             "file: ", paste(misplaced, collapse = ", "))
+    unknown <- setdiff(names(cfg), names(defaults))
+    if (length(unknown) > 0)
+        stop("Unknown key(s) in config file: ", paste(unknown, collapse = ", "),
+             ". Allowed keys: ", paste(names(defaults), collapse = ", "))
+    
+    out <- defaults
+    for (key in names(cfg)) {
+        val <- cfg[[key]]
+        if (key == "breakpoints") {
+            # accept a YAML list of dates or a comma-separated string
+            val <- paste(as.character(unlist(val)), collapse = ",")
+        } else if (is.numeric(defaults[[key]])) {
+            # as.numeric also handles values like 1e10 that YAML may read as text
+            val <- suppressWarnings(as.numeric(val))
+            if (length(val) != 1 || is.na(val))
+                stop("Config key '", key, "' must be a single number.")
+        }
+        out[[key]] <- val
+    }
+    out
+}
+
+parse_cli <- function(args, defaults) {
     out <- defaults
     i <- 1
     while (i <= length(args)) {
         key <- gsub("-", "_", sub("^--", "", args[i]))
         if (!key %in% names(defaults) || i == length(args))
-            stop("Unknown or incomplete argument: ", args[i])
+            stop("Unknown or incomplete argument: ", args[i],
+                 ". Allowed arguments: ",
+                 paste0("--", names(defaults), collapse = ", "))
         val <- args[i + 1]
-        out[[key]] <- if (is.numeric(defaults[[key]]) && key != "breakpoints")
-            as.numeric(val) else val
+        out[[key]] <- if (is.numeric(defaults[[key]])) as.numeric(val) else val
         i <- i + 2
     }
     out
 }
-opt <- parse_cli(defaults)
+
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 1 || startsWith(args[1], "--"))
+    stop("Usage: Rscript episewer.R <config.yml> [--tree_id N] ",
+         "[--data_dir DIR] [--sequencing_delay N]")
+opt <- c(read_config(args[1], config_defaults, names(cli_defaults)),
+         parse_cli(args[-1], cli_defaults))
+message("Read config from ", args[1])
 
 # ---- data -----------------------------------------------------------------
 tree_dir = paste0(opt$data_dir, "/tree_", opt$tree_id)
@@ -70,11 +146,13 @@ ww_data <- sewer_data(measurements = measurements, flows = flows)
 # ---- assumptions (gamma shape = (mean/sd)^2, scale = sd^2/mean) ----------
 ww_assumptions <- sewer_assumptions(
     generation_dist = get_discrete_gamma_shifted(gamma_mean = opt$gen_mean,
-                                                    gamma_sd   = opt$gen_sd),
+                                                 gamma_sd   = opt$gen_sd),
     shedding_dist   = get_discrete_gamma(gamma_shape = (opt$shed_mean / opt$shed_sd)^2,
-                                            gamma_scale = opt$shed_sd^2 / opt$shed_mean),
+                                         gamma_scale = opt$shed_sd^2 / opt$shed_mean),
     shedding_reference = "symptom_onset", #infection
-    incubation_dist = get_discrete_gamma(gamma_shape = 8.5, gamma_scale = 0.4)
+    incubation_dist = get_discrete_gamma(gamma_shape = (opt$incub_mean / opt$incub_sd)^2, 
+                                         gamma_scale = opt$incub_sd^2 / opt$incub_mean),
+    load_per_case = opt$load_per_case
 )
 
 # ---- fit ------------------------------------------------------------------
@@ -82,6 +160,7 @@ options(mc.cores = opt$cores)
 ww_result <- EpiSewer(
     data = ww_data,
     assumptions = ww_assumptions,
+    shedding = model_shedding(load_per_case = load_per_case_assume()),
     fit_opts = set_fit_opts(sampler = sampler_stan_mcmc(
         iter_warmup = opt$iter_warmup, iter_sampling = opt$iter_sampling,
         chains = opt$chains, seed = opt$seed)),
@@ -179,7 +258,7 @@ summarise_sections <- function(samples, variable_name, breakpoints,
 
 breakpoints <- strsplit(breakpoints, ",")[[1]]
 if (length(breakpoints) < 2)
-    stop("--breakpoints needs at least 2 dates to define 1 section.")
+    stop("'breakpoints' needs at least 2 dates to define 1 section.")
 
 samples <- ww_result$summary$samples
 
@@ -196,6 +275,4 @@ message("Section-level summary written to episewer_section_summary.csv")
 # message("Full per-draw distributions written to episewer_section_posterior_draws.csv")
 
 
-message("EpiSewer finished. Results in: ", opt$data_dir, "/tree_", opt$tree_id)
-
-
+message("EpiSewer finished. Results in: ", tree_dir)

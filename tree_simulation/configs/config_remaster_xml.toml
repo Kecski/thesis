@@ -1,10 +1,10 @@
 # Biological & Rate Parameters
-birth_rate = [47, 30]
+birth_rate = [47, 25, 50]
 death_rate = [29.63]
 sampling_rate = [0.79] # Target sampling proportion: 0.025
 
 # Optional rate change times (leave empty or omit if not used)
-change_times_birth = [0.25]
+change_times_birth = [0.2, 0.2]
 change_times_death = []
 change_times_sampling = []
 
@@ -22,5 +22,5 @@ traj_type = "StochasticTrajectory"
 # Optional Constraints & Execution
 min_tips = 10
 # max_pop = 1000
-# seed = 42
+seed = 42
 # beast_cmd = "beast"

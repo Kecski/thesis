@@ -36,7 +36,7 @@ module load gcc/12.2.0 r/4.4.0
 # Rscript -e 'renv::restore(prompt = FALSE)'
 
 # ---- Python environment ----
-# export UV_NO_CONFIG=1
+export UV_NO_CONFIG=1
 # uv sync --frozen
 
 cd tree_simulation

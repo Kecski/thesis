@@ -1,0 +1,31 @@
+# Example config for episewer.R
+# Run: Rscript episewer.R config_example.yml --data_dir data/wastewater --tree_id 0
+#
+# data_dir, tree_id and sequencing_delay are NOT set here; pass them on the
+# command line. All keys below are optional (defaults live in the script).
+ 
+# Shedding / generation / incubation distributions (mean and sd in days)
+shed_mean: 4
+shed_sd: 2
+gen_mean: 3
+gen_sd: 2.4
+incub_mean: 1
+incub_sd: 1.17
+load_per_case: 1.0e+12
+ 
+# Stan settings
+iter_warmup: 500
+iter_sampling: 500
+chains: 4
+cores: 4
+seed: 42
+ 
+# Sections for the per-section summaries.
+# Option A: equal-length sections (leave breakpoints out)
+num_segments: 4
+# Option B: explicit breakpoints (n+1 dates -> n sections); overrides Option A
+# breakpoints:
+#   - "2020-03-01"
+#   - "2020-04-01"
+#   - "2020-05-15"
+#   - "2020-07-01"
