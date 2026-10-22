@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=test_simulation
-#SBATCH --time=02:00:00
+#SBATCH --time=05:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=4G

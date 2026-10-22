@@ -57,9 +57,9 @@ re_change_times = []
 [re_prior]
 distribution       = "LogNormal"
 mean_in_real_space = true
-mean    = 1.0179
-sigma   = 0.0139     # or just: sigma = 0.3
-initial = 1.0179
+mean    = 1.0629
+sigma   = 0.0115     # or just: sigma = 0.3
+initial = 1.0629
 
 [sampling]
 initial = 0.1

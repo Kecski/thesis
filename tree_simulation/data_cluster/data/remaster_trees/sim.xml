@@ -1,15 +1,15 @@
 <beast version="2.0" namespace="beast.base.inference:beast.base.inference.parameter:remaster">
-	<run spec="Simulator" nSims="2">
+	<run spec="Simulator" nSims="10">
 		<simulate id="tree" spec="SimulatedTree">
-			<trajectory id="trajectory" spec="StochasticTrajectory" maxTime="0.4383299110198494" mustHave="S>=10">
+			<trajectory id="trajectory" spec="StochasticTrajectory" maxTime="0.5383299110198494" mustHave="S>=10">
 				<population id="X" spec="RealParameter" value="1"/>
 				<samplePopulation id="S" spec="RealParameter" value="0"/>
 				<samplePopulation id="removed" spec="RealParameter" value="0"/>
 
-				<reaction spec="Reaction" rate="47.0"> X -> 2X </reaction>
+				<reaction spec="Reaction" rate="43.0 30.0" changeTimes="0.25"> X -> 2X </reaction>
 				<reaction spec="Reaction" rate="29.63"> X -> removed </reaction>
-				<reaction spec="Reaction" rate="0.79 0" changeTimes="0.4"> X -> S + removed </reaction>
-				<reaction spec="PunctualReaction" p="1.0" times="0.4383299110198494"> X -> removed </reaction>
+				<reaction spec="Reaction" rate="0.79 0" changeTimes="0.5"> X -> S + removed </reaction>
+				<reaction spec="PunctualReaction" p="1.0" times="0.5383299110198494"> X -> removed </reaction>
 			</trajectory>
 		</simulate>
 
