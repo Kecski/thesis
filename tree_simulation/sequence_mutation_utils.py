@@ -20,6 +20,18 @@ from typing import Optional
 #     trees = dendropy.TreeList.get(path=nexus_file, schema="nexus")
 #     trees.write(path=newick_file, schema="newick")
 
+def _tip_sampling_dates(tree, root_date: float=2002.0) -> dict:
+    """
+    Returns {tip name (spaces replaced by underscores): sampling date} for every tip,
+    where date = root_date + root-to-tip distance.
+    """
+    sampling_dates = {}
+    for leaf in tree.leaf_node_iter():
+        label = "_".join(leaf.taxon.label.split(" "))
+        sampling_dates[label] = root_date + leaf.distance_from_root()
+    return sampling_dates
+
+
 def add_dates(tree, input_fasta: str, root_date: float=2002.0) -> None:
     """
     Calculates the tip dates based on root-to-tip distances and appends them to FASTA headers.
@@ -32,13 +44,7 @@ def add_dates(tree, input_fasta: str, root_date: float=2002.0) -> None:
     Returns:
         None. The input FASTA file is overwritten in place with updated sequence IDs.
     """
-    tip_times = {}
-    for leaf in tree.leaf_node_iter():
-        dist = leaf.distance_from_root()
-        label = "_".join(leaf.taxon.label.split(" "))
-        tip_times[label] = dist
-        
-    sampling_dates = {name: root_date + t for name, t in tip_times.items()}
+    sampling_dates = _tip_sampling_dates(tree, root_date)
     
     records = list(SeqIO.parse(input_fasta, "fasta"))
     for rec in records:
@@ -48,6 +54,34 @@ def add_dates(tree, input_fasta: str, root_date: float=2002.0) -> None:
 
     # output_fasta = f"{input_fasta}"
     SeqIO.write(records, input_fasta, "fasta")
+
+
+def save_tree_with_dates(tree, output_file: str, root_date: float=2002.0,
+                         schema: str="newick") -> None:
+    """
+    Saves a copy of the tree whose tip names carry the sampling date, using exactly the
+    same naming as add_dates() (e.g. "tipA_2005.1234"), so tree tips match FASTA headers.
+    
+    Args:
+        tree (dendropy.Tree): The phylogenetic tree with branch lengths.
+        output_file (str): Path of the tree file to write.
+        root_date (float): The base chronological date of the root node. Defaults to 2002.0.
+        schema (str): Output format, e.g. "newick" or "nexus". Defaults to "newick".
+        
+    Returns:
+        None. The original tree object is left unchanged.
+    """
+    sampling_dates = _tip_sampling_dates(tree, root_date)
+    
+    # depth=2 also copies the taxa, so renaming them doesn't touch the original tree
+    dated_tree = tree.clone(depth=2)
+    for leaf in dated_tree.leaf_node_iter():
+        name = "_".join(leaf.taxon.label.split(" "))
+        leaf.taxon.label = f"{name}_{sampling_dates[name]:.4f}"
+    
+    Path(output_file).parent.mkdir(parents=True, exist_ok=True)
+    # unquoted_underscores keeps labels identical to the FASTA IDs (no added quotes)
+    dated_tree.write(path=output_file, schema=schema, unquoted_underscores=True)
 
 def simulate_sequences_on_tree(tree_file: str,
                                tree_id: int,
@@ -59,7 +93,9 @@ def simulate_sequences_on_tree(tree_file: str,
                                mutation_rates: Optional[dict]=None,
                                gamma_dist: dict={"alpha": 0.5, "num_categories": 4},
                                output_dir: str="./",
-                               root_date: float=2002.0
+                               root_date: float=2002.0,
+                               output_tree_file: Optional[str]=None,
+                               tree_schema: str="newick"
                                ) -> None:
     """
     Simulates nucleotide sequence evolution along trees in a Nexus file and saves the output.
@@ -73,9 +109,13 @@ def simulate_sequences_on_tree(tree_file: str,
         gamma_dist (dict): Parameters for Gamma rate heterogeneity (alpha and number of categories).
         output_dir (str): Destination directory for the generated fasta, info, and rate files.
         root_date (float): Chronological date of the root, passed to add_dates(). Defaults to 2002.0.
+        output_tree_file (str, optional): Path where the tree with dated tip names is saved.
+            If None, it is saved as "tree_with_dates.nwk" (or ".nex" for nexus) inside the
+            tree_<id> output directory.
+        tree_schema (str): Format of the saved tree, "newick" or "nexus". Defaults to "newick".
         
     Returns:
-        None. Generates sequence, info, and rate files in the output directory.
+        None. Generates sequence, info, and rate files, plus the dated tree, in the output directory.
     """
     n_sites = len(root_sequence)
     
@@ -141,6 +181,11 @@ def simulate_sequences_on_tree(tree_file: str,
 
     SeqIO.write(records, fasta_file, "fasta")
     add_dates(dp_trees[tree_id], fasta_file, root_date)
+
+    if output_tree_file is None:
+        ext = "nex" if tree_schema == "nexus" else "nwk"
+        output_tree_file = tree_dir / f"tree_with_dates.{ext}"
+    save_tree_with_dates(dp_trees[tree_id], output_tree_file, root_date, tree_schema)
 
     with open(rates_file, "w") as f:
         f.write("Site_Index\tPartition_Index\tRate_Category\n")

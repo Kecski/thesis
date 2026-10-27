@@ -145,7 +145,7 @@ name="alignment">
         <operator id="originBDMMPrimeScaler.t:sequences" spec="ScaleOperator" parameter="@originBDMMPrime.t:sequences" weight="3.0"/>
         <operator id="ReEpiScaler.t:sequences" spec="ScaleOperator" parameter="@ReEpi.t:sequences" weight="3.0"/>
         <operator id="samplingProportionEpiScaler.t:sequences" spec="ScaleOperator" parameter="@samplingProportionEpi.t:sequences" weight="3.0"/>
-        <logger id="tracelog" spec="Logger" fileName="$(filebase).log" logEvery="{{LOG_EVERY}}" model="@posterior" sanitiseHeaders="true" sort="smart">
+        <logger id="tracelog" spec="Logger" fileName="$(filebase)_$(seed).log" logEvery="{{LOG_EVERY}}" model="@posterior" sanitiseHeaders="true" sort="smart">
             <log idref="posterior"/>
             <log idref="likelihood"/>
             <log idref="prior"/>
@@ -165,16 +165,16 @@ name="alignment">
             <log idref="likelihood"/>
             <log idref="prior"/>
         </logger>
-        <logger id="treelog.t:sequences" spec="Logger" fileName="$(filebase)-$(tree).trees" logEvery="{{LOG_EVERY}}" mode="tree">
+        <logger id="treelog.t:sequences" spec="Logger" fileName="$(filebase)_$(seed)-$(tree).trees" logEvery="{{LOG_EVERY}}" mode="tree">
             <log id="TreeWithMetaDataLogger.t:sequences" spec="beast.base.evolution.TreeWithMetaDataLogger" tree="@Tree.t:sequences"/>
         </logger>
-        <logger id="typedTreeLogger.t:sequences" spec="bdmmprime.util.OptionalLogger" enableLogger="true" fileName="$(filebase).$(tree).typed.trees" logEvery="{{LOG_EVERY}}" mode="tree">
+        <logger id="typedTreeLogger.t:sequences" spec="bdmmprime.util.OptionalLogger" enableLogger="true" fileName="$(filebase)_$(seed).$(tree).typed.trees" logEvery="{{LOG_EVERY}}" mode="tree">
             <log idref="typeMappedTree.t:sequences"/>
         </logger>
-        <logger id="nodeTypedTreeLogger.t:sequences" spec="bdmmprime.util.OptionalLogger" enableLogger="true" fileName="$(filebase).$(tree).typed.node.trees" logEvery="{{LOG_EVERY}}" mode="tree">
+        <logger id="nodeTypedTreeLogger.t:sequences" spec="bdmmprime.util.OptionalLogger" enableLogger="true" fileName="$(filebase)_$(seed).$(tree).typed.node.trees" logEvery="{{LOG_EVERY}}" mode="tree">
             <log id="nodeTypedTree.t:sequences" spec="bdmmprime.mapping.TypedNodeTreeLogger" typedTree="@typeMappedTree.t:sequences"/>
         </logger>
-        <logger id="trajLogger.t:sequences" spec="bdmmprime.util.OptionalLogger" fileName="$(filebase).$(tree).traj" logEvery="{{LOG_EVERY}}">
+        <logger id="trajLogger.t:sequences" spec="bdmmprime.util.OptionalLogger" fileName="$(filebase)_$(seed).$(tree).traj" logEvery="{{LOG_EVERY}}">
             <log id="typedTraj.t:sequences" spec="bdmmprime.trajectories.SampledTrajectory" bdmmDistrib="@BDMMPrime.t:sequences" startTypePriorProbs="@startTypePriorProbs.t:sequences" typeMappedTree="@typeMappedTree.t:sequences" useTauLeaping="true"/>
         </logger>
         <operatorschedule id="OperatorSchedule" spec="OperatorSchedule"/>

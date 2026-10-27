@@ -1,0 +1,79 @@
+# ---------------------------------------------------------------
+# Config for make_beast_xml.py
+# Relative paths are relative to this file.
+# ---------------------------------------------------------------
+template = "../data/beast_reconstructions/template.xml"
+output   = "../data/beast_reconstructions/analysis_tree1_whole_period.xml"
+
+# Optional: add e.g. "10.0.0" to append "feast v10.0.0" to the <beast required=...> attribute
+# (use the version you have installed). Leave commented out to skip.
+# feast_version = "10.0.0"
+
+[data]
+fasta = "../data/simulated_sequences/tree1/sequences.fasta"
+# Tip dates are read from the tip name with this regular expression (group 1 = decimal year).
+# Default matches names ending in _2002.2012
+date_regex = '_(\d{4}(?:\.\d+)?)$'
+# ...or give a CSV (header row; column 1 = tip name, column 2 = decimal-year date) instead:
+# dates_csv = "dates.csv"
+
+[mcmc]
+chain_length = 5_000_000
+store_every  = 2_000
+log_every    = 2_000
+
+[model]
+# Rate of becoming uninfectious, per YEAR (30.42 = 365/12 -> 12-day infectious period)
+become_uninfectious_rate = 30.42
+# Must be larger than the sampling time span and than the last Re change time (units: years)
+origin_initial = 5.0
+re_upper = 10.0
+# Re change times as AGES (years back from the most recent sample), strictly increasing.
+# n intervals need n-1 change times.
+re_change_times = []
+# CONSTANT Re (no change over time): use a single value in [re_prior] (mean = 1.2,
+# sigma = 0.4, ...) or length-1 vectors, and set re_change_times = [] (or delete the line).
+# ...or, instead of re_change_times, equally long intervals (here 0.1 yr each);
+# the number of intervals is then taken from the vectors in [re_prior]:
+# re_interval_length = 0.1
+
+# ---------------------------------------------------------------
+# Priors on Re, one entry per interval (index 0 first).
+# The NUMBER OF INTERVALS is the length of these vectors; change them (and
+# re_change_times) together. Any field may also be a single value, which is
+# then used for every interval.
+#
+# distribution:
+#   "LogNormal" : mean_in_real_space = true  -> `mean` is the mean of Re itself,
+#                                              `sigma` is the SD on the log scale
+#                 mean_in_real_space = false -> `mean` is M, the mean of log(Re)
+#                                              (the median of Re is exp(M)),
+#                                              `sigma` is the SD on the log scale
+#   "Normal"    : `mean` and `sigma` are both on the Re scale
+# distribution and mean_in_real_space can be a single value or a vector (to mix them).
+# `initial` (optional) = MCMC starting values; default is the prior mean
+# (exp(M) for LogNormal with mean_in_real_space = false).
+# ---------------------------------------------------------------
+[re_prior]
+distribution       = "LogNormal"
+mean_in_real_space = true
+mean    = 1.0311
+sigma   = 0.0332     # or just: sigma = 0.3
+initial = 1.0311
+
+[sampling]
+initial = 0.1
+# LogNormal prior on the sampling proportion (M on log scale, S = SD on log scale)
+prior_m = 1.0
+prior_s = 1.25
+
+[clock]
+initial = 1.0
+# LogNormal prior, mean in real space
+prior_mean  = 0.001
+prior_sigma = 1.25
+
+[substitution]
+kappa = 3.77
+gamma_shape = 0.5
+gamma_categories = 1

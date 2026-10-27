@@ -8,7 +8,7 @@ remaster_output_dir = "data/remaster_trees"
 remaster_output_name = "sim"
 
 sequence_mutation_output_dir = "data/simulated_sequences"
-sequence_mutation_root_sequence_file = "templates/root_sequences/test_root_sequence_1700.txt"
+sequence_mutation_root_sequence_file = "templates/root_sequences/test_root_sequence_500.txt"
 sequence_mutation_tree_file = f"{remaster_output_dir}/logs/{remaster_output_name}.sampled.trees"
 
 wastewater_tree_file = f"{remaster_output_dir}/logs/{remaster_output_name}.full.trees"
@@ -19,7 +19,7 @@ beast_dir = "data/beast_reconstructions"
 
 # OTHER GENERAL PARAMETERS
 seed = 42
-n_sims = 10
+n_sims = 1
 simulation_length = 0.5 # years
 sequencing_delay = 14 # days
 
@@ -33,6 +33,7 @@ real_change_times = list(map(str, config_remaster["change_times_birth"]))
 sampled_trees_file = f"{remaster_output_dir}/logs/{remaster_output_name}.sampled.trees"
 full_trees_file = f"{remaster_output_dir}/logs/{remaster_output_name}.full.trees"
 
+BEAST_SEEDS = [17, 42, 37]
 TREE_IDS = [i for i in range(n_sims)]
 CONFIG_TYPES = ["base", "sections", "whole_period", "true_values"]
 
@@ -79,9 +80,10 @@ rule all:
             config_type=CONFIG_TYPES
         ),
         expand(
-            f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.log",
+            f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.log",
             tree_id=TREE_IDS,
-            config_type=CONFIG_TYPES
+            config_type=CONFIG_TYPES,
+            beast_seed=BEAST_SEEDS
         )
 
 
@@ -138,7 +140,8 @@ rule mutate_sequences:
     output:
         seq_info = f"{sequence_mutation_output_dir}/tree_{{tree_id}}/sequences_info.txt",
         seq_rates = f"{sequence_mutation_output_dir}/tree_{{tree_id}}/sequences_rates.txt",
-        seq_fasta = f"{sequence_mutation_output_dir}/tree_{{tree_id}}/sequences.fasta"
+        seq_fasta = f"{sequence_mutation_output_dir}/tree_{{tree_id}}/sequences.fasta",
+        tree_with_dates = f"{sequence_mutation_output_dir}/tree_{{tree_id}}/tree_with_dates.nwk"
     params:
         output_dir = sequence_mutation_output_dir
     shell:
@@ -269,11 +272,11 @@ rule run_beast:
     input:
         xml = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.xml"
     output:
-        trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}-sequences.trees",
-        log = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.log",
-        typed_trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.sequences.typed.trees",
-        typed_node_trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.sequences.typed.node.trees",
-        state = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.xml.state"
+        trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}-sequences.trees",
+        log = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.log",
+        typed_trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.sequences.typed.trees",
+        typed_node_trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.sequences.typed.node.trees"
+        # state = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.xml.state"
     params:
         beast_dir = beast_dir,
         seed = seed
@@ -281,9 +284,9 @@ rule run_beast:
         """
         beast \
             -overwrite \
-            -seed {params.seed} \
+            -seed {wildcards.beast_seed} \
             -working \
-            {params.beast_dir}/tree_{wildcards.tree_id}/{wildcards.config_type}.xml
+            {input.xml}
         """
 
 
