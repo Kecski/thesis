@@ -122,11 +122,12 @@ rule run_remaster:
         traj = f"{remaster_output_dir}/logs/{remaster_output_name}.traj"
     params:
         working_dir = remaster_output_dir,
-        xml_name = remaster_output_name
+        xml_name = remaster_output_name,
+        seed = 42
     shell:
         """
         cd {params.working_dir}
-        beast -overwrite {params.xml_name}.xml
+        beast -overwrite -seed {params.seed} {params.xml_name}.xml
         cd -
         """
 
