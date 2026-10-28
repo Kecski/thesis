@@ -121,4 +121,4 @@ data_cluster/
 *.png
 
 # Tree config files
-configs/tree_*/
+**/configs/tree_*/
