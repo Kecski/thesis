@@ -63,7 +63,7 @@ config_defaults <- list(shed_mean = 8, shed_sd = 5, gen_mean = 3, gen_sd = 2.4,
                         incub_mean = 3.4, incub_sd = 1.17, load_per_case = 1e10,
                         iter_warmup = 500, iter_sampling = 500, chains = 4,
                         cores = 4, seed = 42, num_segments = 1,
-                        breakpoints = "")
+                        breakpoints = "") # format for breakpoints: "YYYY-MM-DD,YYYY-MM-DD,..." 
 cli_defaults <- list(data_dir = "data/wastewater", tree_id = 0,
                      sequencing_delay = 0)
 
@@ -140,6 +140,64 @@ if(opt$breakpoints == ""){
     breakpoints <- opt$breakpoints
 }
 
+
+# ---- write the parameters used for this run ---------------------------------
+# Written before the model is fitted, so the file exists even if the fit fails.
+# Note: the file sits in data_dir (not tree_dir), so it is overwritten when
+# another tree_id is analysed with the same data_dir.
+write_parameters <- function(file, opt, config_file, breakpoints) {
+    fmt <- function(x) format(x, scientific = FALSE, trim = TRUE)
+    lines <- c(
+        "EpiSewer run parameters",
+        paste0("Run time: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")),
+        paste0("Config file: ", config_file),
+        paste0("EpiSewer version: ", as.character(packageVersion("EpiSewer"))),
+        "",
+        "[Command-line parameters]",
+        paste0("data_dir = ", opt$data_dir),
+        paste0("tree_dir = ", tree_dir),
+        paste0("tree_id = ", fmt(opt$tree_id)),
+        paste0("sequencing_delay = ", fmt(opt$sequencing_delay)),
+        "",
+        "[Config parameters]",
+        paste0("shed_mean = ", fmt(opt$shed_mean)),
+        paste0("shed_sd = ", fmt(opt$shed_sd)),
+        paste0("gen_mean = ", fmt(opt$gen_mean)),
+        paste0("gen_sd = ", fmt(opt$gen_sd)),
+        paste0("incub_mean = ", fmt(opt$incub_mean)),
+        paste0("incub_sd = ", fmt(opt$incub_sd)),
+        paste0("load_per_case = ", format(opt$load_per_case, scientific = TRUE)),
+        paste0("iter_warmup = ", fmt(opt$iter_warmup)),
+        paste0("iter_sampling = ", fmt(opt$iter_sampling)),
+        paste0("chains = ", fmt(opt$chains)),
+        paste0("cores = ", fmt(opt$cores)),
+        paste0("seed = ", fmt(opt$seed)),
+        paste0("num_segments = ", fmt(opt$num_segments)),
+        paste0("breakpoints (as given in config) = ",
+               if (opt$breakpoints == "") "<empty>" else opt$breakpoints),
+        "",
+        "[Derived parameters]",
+        paste0("breakpoints (used) = ", breakpoints),
+        paste0("generation_dist: discrete shifted gamma, mean = ", fmt(opt$gen_mean),
+               ", sd = ", fmt(opt$gen_sd)),
+        paste0("shedding_dist: discrete gamma, shape = ",
+               fmt((opt$shed_mean / opt$shed_sd)^2),
+               ", scale = ", fmt(opt$shed_sd^2 / opt$shed_mean)),
+        paste0("incubation_dist: discrete gamma, shape = ",
+               fmt((opt$incub_mean / opt$incub_sd)^2),
+               ", scale = ", fmt(opt$incub_sd^2 / opt$incub_mean)),
+        "",
+        "[Fixed settings in this script]",
+        "shedding_reference = symptom_onset",
+        "summary_intervals = 0.5, 0.95",
+        paste0("samples_ndraws = ", fmt(opt$chains * opt$iter_sampling))
+    )
+    writeLines(lines, file)
+}
+ 
+params_file <- file.path(opt$data_dir, "parameters_episewer.txt")
+write_parameters(params_file, opt, args[1], breakpoints)
+message("Parameters written to ", params_file)
 
 ww_data <- sewer_data(measurements = measurements, flows = flows)
 
