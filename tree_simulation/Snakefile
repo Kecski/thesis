@@ -63,27 +63,44 @@ CONFIG_TYPES = ["base", "sections", "whole_period", "true_values"]
 # wastewater_output_dir = cfg.get("output_dir", "./data/wastewater")
 
 
+wildcard_constraints:
+    beast_seed = r"\d+"
 
 rule all:
     input: 
-        f"{sequence_mutation_output_dir}/tree_0/sequences.fasta",
-        f"{wastewater_output_dir}/tree_0/measurements.csv",
-        f"{wastewater_output_dir}/tree_0/episewer_summary.csv",
+        # f"{sequence_mutation_output_dir}/tree_0/sequences.fasta",
+        # f"{wastewater_output_dir}/tree_0/measurements.csv",
+        # f"{wastewater_output_dir}/tree_0/episewer_summary.csv",
+        # expand(
+        #     "configs/tree_{tree_id}/config_beast_xml_sections.toml", 
+        #     tree_id=TREE_IDS
+        # ),
+        # # expand("data/beast_reconstructions/{tree_id}/", tree_id=TREE_IDS)
+        # expand(
+        #     "data/beast_reconstructions/tree_{tree_id}/{config_type}.xml",
+        #     tree_id=TREE_IDS,
+        #     config_type=CONFIG_TYPES
+        # ),
+        # expand(
+        #     f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.log",
+        #     tree_id=TREE_IDS,
+        #     config_type=CONFIG_TYPES,
+        #     beast_seed=BEAST_SEEDS
+        # ),
         expand(
-            "configs/tree_{tree_id}/config_beast_xml_sections.toml", 
-            tree_id=TREE_IDS
-        ),
-        # expand("data/beast_reconstructions/{tree_id}/", tree_id=TREE_IDS)
-        expand(
-            "data/beast_reconstructions/tree_{tree_id}/{config_type}.xml",
+            f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_combined.log",
             tree_id=TREE_IDS,
             config_type=CONFIG_TYPES
         ),
         expand(
-            f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.log",
+            f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_combined-sequences.trees",
             tree_id=TREE_IDS,
-            config_type=CONFIG_TYPES,
-            beast_seed=BEAST_SEEDS
+            config_type=CONFIG_TYPES
+        ),
+        expand(
+            f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_combined-sequences.mcc.tree",
+            tree_id=TREE_IDS,
+            config_type=CONFIG_TYPES
         )
 
 
@@ -274,22 +291,61 @@ rule run_beast:
         xml = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}.xml"
     output:
         trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}-sequences.trees",
-        log = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.log",
+        logs = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.log",
         typed_trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.sequences.typed.trees",
-        typed_node_trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.sequences.typed.node.trees"
-        # state = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.xml.state"
-    params:
-        beast_dir = beast_dir,
-        seed = seed
+        typed_node_trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.sequences.typed.node.trees",
+        state = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.xml.state"
     shell:
         """
         beast \
             -overwrite \
             -seed {wildcards.beast_seed} \
             -working \
+            -statefile {output.state} \
             {input.xml}
         """
 
+rule combine_beast_logs:
+    input:
+        expand(f"{beast_dir}/tree_{{{{tree_id}}}}/{{{{config_type}}}}_{{beast_seed}}.log", beast_seed=BEAST_SEEDS)
+    output:
+        combined_logs = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_combined.log"
+    params:
+        burnin = 10,
+        inputs = lambda wc, input: " ".join(f"-log {file}" for file in input)
+    shell:
+        """
+        uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_logs}
+        """
+
+rule combine_beast_trees:
+    input:
+        expand(f"{beast_dir}/tree_{{{{tree_id}}}}/{{{{config_type}}}}_{{beast_seed}}-sequences.trees", beast_seed=BEAST_SEEDS)
+    output:
+        combined_trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_combined-sequences.trees"
+    params:
+        burnin = 10,
+        inputs = lambda wc, input: " ".join(f"-log {f}" for f in input)
+    shell:
+        "uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_trees}"
+
+rule annotate_trees:
+    input:
+        trees = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_combined-sequences.trees"
+    output:
+        mcc = f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_combined-sequences.mcc.tree"
+    params:
+        burnin = 0 , # already removed per chain by LogCombiner
+        node_heights = "CA", # Common Ancestor heights
+        target_type = "MCC" # Maximum clade credibility tree
+    shell:
+        """
+        uv run treeannotator \
+            -burnin {params.burnin} \
+            -height {params.node_heights} \
+            -target {params.target_type} \
+            {input.trees} {output.mcc}
+        """
 
 
 # uv run make_configs_from_episewer.py 
