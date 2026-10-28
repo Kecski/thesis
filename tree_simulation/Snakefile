@@ -26,7 +26,10 @@ sequencing_delay = 14 # days
 with open("configs/config_remaster_xml.toml", "rb") as f:
     config_remaster = tomllib.load(f)
 real_Re = np.array(config_remaster["birth_rate"]) / (np.array(config_remaster["death_rate"]) + np.array(config_remaster["sampling_rate"]))
-real_change_times = list(map(str, config_remaster["change_times_birth"]))
+real_Re = np.flip(real_Re) # The values have to be in reverse order as beast looks at time the opposite way, going back towards the origin
+
+real_change_times = list(map(str, [simulation_length - x for x in config_remaster["change_times_birth"]])) # As beast looks at the time backwards we need to calculate how much time ago did a change happen
+real_change_times = real_change_times[::-1] # The same way as with Re, we need to reverse the order
 
 
 # DERIVED PATHS FROM GENERAL PARAMETERS
