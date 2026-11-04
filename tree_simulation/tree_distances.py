@@ -27,16 +27,34 @@ Usage
   python tree_distances.py a.nwk b.nwk c.nwk        # several files (all trees pooled)
   python tree_distances.py trees.nwk --csv out      # also write out_<metric>.csv
 
+Tree names (used as row/column labels in the CSVs and in plot_distances.py)
+  A file holding one tree is named after the file (a.nwk -> "a").
+  A file holding several trees is named <file>_<tree label> for Nexus trees that have a
+  label, otherwise <file>_<position> (1-based). Duplicate names get a _2, _3, ... suffix.
+  --csv PREFIX writes labelled matrices PREFIX_<metric>.csv plus PREFIX_trees.csv
+  (tree name -> source file).
+
 Requires: pip install dendropy numpy
 """
 import argparse
+import csv
 import itertools
 import math
+from collections import Counter
 from pathlib import Path
 
 import dendropy
 import numpy as np
 
+
+
+name_mapping = {
+    "tree_with_dates": "ground truth",
+    "base_combined-sequences.mcc": "no informative priors",
+    "sections_combined-sequences.mcc": "multiple ww priors",
+    "whole_period_combined-sequences.mcc": "single ww prior",
+    "true_values_combined-sequences.mcc": "true value priors"
+}
 
 # ----------------------------------------------------------------- loading
 def detect_schema(path):
@@ -48,21 +66,51 @@ def detect_schema(path):
     raise SystemExit(f"{path} is empty.")
 
 
+def unique(names):
+    """Make names unique by suffixing _2, _3, ... to repeats."""
+    seen, out = Counter(), []
+    for n in names:
+        seen[n] += 1
+        out.append(n if seen[n] == 1 else f"{n}_{seen[n]}")
+    return out
+
+
 def load_trees(paths, schema="auto"):
     """Read all trees from the given Newick/Nexus files into one shared namespace.
-    schema: 'auto' (sniff each file), 'newick' or 'nexus'."""
+    schema: 'auto' (sniff each file), 'newick' or 'nexus'.
+    Returns (trees, names, sources): one display name and one source file per tree."""
     tns = dendropy.TaxonNamespace()
     trees = dendropy.TreeList(taxon_namespace=tns)
+    names, sources = [], []
     for p in paths:
         fmt = detect_schema(p) if schema == "auto" else schema
+        before = len(trees)
         trees.read(path=p, schema=fmt, rooting="force-rooted",
                    taxon_namespace=tns, preserve_underscores=True)
+        new = trees[before:]
+        stem = Path(p).stem
+        for k, t in enumerate(new, start=1):
+            if len(new) == 1:
+                names.append(stem)
+            else:
+                names.append(f"{stem}_{t.label}" if t.label else f"{stem}_{k}")
+            sources.append(Path(p).name)
+    names = unique(names)
     if len(trees) < 2:
         raise SystemExit("Need at least two trees.")
     leafsets = [frozenset(l.taxon.label for l in t.leaf_node_iter()) for t in trees]
     if len(set(leafsets)) != 1:
         raise SystemExit("Trees do not all have the same taxa.")
-    return trees
+    return trees, names, sources
+
+
+def write_matrix(path, mat, names):
+    """Write a labelled square matrix (header row + first column of names)."""
+    with open(path, "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow([""] + names)
+        for name, row in zip(names, mat):
+            w.writerow([name] + [f"{v:.6g}" for v in row])
 
 
 # -------------------------------------------------------- tree summaries
@@ -227,19 +275,62 @@ def main():
     ap.add_argument("--csv", metavar="PREFIX", help="write PREFIX_<metric>.csv matrices")
     args = ap.parse_args()
 
-    trees = load_trees(args.files, args.format)
+    trees, names, sources = load_trees(args.files, args.format)
+    for i, name in enumerate(names):
+        if name in name_mapping:
+            names[i] = name_mapping[name]
+            
     n = len(trees)
-    print(f"{n} trees, {len(trees.taxon_namespace)} taxa\n")
+    print(f"{n} trees, {len(trees.taxon_namespace)} taxa")
+    print("Order: " + ", ".join(names) + "\n")
     M = all_pairwise(trees, args.anchor)
     
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    
+    if args.csv:
+        with open(f"{output_dir / args.csv}_trees.csv", "w", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(["name", "source"])
+            w.writerows(zip(names, sources))
 
     for k, mat in M.items():
         print(f"== {k} ==")
         print(np.array2string(mat, precision=4, suppress_small=True), "\n")
         if args.csv:
-            np.savetxt(f"{output_dir / args.csv}_{k}.csv", mat, delimiter=",", fmt="%.6g")
+            write_matrix(f"{output_dir / args.csv}_{k}.csv", mat, names)
+
+
+if __name__ == "__main__":
+    main()
+
+# def main():
+#     ap = argparse.ArgumentParser(description=__doc__,
+#                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+#     ap.add_argument("files", nargs="+", help="Newick or Nexus file(s)")
+#     ap.add_argument("--output_dir", type=str, default=".",
+#                     help="Output directory of the csvs.")
+#     ap.add_argument("--format", choices=["auto", "newick", "nexus"], default="auto",
+#                     help="input format (default: auto-detect each file)")
+#     ap.add_argument("--anchor", choices=["root", "tips"], default="root",
+#                     help="time-aware metrics: use heights from the root (default) or "
+#                          "ages before the latest tip")
+#     ap.add_argument("--csv", metavar="PREFIX", help="write PREFIX_<metric>.csv matrices")
+#     args = ap.parse_args()
+
+#     trees = load_trees(args.files, args.format)
+#     n = len(trees)
+#     print(f"{n} trees, {len(trees.taxon_namespace)} taxa\n")
+#     M = all_pairwise(trees, args.anchor)
+    
+#     output_dir = Path(args.output_dir)
+#     output_dir.mkdir(parents=True, exist_ok=True)
+
+#     for k, mat in M.items():
+#         print(f"== {k} ==")
+#         print(np.array2string(mat, precision=4, suppress_small=True), "\n")
+#         if args.csv:
+#             np.savetxt(f"{output_dir / args.csv}_{k}.csv", mat, delimiter=",", fmt="%.6g")
 
 
 if __name__ == "__main__":

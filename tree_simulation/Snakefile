@@ -22,9 +22,10 @@ beast_dir = f"{data_dir}/beast_reconstructions"
 results_dir = f"{data_dir}/results"
 tree_distance_dir = f"{results_dir}/tree_distances"
 
+
 # OTHER GENERAL PARAMETERS
 seed = 42
-n_sims = 10
+n_sims = 3
 simulation_length = 0.5 # years
 sequencing_delay = 14 # days
 
@@ -44,7 +45,12 @@ full_trees_file = f"{remaster_output_dir}/logs/{remaster_output_name}.full.trees
 BEAST_SEEDS = [17, 42, 37]
 TREE_IDS = [i for i in range(n_sims)]
 CONFIG_TYPES = ["base", "sections", "whole_period", "true_values"]
+
 TREE_DISTANCE_MEASURES = ["bsd", "clade_age_mad", "clade_age_rmse", "mrca_mad", "mrca_rmse", "n_shared", "rf_norm", "rf", "triplet", "wrf"]
+TREE_DISTANCE_PREFIX = "out"
+
+PLOTS = ["clustered_mrca_rmse_mean", "heatmaps_mean", "heatmaps_sd", "mds_mean", "pairwise_distributions"]
+
 
 
 # REMASTER_CONFIG_PATH = Path("config_remaster_xml.toml")
@@ -100,17 +106,27 @@ rule all:
             f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_combined.log",
             tree_id=TREE_IDS,
             config_type=CONFIG_TYPES
-        ),
+        ), # combined log files from beast simulations
         expand(
             f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_combined-sequences.trees",
             tree_id=TREE_IDS,
             config_type=CONFIG_TYPES
-        ),
+        ), #combined trees files
         expand(
             f"{beast_dir}/tree_{{tree_id}}/{{config_type}}_combined-sequences.mcc.tree",
             tree_id=TREE_IDS,
             config_type=CONFIG_TYPES
-        )
+        ), # mcc trees
+        expand(
+            f"{tree_distance_dir}/tree_{{tree_id}}/{{prefix}}_{{tree_distance_measure}}.csv",
+            tree_id=TREE_IDS,
+            prefix=TREE_DISTANCE_PREFIX,
+            tree_distance_measure=TREE_DISTANCE_MEASURES
+        ), # tree distance calculations
+        expand(
+            f"{tree_distance_dir}/plots/{{plot}}.png",
+            plot=PLOTS
+        ) # tree distance plots
 
 
 # Create the xml file for the remaster simulation
@@ -357,19 +373,35 @@ rule annotate_trees:
             {input.trees} {output.mcc}
         """
 
-### NOT READY YET
-# rule calculate_tree_distances:
-#     input:
-#         expand(f"{beast_dir}/tree_{{{{tree_id}}}}/{{config_type}}_combined-sequences.mcc.tree", config_type=CONFIG_TYPES)
-#     output:
-#         expand(f"{tree_distance_dir}/tree_{{{{tree_id}}}}/{params.prefix}_{{tree_distance_measure}}.csv", tree_distance_measure=TREE_DISTANCE_MEASURES)
-#     params:
-#         mcc_trees = " ".join({input})
-#         output_dir = expamd(f"{tree_distance_dir}/tree_{{tree_id}}", tree_id=TREE_IDS),
-#         prefix = "out"
-#     shell:
-#         """
-#         uv run tree_distances.py {params.mcc_trees} \
-#             --output_dir 
-#         """
+rule calculate_tree_distances:
+    input:
+        ground_truth_tree = f"{sequence_mutation_output_dir}/tree_{{tree_id}}/tree_with_dates.nwk",
+        mcc_trees = expand(f"{beast_dir}/tree_{{{{tree_id}}}}/{{config_type}}_combined-sequences.mcc.tree", config_type=CONFIG_TYPES)
+    output:
+        expand(f"{tree_distance_dir}/tree_{{{{tree_id}}}}/{TREE_DISTANCE_PREFIX}_{{tree_distance_measure}}.csv", tree_distance_measure=TREE_DISTANCE_MEASURES)
+    params:
+        output_dir = f"{tree_distance_dir}/tree_{{tree_id}}",
+        prefix = TREE_DISTANCE_PREFIX
+    shell:
+        """
+        uv run tree_distances.py {input.ground_truth_tree} {input.mcc_trees} \
+            --output_dir {params.output_dir} \
+            --csv {params.prefix}
+        """
 
+rule plot_tree_distances:
+    input:
+        expand(f"{tree_distance_dir}/tree_{{tree_id}}/{TREE_DISTANCE_PREFIX}_{{tree_distance_measure}}.csv", tree_id=TREE_IDS, tree_distance_measure=TREE_DISTANCE_MEASURES)
+    output:
+        expand(f"{tree_distance_dir}/plots/{{plot}}.png", plot=PLOTS)
+    params:
+        input_dir = tree_distance_dir,
+        output_dir = f"{tree_distance_dir}/plots",
+        prefix = TREE_DISTANCE_PREFIX 
+    shell:
+        """
+        uv run plot_tree_distances.py \
+            --input_dir {params.input_dir} \
+            --output_dir {params.output_dir} \
+            --prefix {params.prefix}
+        """
