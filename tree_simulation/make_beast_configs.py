@@ -133,7 +133,7 @@ def build(template, template_dir, new_dir, tree_idx, tag, means, sigmas,
     return text, paths["output"], paths["fasta"]
 
 
-def find_trees(input_dir):
+def find_trees(input_dir, tree_id):
     trees = []
     for d in Path(input_dir).iterdir():
         m = re.fullmatch(r"tree_(\d+)", d.name)
@@ -249,18 +249,14 @@ def main():
         return
 
 
-    trees = find_trees(args.input_dir)
-    if not trees:
-        sys.exit(f"No tree_<i> folders found in {args.input_dir}")
+    tree_dir = Path(args.input_dir) / f"tree_{args.tree_id}"
 
     def params(rows):
         out = [to_prior_params(float(r["mean"]), float(r["sd"]),
                                sigma_mode, mean_in_real_space) for r in rows]
         return [o[0] for o in out], [o[1] for o in out]
 
-    n_done = 0
     # for idx, tree_dir in trees:
-    tree_dir = trees[args.tree_id][1]
     csv_path = tree_dir / args.summary_name
     # if not csv_path.exists():
     #     print(f"[tree_{idx}] skipped: {csv_path} not found", file=sys.stderr)
@@ -298,9 +294,8 @@ def main():
         dest.write_text(text)
         print(f"{dest}: mean={fmt(means)} sigma={fmt(sigmas)} "
                 f"change_times={change_times} fasta={fasta}")
-    n_done += 1
 
-    print(f"Done: {n_done} of {len(trees)} trees written to {args.output_dir}")
+    print(f"Done: {args.tree_id} written to {args.output_dir}")
 
 
 if __name__ == "__main__":

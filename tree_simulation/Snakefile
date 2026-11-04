@@ -4,22 +4,27 @@ import tomllib
 import numpy as np
 
 # GENERAL FILE INPUT/OUTPUT PARAMETERS
-remaster_output_dir = "data/remaster_trees"
+data_dir = "data"
+
+remaster_output_dir = f"{data_dir}/remaster_trees"
 remaster_output_name = "sim"
 
-sequence_mutation_output_dir = "data/simulated_sequences"
-sequence_mutation_root_sequence_file = "templates/root_sequences/test_root_sequence_500.txt"
+sequence_mutation_output_dir = f"{data_dir}/simulated_sequences"
+sequence_mutation_root_sequence_file = "templates/root_sequences/focal_sequences_strain.fasta"
 sequence_mutation_tree_file = f"{remaster_output_dir}/logs/{remaster_output_name}.sampled.trees"
 
 wastewater_tree_file = f"{remaster_output_dir}/logs/{remaster_output_name}.full.trees"
 wastewater_tree_format = "nexus"
-wastewater_output_dir = "data/wastewater"
+wastewater_output_dir = f"{data_dir}/wastewater"
 
-beast_dir = "data/beast_reconstructions"
+beast_dir = f"{data_dir}/beast_reconstructions"
+
+results_dir = f"{data_dir}/results"
+tree_distance_dir = f"{results_dir}/tree_distances"
 
 # OTHER GENERAL PARAMETERS
 seed = 42
-n_sims = 1
+n_sims = 10
 simulation_length = 0.5 # years
 sequencing_delay = 14 # days
 
@@ -39,6 +44,7 @@ full_trees_file = f"{remaster_output_dir}/logs/{remaster_output_name}.full.trees
 BEAST_SEEDS = [17, 42, 37]
 TREE_IDS = [i for i in range(n_sims)]
 CONFIG_TYPES = ["base", "sections", "whole_period", "true_values"]
+TREE_DISTANCE_MEASURES = ["bsd", "clade_age_mad", "clade_age_rmse", "mrca_mad", "mrca_rmse", "n_shared", "rf_norm", "rf", "triplet", "wrf"]
 
 
 # REMASTER_CONFIG_PATH = Path("config_remaster_xml.toml")
@@ -259,9 +265,10 @@ rule make_beast_configs:
             --config {input.config} \
             --re-means {params.real_Re_str} \
             --re-sigmas {params.sigmas} \
-            --re-change-times {params.real_change_times_str} \
-            --reverse-sections
+            --re-change-times {params.real_change_times_str}
         """
+            # --reverse-sections is not necessary as we already inversed the Rts and change times earlier. Also, it is also implemented for reading values from csv, not for manual parameters
+
 # uv run make_beast_configs.py \
 #     --output_dir configs/tree_0 \
 #     --config configs/config_beast_xml_template.toml \
@@ -350,11 +357,19 @@ rule annotate_trees:
             {input.trees} {output.mcc}
         """
 
-
-# uv run make_configs_from_episewer.py 
-#     --summary data/wastewater/tree_0/episewer_summary.csv 
-#     --config configs/config_beast_xml.toml
-#     --outdir test_configs/ 
-#     --simulation_length 0.6 
-#     --reverse-sections
+### NOT READY YET
+# rule calculate_tree_distances:
+#     input:
+#         expand(f"{beast_dir}/tree_{{{{tree_id}}}}/{{config_type}}_combined-sequences.mcc.tree", config_type=CONFIG_TYPES)
+#     output:
+#         expand(f"{tree_distance_dir}/tree_{{{{tree_id}}}}/{params.prefix}_{{tree_distance_measure}}.csv", tree_distance_measure=TREE_DISTANCE_MEASURES)
+#     params:
+#         mcc_trees = " ".join({input})
+#         output_dir = expamd(f"{tree_distance_dir}/tree_{{tree_id}}", tree_id=TREE_IDS),
+#         prefix = "out"
+#     shell:
+#         """
+#         uv run tree_distances.py {params.mcc_trees} \
+#             --output_dir 
+#         """
 
