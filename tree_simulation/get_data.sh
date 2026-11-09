@@ -4,7 +4,7 @@ set -euo pipefail
 # ---- adjust these ----
 REMOTE="euler"
 REMOTE_DIR="/cluster/home/aimolay/scratch/thesis/tree_simulation/data/"   # trailing slash = copy contents
-LOCAL_DIR="./data_cluster/simple_parameter_test_run"
+LOCAL_DIR="./data_cluster/long_sequence_run"
 # ----------------------
 
 mkdir -p "$LOCAL_DIR"

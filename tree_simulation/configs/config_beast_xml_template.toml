@@ -19,7 +19,7 @@ date_regex = '_(\d{4}(?:\.\d+)?)$'
 
 [mcmc]
 chain_length = 5_000_000
-store_every  = 2_000
+store_every  = 10_000
 log_every    = 2_000
 
 [model]
