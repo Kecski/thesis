@@ -1,0 +1,5 @@
+cores: 4
+latency-wait: 5
+keep-going: true
+rerun-incomplete: true
+printshellcmds: true

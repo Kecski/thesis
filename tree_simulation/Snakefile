@@ -3,28 +3,22 @@ from pathlib import Path
 import tomllib
 import numpy as np
 
-# GENERAL FILE INPUT/OUTPUT PARAMETERS
-data_dir = "data"
-base_configs_dir = "configs"
 
-remaster_output_name = "sim"
-sequence_mutation_root_sequence_file = "templates/root_sequences/focal_sequences_strain.fasta"
+# Loading parameters from the snakemake config file
+configfile: "configs/config_snakemake.yml"
+data_dir = config.get("data_dir", "data")
+base_configs_dir = config.get("base_configs_dir", "configs")
+remaster_output_name = config.get("remaster_output_name", "sim")
+sequence_mutation_root_sequence_file = config.get("sequence_mutation_root_sequence_file", "template.fasta")
 
-# remaster_output_dir = f"{data_dir}/remaster_trees"
-# sequence_mutation_output_dir = f"{data_dir}/simulated_sequences"
-# wastewater_tree_format = "nexus"
-# wastewater_output_dir = f"{data_dir}/wastewater"
-# generated_configs_dir = f"{data_dir}/configs"
-# beast_dir = f"{data_dir}/beast_reconstructions"
-# results_dir = f"{data_dir}/results"
-# tree_distance_dir = f"{results_dir}/tree_distances"
+seed = config.get("seed", 42)
+n_sims = config.get("n_sims", 1)
+simulation_length = config.get("simulation_length", 1.0)
+sequencing_delay = config.get("sequencing_delay", 0)
 
-# OTHER GENERAL PARAMETERS
-seed = 42
-n_sims = 3
-simulation_length = 0.5 # years
-sequencing_delay = 14 # days
+tree_distance_prefix = config.get("tree_distance_prefix", "out")
 
+# Loading other necessary parameters from the remaster config file
 with open("configs/config_remaster_xml.toml", "rb") as f:
     config_remaster = tomllib.load(f)
 real_Re = np.array(config_remaster["birth_rate"]) / (np.array(config_remaster["death_rate"]) + np.array(config_remaster["sampling_rate"]))
@@ -33,50 +27,22 @@ real_Re = np.flip(real_Re) # The values have to be in reverse order as beast loo
 real_change_times = list(map(str, [simulation_length - x for x in config_remaster["change_times_birth"]])) # As beast looks at the time backwards we need to calculate how much time ago did a change happen
 real_change_times = real_change_times[::-1] # The same way as with Re, we need to reverse the order
 
-
-# DERIVED PATHS FROM GENERAL PARAMETERS
-
-# sampled_trees_file = f"{remaster_output_dir}/logs/{remaster_output_name}.sampled.trees"
-# full_trees_file = f"{remaster_output_dir}/logs/{remaster_output_name}.full.trees"
-
+# Wildcardd
 BEAST_SEEDS = [17, 42, 37]
 TREE_IDS = [i for i in range(n_sims)]
 CONFIG_TYPES = ["base", "sections", "whole_period", "true_values"]
-
 TREE_DISTANCE_MEASURES = ["bsd", "clade_age_mad", "clade_age_rmse", "mrca_mad", "mrca_rmse", "n_shared", "rf_norm", "rf", "triplet", "wrf"]
-TREE_DISTANCE_PREFIX = "out"
-
 PLOTS = ["clustered_mrca_rmse_mean", "heatmaps_mean", "heatmaps_sd", "mds_mean", "pairwise_distributions"]
-
-
-
-# REMASTER_CONFIG_PATH = Path("config_remaster_xml.toml")
-# SEQUENCE_MUTATION_CONFIG_PATH = Path("config_sequence_mutation.toml")
-# WASTEWATER_DATA_CONFIG_PATH = Path("config_wastewater_data.toml")
-
-# with open(REMASTER_CONFIG_PATH, "rb") as f:
-#     cfg = tomllib.load(f)
-
-# n_sims = cfg.get("n_sims", 1)
-# remaster_output_dir = cfg.get("output_dir", "./remaster_sims")
-# remaster_output_name = cfg.get("output_name", "sim")
-
-# with open(SEQUENCE_MUTATION_CONFIG_PATH, "rb") as f:
-#     cfg= tomllib.load(f)
-
-# sequence_mutation_output_dir = cfg.get("output_dir", "./simulated_sequences")
-# root_sequence_file = cfg.get("root_sequence_file", "./data/root_sequences/test_root_sequence_500.txt")
-# sequence_sampled_tree_file = cfg.get("tree_file", "./data/remaster_trees/logs/sim.sampled.trees")
-
-# with open(WASTEWATER_DATA_CONFIG_PATH, "rb") as f:
-#     cfg = tomllib.load(f)
-
-# wastewater_tree_file = cfg.get("tree", "./data/remaster_trees/logs/sim.full.trees")
-# wastewater_output_dir = cfg.get("output_dir", "./data/wastewater")
 
 
 wildcard_constraints:
     beast_seed = r"\d+"
+
+# rule all:
+#     input:
+#         full_trees = f"{data_dir}/remaster_trees/logs/{remaster_output_name}.full.trees",
+#         sampled_trees = f"{data_dir}/remaster_trees/logs/{remaster_output_name}.sampled.trees",
+#         traj = f"{data_dir}/remaster_trees/logs/{remaster_output_name}.traj"
 
 rule all:
     input: 
@@ -96,15 +62,19 @@ rule all:
             config_type=CONFIG_TYPES
         ), # mcc trees
         expand(
-            f"{data_dir}/results/tree_distances/tree_{{tree_id}}/{{prefix}}_{{tree_distance_measure}}.csv",
+            f"{data_dir}/results/tree_distances/tree_{{tree_id}}/{tree_distance_prefix}_{{tree_distance_measure}}.csv",
             tree_id=TREE_IDS,
-            prefix=TREE_DISTANCE_PREFIX,
             tree_distance_measure=TREE_DISTANCE_MEASURES
         ), # tree distance calculations
         expand(
             f"{data_dir}/results/tree_distances/plots/{{plot}}.png",
             plot=PLOTS
-        ) # tree distance plots
+        ), # tree distance plots
+        directory(expand(
+            f"{data_dir}/results/posterior_analysis/tree_{{tree_id}}",
+            tree_id=TREE_IDS
+         )), # posterior analysis of beast logs
+        directory(f"{data_dir}/results/posterior_analysis/comparison")
 
 
 # Create the xml file for the remaster simulation
@@ -121,6 +91,10 @@ rule create_remaster_xml:
         n_sims = n_sims,
         max_time = simulation_length,
         sequencing_delay = sequencing_delay
+    threads: 1
+    resources:
+        runtime = 5,
+        run_mb_per_cpu = 1000
     shell:
         """
         uv run {input.script} \
@@ -144,6 +118,10 @@ rule run_remaster:
         working_dir = f"{data_dir}/remaster_trees",
         xml = f"{remaster_output_name}.xml",
         seed = 42
+    threads: 1
+    resources:
+        runtime = 60,
+        run_mb_per_cpu = 1000
     shell:
         """
         cd {params.working_dir}
@@ -165,6 +143,10 @@ rule mutate_sequences:
         tree_with_dates = f"{data_dir}/simulated_sequences/tree_{{tree_id}}/tree_with_dates.nwk"
     params:
         output_dir = f"{data_dir}/simulated_sequences"
+    threads: 1
+    resources:
+        runtime = 60,
+        run_mb_per_cpu = 1000
     shell:
         """
         uv run {input.script} \
@@ -190,6 +172,10 @@ rule simulate_wastewater_data:
         tree_format = "nexus",
         sequencing_delay = sequencing_delay,
         n_days = int(simulation_length * 365.25)
+    threads: 1
+    resources:
+        runtime = 60,
+        run_mb_per_cpu = 1000
     shell:
         """
         uv run {input.script} \
@@ -213,6 +199,10 @@ rule run_episewer:
     params:
         data_dir = f"{data_dir}/wastewater",
         sequencing_delay = sequencing_delay
+    threads: 4
+    resources:
+        runtime = 60,
+        run_mb_per_cpu = 1000
     shell:
         """
         Rscript {input.script} {input.config} \
@@ -234,13 +224,17 @@ rule make_beast_configs:
         # config_true_values = "configs/{tree_id}/"
     params:
         input_dir_csv = f"{data_dir}/wastewater",
-        output_dir = "data/configs",
+        output_dir = f"{data_dir}/configs",
         simulation_length = simulation_length,
         output_name_base = "config_beast_xml_base.toml",
         output_name_manual = "config_beast_xml_true_values.toml",
         real_Re_str = " ".join(real_Re.astype(str)),
         real_change_times_str = " ".join(real_change_times) if real_change_times else -1,
         sigmas = " ".join(["0.05"] * len(real_Re))
+    threads: 1
+    resources:
+        runtime = 5,
+        run_mb_per_cpu = 1000
     shell:
         """
         uv run {input.script} \
@@ -275,13 +269,17 @@ rule make_beast_xml:
         script = "make_beast_xml.py",
         sequences = f"{data_dir}/simulated_sequences/tree_{{tree_id}}/sequences.fasta",
         configs = f"{data_dir}/configs/tree_{{tree_id}}/config_beast_xml_{{config_type}}.toml",
-        template = "templates/beast_xmls/template.xml"
+        template = "templates/beast_xmls/template_uniform_sp_prior.xml"
         # config_base = "configs/config_beast_xml_template.toml",
         # config_sections = "configs/{tree_id}/config_beast_xml_sections.toml",
         # config_whole = "configs/{tree_id}/config_beast_xml_whole_period.toml"
         # config_true_values = "configs/{}"
     output:
         output_file = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}.xml"
+    threads: 1
+    resources:
+        runtime = 5,
+        run_mb_per_cpu = 1000
     shell:
         """
         uv run {input.script} {input.configs} \
@@ -299,6 +297,10 @@ rule run_beast:
         typed_trees = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.sequences.typed.trees",
         typed_node_trees = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.sequences.typed.node.trees",
         state = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.xml.state"
+    threads: 4
+    resources:
+        runtime = 300,
+        run_mb_per_cpu = 2000
     shell:
         """
         beast \
@@ -317,6 +319,10 @@ rule combine_beast_logs:
     params:
         burnin = 10,
         inputs = lambda wc, input: " ".join(f"-log {file}" for file in input)
+    threads: 1
+    resources:
+        runtime = 60,
+        run_mb_per_cpu = 2000
     shell:
         """
         uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_logs}
@@ -330,6 +336,10 @@ rule combine_beast_trees:
     params:
         burnin = 10,
         inputs = lambda wc, input: " ".join(f"-log {f}" for f in input)
+    threads: 1
+    resources:
+        runtime = 60,
+        run_mb_per_cpu = 5000
     shell:
         "uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_trees}"
 
@@ -339,9 +349,13 @@ rule annotate_trees:
     output:
         mcc = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}_combined-sequences.mcc.tree"
     params:
-        burnin = 0 , # already removed per chain by LogCombiner
+        burnin = 0, # already removed per chain by LogCombiner
         node_heights = "CA", # Common Ancestor heights
         target_type = "MCC" # Maximum clade credibility tree
+    threads: 1
+    resources:
+        runtime = 60,
+        run_mb_per_cpu = 5000
     shell:
         """
         uv run treeannotator \
@@ -356,10 +370,14 @@ rule calculate_tree_distances:
         ground_truth_tree = f"{data_dir}/simulated_sequences/tree_{{tree_id}}/tree_with_dates.nwk",
         mcc_trees = expand(f"{data_dir}/beast_reconstructions/tree_{{{{tree_id}}}}/{{config_type}}_combined-sequences.mcc.tree", config_type=CONFIG_TYPES)
     output:
-        expand(f"{data_dir}/results/tree_distances/tree_{{{{tree_id}}}}/{TREE_DISTANCE_PREFIX}_{{tree_distance_measure}}.csv", tree_distance_measure=TREE_DISTANCE_MEASURES)
+        expand(f"{data_dir}/results/tree_distances/tree_{{{{tree_id}}}}/{tree_distance_prefix}_{{tree_distance_measure}}.csv", tree_distance_measure=TREE_DISTANCE_MEASURES)
     params:
         output_dir = f"{data_dir}/results/tree_distances/tree_{{tree_id}}",
-        prefix = TREE_DISTANCE_PREFIX
+        prefix = tree_distance_prefix
+    threads: 1
+    resources:
+        runtime = 60,
+        run_mb_per_cpu = 2000
     shell:
         """
         uv run tree_distances.py {input.ground_truth_tree} {input.mcc_trees} \
@@ -369,17 +387,73 @@ rule calculate_tree_distances:
 
 rule plot_tree_distances:
     input:
-        expand(f"{data_dir}/results/tree_distances/tree_{{tree_id}}/{TREE_DISTANCE_PREFIX}_{{tree_distance_measure}}.csv", tree_id=TREE_IDS, tree_distance_measure=TREE_DISTANCE_MEASURES)
+        expand(f"{data_dir}/results/tree_distances/tree_{{tree_id}}/{tree_distance_prefix}_{{tree_distance_measure}}.csv", tree_id=TREE_IDS, tree_distance_measure=TREE_DISTANCE_MEASURES)
     output:
         expand(f"{data_dir}/results/tree_distances/plots/{{plot}}.png", plot=PLOTS)
     params:
         input_dir = f"{data_dir}/results/tree_distances",
         output_dir = f"{data_dir}/results/tree_distances/plots",
-        prefix = TREE_DISTANCE_PREFIX 
+        prefix = tree_distance_prefix 
+    threads: 1
+    resources:
+        runtime = 10,
+        run_mb_per_cpu = 1000
     shell:
         """
         uv run plot_tree_distances.py \
             --input_dir {params.input_dir} \
             --output_dir {params.output_dir} \
             --prefix {params.prefix}
+        """
+
+rule analyse_beast_logs:
+    input:
+        logs = expand(f"{data_dir}/beast_reconstructions/tree_{{{{tree_id}}}}/{{config_type}}_combined.log", config_type=CONFIG_TYPES)
+    output:
+        dir = directory(f"{data_dir}/results/posterior_analysis/tree_{{tree_id}}")
+    params:
+        input_dir = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}",
+        pattern = r"^.+_combined\.log$",
+        burnin = 0
+    threads: 1
+    resources:
+        runtime = 60,
+        run_mb_per_cpu = 2000
+    shell:
+        """
+        uv run analyse_beast_logs.py {params.input_dir} \
+            --output {output.dir} \
+            --pattern "{params.pattern}" \
+            --burnin {params.burnin}
+        """
+
+rule compare_beast_logs:
+    input: 
+        logs = expand(f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}_combined.log", tree_id=TREE_IDS, config_type=CONFIG_TYPES)
+    output:
+        dir = directory(f"{data_dir}/results/posterior_analysis/comparison")
+    params:
+        input_dir = f"{data_dir}/beast_reconstructions",
+        pattern = r"^.+_combined\.log$",
+        estimate = "median",
+        reference = "true_values",
+        truth = " ".join([
+            "samplingProportion=0.025",
+            "clockRate=0.00112",
+            f"originBDMMPrime={simulation_length}"
+        ]),
+        burnin = 0
+    threads: 1
+    resources:
+        runtime = 60,
+        run_mb_per_cpu = 2000
+    shell:
+        """
+        uv run compare_beast_logs.py {params.input_dir} \
+            --output {output.dir} \
+            --pattern "{params.pattern}" \
+            --estimate {params.estimate} \
+            --truth {params.truth} \
+            --reference {params.reference} \
+            --burnin {params.burnin}
         """

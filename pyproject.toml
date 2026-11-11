@@ -12,4 +12,5 @@ dependencies = [
     "pyvolve>=1.1.0",
     "seaborn>=0.13.2",
     "snakemake>=9.27.0",
+    "snakemake-executor-plugin-slurm>=2.8.0",
 ]

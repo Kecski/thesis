@@ -111,6 +111,7 @@ secrets.yaml
 data/raw/
 data/
 data_cluster/
+data_test/
 
 # snakemake
 .snakemake/

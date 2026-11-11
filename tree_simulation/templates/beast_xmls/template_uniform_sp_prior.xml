@@ -92,10 +92,7 @@ name="alignment">
                     <OneOnX id="OneOnX.1" name="distr"/>
                 </prior>
                 <distribution id="samplingProportionEpiPrior.t:sequences" spec="bdmmprime.util.priors.ZeroExcludingPrior" x="@samplingProportionEpi.t:sequences">
-                    <LogNormal id="LogNormalDistributionModel.6" name="distr">
-                        <parameter id="RealParameter.20" spec="parameter.RealParameter" estimate="false" name="M">{{SAMPLING_PRIOR_M}}</parameter>
-                        <parameter id="RealParameter.21" spec="parameter.RealParameter" estimate="false" lower="0.0" name="S" upper="5.0">{{SAMPLING_PRIOR_S}}</parameter>
-                    </LogNormal>
+                    <Uniform id="Uniform.19" name="distr"/>
                 </distribution>
             </distribution>
             <distribution id="likelihood" spec="CompoundDistribution" useThreads="true">

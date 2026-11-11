@@ -2,8 +2,8 @@
 #SBATCH --job-name=test_simulation
 #SBATCH --time=12:00:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=5
-#SBATCH --mem-per-cpu=20G
+#SBATCH --cpus-per-task=10
+#SBATCH --mem-per-cpu=8G
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 

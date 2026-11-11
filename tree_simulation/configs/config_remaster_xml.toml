@@ -20,7 +20,7 @@ traj_type = "StochasticTrajectory"
 # output_name = "sim"
 
 # Optional Constraints & Execution
-min_tips = 10
+min_tips = 20
 # max_pop = 1000
 seed = 42
 # beast_cmd = "beast"

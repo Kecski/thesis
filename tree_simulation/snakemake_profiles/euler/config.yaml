@@ -1,0 +1,12 @@
+executor: slurm
+jobs: 100                  # max number of simultaneous SLURM jobs
+latency-wait: 60           # shared file systems can be slow
+keep-going: true
+rerun-incomplete: true
+printshellcmds: true
+default-resources:
+  runtime: 60              # max execution time in minutes
+  mem_mb_per_cpu: 1000     # memory per CPU core in MB
+  cpus_per_task: 1
+  # slurm_account: your_share_name   # if your Euler setup needs one
+  # slurm_partition: ...             # check which partitions you may use
