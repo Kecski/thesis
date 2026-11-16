@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 import tomllib
@@ -26,6 +27,8 @@ real_Re = np.flip(real_Re) # The values have to be in reverse order as beast loo
 
 real_change_times = list(map(str, [simulation_length - x for x in config_remaster["change_times_birth"]])) # As beast looks at the time backwards we need to calculate how much time ago did a change happen
 real_change_times = real_change_times[::-1] # The same way as with Re, we need to reverse the order
+
+RENV_DIR = os.path.abspath(os.path.join(workflow.basedir, ".."))
 
 # Wildcardd
 BEAST_SEEDS = [17, 42, 37]
@@ -93,8 +96,8 @@ rule create_remaster_xml:
         sequencing_delay = sequencing_delay
     threads: 1
     resources:
-        runtime = 5,
-        run_mb_per_cpu = 1000
+        runtime = 60,
+        mem_mb_per_cpu = 4000
     shell:
         """
         uv run {input.script} \
@@ -121,7 +124,7 @@ rule run_remaster:
     threads: 1
     resources:
         runtime = 60,
-        run_mb_per_cpu = 1000
+        mem_mb_per_cpu = 4000
     shell:
         """
         cd {params.working_dir}
@@ -146,7 +149,7 @@ rule mutate_sequences:
     threads: 1
     resources:
         runtime = 60,
-        run_mb_per_cpu = 1000
+        mem_mb_per_cpu = 4000
     shell:
         """
         uv run {input.script} \
@@ -175,7 +178,7 @@ rule simulate_wastewater_data:
     threads: 1
     resources:
         runtime = 60,
-        run_mb_per_cpu = 1000
+        mem_mb_per_cpu = 4000
     shell:
         """
         uv run {input.script} \
@@ -197,15 +200,16 @@ rule run_episewer:
     output:
         summary = f"{data_dir}/wastewater/tree_{{tree_id}}/episewer_summary.csv"
     params:
+        renv = RENV_DIR,
         data_dir = f"{data_dir}/wastewater",
         sequencing_delay = sequencing_delay
     threads: 4
     resources:
         runtime = 60,
-        run_mb_per_cpu = 1000
+        mem_mb_per_cpu = 4000
     shell:
         """
-        Rscript {input.script} {input.config} \
+        RENV_PROJECT={params.renv} Rscript {input.script} {input.config} \
             --data-dir {params.data_dir} \
             --tree-id {wildcards.tree_id} \
             --sequencing-delay {params.sequencing_delay}
@@ -233,8 +237,8 @@ rule make_beast_configs:
         sigmas = " ".join(["0.05"] * len(real_Re))
     threads: 1
     resources:
-        runtime = 5,
-        run_mb_per_cpu = 1000
+        runtime = 60,
+        mem_mb_per_cpu = 4000
     shell:
         """
         uv run {input.script} \
@@ -278,8 +282,8 @@ rule make_beast_xml:
         output_file = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}.xml"
     threads: 1
     resources:
-        runtime = 5,
-        run_mb_per_cpu = 1000
+        runtime = 60,
+        mem_mb_per_cpu = 4000
     shell:
         """
         uv run {input.script} {input.configs} \
@@ -300,7 +304,7 @@ rule run_beast:
     threads: 4
     resources:
         runtime = 300,
-        run_mb_per_cpu = 2000
+        mem_mb_per_cpu = 4000
     shell:
         """
         beast \
@@ -322,7 +326,7 @@ rule combine_beast_logs:
     threads: 1
     resources:
         runtime = 60,
-        run_mb_per_cpu = 2000
+        mem_mb_per_cpu = 4000
     shell:
         """
         uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_logs}
@@ -339,7 +343,7 @@ rule combine_beast_trees:
     threads: 1
     resources:
         runtime = 60,
-        run_mb_per_cpu = 5000
+        mem_mb_per_cpu = 5000
     shell:
         "uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_trees}"
 
@@ -355,7 +359,7 @@ rule annotate_trees:
     threads: 1
     resources:
         runtime = 60,
-        run_mb_per_cpu = 5000
+        mem_mb_per_cpu = 5000
     shell:
         """
         uv run treeannotator \
@@ -377,7 +381,7 @@ rule calculate_tree_distances:
     threads: 1
     resources:
         runtime = 60,
-        run_mb_per_cpu = 2000
+        mem_mb_per_cpu = 4000
     shell:
         """
         uv run tree_distances.py {input.ground_truth_tree} {input.mcc_trees} \
@@ -396,8 +400,8 @@ rule plot_tree_distances:
         prefix = tree_distance_prefix 
     threads: 1
     resources:
-        runtime = 10,
-        run_mb_per_cpu = 1000
+        runtime = 60,
+        mem_mb_per_cpu = 4000
     shell:
         """
         uv run plot_tree_distances.py \
@@ -418,7 +422,7 @@ rule analyse_beast_logs:
     threads: 1
     resources:
         runtime = 60,
-        run_mb_per_cpu = 2000
+        mem_mb_per_cpu = 4000
     shell:
         """
         uv run analyse_beast_logs.py {params.input_dir} \
@@ -446,7 +450,7 @@ rule compare_beast_logs:
     threads: 1
     resources:
         runtime = 60,
-        run_mb_per_cpu = 2000
+        mem_mb_per_cpu = 4000
     shell:
         """
         uv run compare_beast_logs.py {params.input_dir} \
