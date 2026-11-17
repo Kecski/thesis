@@ -1,5 +1,5 @@
 # Input/Output Parameters
-data_dir: "data_test"
+data_dir: "data"
 base_configs_dir: "configs"
 
 remaster_output_name: "sim"
@@ -7,7 +7,7 @@ sequence_mutation_root_sequence_file: "templates/root_sequences/focal_sequences_
 
 # General Parameters
 seed: 42
-n_sims: 3
+n_sims: 10
 simulation_length: 0.5 # years
 sequencing_delay: 14 # days
 

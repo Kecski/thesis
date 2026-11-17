@@ -94,10 +94,11 @@ rule create_remaster_xml:
         n_sims = n_sims,
         max_time = simulation_length,
         sequencing_delay = sequencing_delay
+    group: "remaster"
     threads: 1
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 4000
+        runtime = 60
+        mem_mb_per_cpu = 8000
     shell:
         """
         uv run {input.script} \
@@ -121,10 +122,11 @@ rule run_remaster:
         working_dir = f"{data_dir}/remaster_trees",
         xml = f"{remaster_output_name}.xml",
         seed = 42
-    threads: 1
+    group: "remaster"
+    threads: 4
     resources:
         runtime = 60,
-        mem_mb_per_cpu = 4000
+        mem_mb_per_cpu = 8000
     shell:
         """
         cd {params.working_dir}
@@ -149,7 +151,7 @@ rule mutate_sequences:
     threads: 1
     resources:
         runtime = 60,
-        mem_mb_per_cpu = 4000
+        mem_mb_per_cpu = 8000
     shell:
         """
         uv run {input.script} \
@@ -175,10 +177,11 @@ rule simulate_wastewater_data:
         tree_format = "nexus",
         sequencing_delay = sequencing_delay,
         n_days = int(simulation_length * 365.25)
+    group: "wastewater"
     threads: 1
     resources:
         runtime = 60,
-        mem_mb_per_cpu = 4000
+        mem_mb_per_cpu = 8000
     shell:
         """
         uv run {input.script} \
@@ -203,6 +206,7 @@ rule run_episewer:
         renv = RENV_DIR,
         data_dir = f"{data_dir}/wastewater",
         sequencing_delay = sequencing_delay
+    group: "wastewater"
     threads: 4
     resources:
         runtime = 60,
@@ -235,6 +239,7 @@ rule make_beast_configs:
         real_Re_str = " ".join(real_Re.astype(str)),
         real_change_times_str = " ".join(real_change_times) if real_change_times else -1,
         sigmas = " ".join(["0.05"] * len(real_Re))
+    group: "beast setup"
     threads: 1
     resources:
         runtime = 60,
@@ -280,6 +285,7 @@ rule make_beast_xml:
         # config_true_values = "configs/{}"
     output:
         output_file = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}.xml"
+    group: "beast setup"
     threads: 1
     resources:
         runtime = 60,
@@ -304,7 +310,7 @@ rule run_beast:
     threads: 4
     resources:
         runtime = 300,
-        mem_mb_per_cpu = 4000
+        mem_mb_per_cpu = 8000
     shell:
         """
         beast \
@@ -326,7 +332,7 @@ rule combine_beast_logs:
     threads: 1
     resources:
         runtime = 60,
-        mem_mb_per_cpu = 4000
+        mem_mb_per_cpu = 8000
     shell:
         """
         uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_logs}
@@ -343,7 +349,7 @@ rule combine_beast_trees:
     threads: 1
     resources:
         runtime = 60,
-        mem_mb_per_cpu = 5000
+        mem_mb_per_cpu = 10000
     shell:
         "uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_trees}"
 
@@ -359,7 +365,7 @@ rule annotate_trees:
     threads: 1
     resources:
         runtime = 60,
-        mem_mb_per_cpu = 5000
+        mem_mb_per_cpu = 10000
     shell:
         """
         uv run treeannotator \
@@ -381,7 +387,7 @@ rule calculate_tree_distances:
     threads: 1
     resources:
         runtime = 60,
-        mem_mb_per_cpu = 4000
+        mem_mb_per_cpu = 8000
     shell:
         """
         uv run tree_distances.py {input.ground_truth_tree} {input.mcc_trees} \

@@ -2171,15 +2171,15 @@ wheels = [
 
 [[package]]
 name = "snakemake-executor-plugin-slurm-jobstep"
-version = "0.6.1"
+version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "snakemake-interface-common" },
     { name = "snakemake-interface-executor-plugins" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fc/ec/4d4e41125a29717b71610ae7962a3cde0552c6b0c72c995139b8a0adeb7b/snakemake_executor_plugin_slurm_jobstep-0.6.1.tar.gz", hash = "sha256:0ed2feaa88d1d64f35dc66b4990f131d3f151733edece90d5e952dec0e8f7feb", size = 7437, upload-time = "2026-05-27T12:14:28.522Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/88/7aaa97a325c2255651761de6c7e89c103d72351c7864a04bd605ece9d83c/snakemake_executor_plugin_slurm_jobstep-0.6.0.tar.gz", hash = "sha256:98fffdaf2eb8f06bf4ad07e46f3a0144fa84cefa88525b71717513f78707af95", size = 6762, upload-time = "2026-03-26T10:36:34.118Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/40/85/c6f70395037964e1d3b5334dde546cebc4bb0d05bd4c96399b03b6c4beab/snakemake_executor_plugin_slurm_jobstep-0.6.1-py3-none-any.whl", hash = "sha256:120e122ee1317257bd9608a2a458527ad9fe4520aa1a86109e9ce2ac322321ef", size = 8275, upload-time = "2026-05-27T12:14:29.514Z" },
+    { url = "https://files.pythonhosted.org/packages/90/3e/a3ef44cb2a92f74208087fea16ac956493bf2fc924d4a7280a86785d9de1/snakemake_executor_plugin_slurm_jobstep-0.6.0-py3-none-any.whl", hash = "sha256:4ff9d064d97baae7bab2458ff5e63534c1b44574889e928f5e0b39a927dc398e", size = 7562, upload-time = "2026-03-26T10:36:34.784Z" },
 ]
 
 [[package]]
@@ -2355,6 +2355,7 @@ dependencies = [
     { name = "seaborn" },
     { name = "snakemake" },
     { name = "snakemake-executor-plugin-slurm" },
+    { name = "snakemake-executor-plugin-slurm-jobstep" },
 ]
 
 [package.metadata]
@@ -2367,6 +2368,7 @@ requires-dist = [
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "snakemake", specifier = ">=9.27.0" },
     { name = "snakemake-executor-plugin-slurm", specifier = ">=2.8.0" },
+    { name = "snakemake-executor-plugin-slurm-jobstep", specifier = "==0.6.0" },
 ]
 
 [[package]]
