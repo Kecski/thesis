@@ -4,6 +4,7 @@ latency-wait: 60           # shared file systems can be slow
 keep-going: true
 rerun-incomplete: true
 printshellcmds: true
+retries: 3
 default-resources:
   runtime: 60              # max execution time in minutes
   mem_mb_per_cpu: 4000     # memory per CPU core in MB

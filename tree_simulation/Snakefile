@@ -97,8 +97,8 @@ rule create_remaster_xml:
     group: "remaster"
     threads: 1
     resources:
-        runtime = 60
-        mem_mb_per_cpu = 8000
+        runtime = 10,
+        mem_mb_per_cpu = 1000
     shell:
         """
         uv run {input.script} \
@@ -126,7 +126,7 @@ rule run_remaster:
     threads: 4
     resources:
         runtime = 60,
-        mem_mb_per_cpu = 8000
+        mem_mb_per_cpu = wildcards, attempt: 4000 * attempt
     shell:
         """
         cd {params.working_dir}
@@ -150,8 +150,8 @@ rule mutate_sequences:
         output_dir = f"{data_dir}/simulated_sequences"
     threads: 1
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 8000
+        runtime = wildcards, attempt: 60 * attempt,
+        mem_mb_per_cpu = wildcards, attempt: 4000 * attempt
     shell:
         """
         uv run {input.script} \
@@ -181,7 +181,7 @@ rule simulate_wastewater_data:
     threads: 1
     resources:
         runtime = 60,
-        mem_mb_per_cpu = 8000
+        mem_mb_per_cpu = 2000
     shell:
         """
         uv run {input.script} \
@@ -210,7 +210,7 @@ rule run_episewer:
     threads: 4
     resources:
         runtime = 60,
-        mem_mb_per_cpu = 4000
+        mem_mb_per_cpu = 2000
     shell:
         """
         RENV_PROJECT={params.renv} Rscript {input.script} {input.config} \
@@ -242,8 +242,8 @@ rule make_beast_configs:
     group: "beast setup"
     threads: 1
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 4000
+        runtime = 10,
+        mem_mb_per_cpu = 1000
     shell:
         """
         uv run {input.script} \
@@ -288,8 +288,8 @@ rule make_beast_xml:
     group: "beast setup"
     threads: 1
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 4000
+        runtime = 10,
+        mem_mb_per_cpu = 1000
     shell:
         """
         uv run {input.script} {input.configs} \
@@ -309,8 +309,8 @@ rule run_beast:
         state = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.xml.state"
     threads: 4
     resources:
-        runtime = 300,
-        mem_mb_per_cpu = 8000
+        runtime = wildcards, attempt: 240 + attempt * 60,
+        mem_mb_per_cpu = wildcards, attempt: 4000 * attempt
     shell:
         """
         beast \
@@ -329,10 +329,11 @@ rule combine_beast_logs:
     params:
         burnin = 10,
         inputs = lambda wc, input: " ".join(f"-log {file}" for file in input)
+    group: "param_log_post_processing"
     threads: 1
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 8000
+        runtime = 30,
+        mem_mb_per_cpu = 2000
     shell:
         """
         uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_logs}
@@ -347,9 +348,10 @@ rule combine_beast_trees:
         burnin = 10,
         inputs = lambda wc, input: " ".join(f"-log {f}" for f in input)
     threads: 1
+    group: "tree_log_post_processing"
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 10000
+        runtime = wildcards, attempt: 30 * attempt,
+        mem_mb_per_cpu = wildcards, attempt: 5000 * attempt
     shell:
         "uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_trees}"
 
@@ -363,9 +365,10 @@ rule annotate_trees:
         node_heights = "CA", # Common Ancestor heights
         target_type = "MCC" # Maximum clade credibility tree
     threads: 1
+    group: "tree_log_post_processing"
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 10000
+        runtime = wildcards, attempt: 30 * attempt,
+        mem_mb_per_cpu = wildcards, attempt: 5000 * attempt
     shell:
         """
         uv run treeannotator \
@@ -385,9 +388,10 @@ rule calculate_tree_distances:
         output_dir = f"{data_dir}/results/tree_distances/tree_{{tree_id}}",
         prefix = tree_distance_prefix
     threads: 1
+    group: "tree_log_post_processing"
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 8000
+        runtime = 10,
+        mem_mb_per_cpu = 1000
     shell:
         """
         uv run tree_distances.py {input.ground_truth_tree} {input.mcc_trees} \
@@ -405,9 +409,10 @@ rule plot_tree_distances:
         output_dir = f"{data_dir}/results/tree_distances/plots",
         prefix = tree_distance_prefix 
     threads: 1
+    group: "tree_log_post_processing"
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 4000
+        runtime = 10,
+        mem_mb_per_cpu = 1000
     shell:
         """
         uv run plot_tree_distances.py \
@@ -425,10 +430,11 @@ rule analyse_beast_logs:
         input_dir = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}",
         pattern = r"^.+_combined\.log$",
         burnin = 0
+    group: "param_log_post_processing"
     threads: 1
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 4000
+        runtime = 10,
+        mem_mb_per_cpu = 1000
     shell:
         """
         uv run analyse_beast_logs.py {params.input_dir} \
@@ -453,10 +459,11 @@ rule compare_beast_logs:
             f"originBDMMPrime={simulation_length}"
         ]),
         burnin = 0
+    group: "param_log_post_processing"
     threads: 1
     resources:
-        runtime = 60,
-        mem_mb_per_cpu = 4000
+        runtime = 10,
+        mem_mb_per_cpu = 1000
     shell:
         """
         uv run compare_beast_logs.py {params.input_dir} \
