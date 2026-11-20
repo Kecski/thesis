@@ -5,6 +5,7 @@ keep-going: true
 rerun-incomplete: true
 printshellcmds: true
 retries: 3
+# slurm-keep-succesful-logs: true # for testing memory requirements
 default-resources:
   runtime: 60              # max execution time in minutes
   mem_mb_per_cpu: 4000     # memory per CPU core in MB

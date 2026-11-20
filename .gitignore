@@ -112,6 +112,7 @@ data/raw/
 data/
 data_cluster/
 data_test/
+data*/
 
 # snakemake
 .snakemake/

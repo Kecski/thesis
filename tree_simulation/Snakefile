@@ -33,7 +33,11 @@ RENV_DIR = os.path.abspath(os.path.join(workflow.basedir, ".."))
 # Wildcardd
 BEAST_SEEDS = [17, 42, 37]
 TREE_IDS = [i for i in range(n_sims)]
+
 CONFIG_TYPES = ["base", "sections", "whole_period", "true_values"]
+# CHANGE_TIMES_CONFIG_TYPES = ["sections", "true_values"]
+# NO_CHANGE_TIMES_CONFIG_TYPES = ["base", "whole_period"]
+
 TREE_DISTANCE_MEASURES = ["bsd", "clade_age_mad", "clade_age_rmse", "mrca_mad", "mrca_rmse", "n_shared", "rf_norm", "rf", "triplet", "wrf"]
 PLOTS = ["clustered_mrca_rmse_mean", "heatmaps_mean", "heatmaps_sd", "mds_mean", "pairwise_distributions"]
 
@@ -49,6 +53,8 @@ wildcard_constraints:
 
 rule all:
     input: 
+        f"{data_dir}/remaster_trees/logs/sampled_tree_sizes.csv", # Sampled tree sizes
+        f"{data_dir}/remaster_trees/logs/full_tree_sizes.csv", # Full tree sizes
         expand(
             f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}_combined.log",
             tree_id=TREE_IDS,
@@ -123,16 +129,45 @@ rule run_remaster:
         xml = f"{remaster_output_name}.xml",
         seed = 42
     group: "remaster"
-    threads: 4
+    threads: 1
     resources:
         runtime = 60,
-        mem_mb_per_cpu = wildcards, attempt: 4000 * attempt
+        mem_mb_per_cpu = lambda wildcards, attempt: 4000 * attempt
     shell:
         """
         cd {params.working_dir}
         beast -overwrite -seed {params.seed} {params.xml}
         cd -
         """
+
+rule get_tree_sizes:
+    input:
+        script = "get_tree_sizes.py",
+        sampled_trees = f"{data_dir}/remaster_trees/logs/{remaster_output_name}.sampled.trees",
+        full_trees = f"{data_dir}/remaster_trees/logs/{remaster_output_name}.full.trees"
+    output:
+        sampled_sizes = f"{data_dir}/remaster_trees/logs/sampled_tree_sizes.csv",
+        full_sizes = f"{data_dir}/remaster_trees/logs/full_tree_sizes.csv"
+    params:
+        output_sampled = f"{data_dir}/remaster_trees/logs/sampled_tree_sizes.csv",
+        output_full = f"{data_dir}/remaster_trees/logs/full_tree_sizes.csv"
+    group: "remaster"
+    threads: 1
+    resources:
+        runtime = 5,
+        mem_mb_per_cpu = 1000
+    shell:
+        """
+        uv run {input.script} \
+            --tree {input.sampled_trees} \
+            --output {params.output_sampled}
+
+        uv run {input.script} \
+            --tree {input.full_trees} \
+            --output {params.output_full}
+        """
+    
+
 
 # Simulate sequences along the sampled remaster trees
 rule mutate_sequences:
@@ -150,8 +185,8 @@ rule mutate_sequences:
         output_dir = f"{data_dir}/simulated_sequences"
     threads: 1
     resources:
-        runtime = wildcards, attempt: 60 * attempt,
-        mem_mb_per_cpu = wildcards, attempt: 4000 * attempt
+        runtime = lambda wildcards, attempt: 60 * attempt,
+        mem_mb_per_cpu = lambda wildcards, attempt: 4000 * attempt
     shell:
         """
         uv run {input.script} \
@@ -213,7 +248,7 @@ rule run_episewer:
         mem_mb_per_cpu = 2000
     shell:
         """
-        RENV_PROJECT={params.renv} Rscript {input.script} {input.config} \
+        RENV_PROJECT="{params.renv}" Rscript {input.script} {input.config} \
             --data-dir {params.data_dir} \
             --tree-id {wildcards.tree_id} \
             --sequencing-delay {params.sequencing_delay}
@@ -298,6 +333,58 @@ rule make_beast_xml:
             --template {input.template}
         """
 
+# IN DEVELOPMENT: It is not working properly for some reason
+#
+# rule make_beast_xml:
+#     input:
+#         script_no_change_times = "make_beast_xml.py",
+#         script_change_times = "make_beast_xml_with_change_times.py",
+#         sequences = f"{data_dir}/simulated_sequences/tree_{{tree_id}}/sequences.fasta",
+
+#         configs = expand(f"{data_dir}/configs/tree_{{{{tree_id}}}}/config_beast_xml_{{config_type}}.toml", config_type=CONFIG_TYPES),
+
+#         template_no_change_times = "templates/beast_xmls/template_uniform_sp_prior.xml",
+#         template_change_times = "templates/beast_xmls/template_uniform_sp_prior_and_estimated_time_changes.xml"
+#     output:
+#         output_file = expand(f"{data_dir}/beast_reconstructions/tree_{{{{tree_id}}}}/{{config_type}}.xml", config_type=CONFIG_TYPES)
+#     params:
+#         config_base = f"{data_dir}/configs/tree_{{tree_id}}/config_beast_xml_base.toml",
+#         config_sections = f"{data_dir}/configs/tree_{{tree_id}}/config_beast_xml_sections.toml",
+#         config_whole_period = f"{data_dir}/configs/tree_{{tree_id}}/config_beast_xml_whole_period.toml",
+#         config_true_values = f"{data_dir}/configs/tree_{{tree_id}}/config_beast_xml_true_values.toml",
+
+#         output_base = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/base.xml",
+#         output_sections = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/sections.xml",
+#         output_whole_period = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/whole_period.xml",
+#         output_true_values = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/true_values.xml"
+#     group: "beast setup"
+#     threads: 1
+#     resources:
+#         runtime = 10,
+#         mem_mb_per_cpu = 1000
+#     shell:
+#         """
+#         uv run {input.script_no_change_times} {params.config_base} \
+#             --fasta {input.sequences} \
+#             -o {params.output_base} \
+#             --template {input.template_no_change_times}
+
+#         uv run {input.script_no_change_times} {params.config_whole_period} \
+#             --fasta {input.sequences} \
+#             -o {params.output_whole_period} \
+#             --template {input.template_no_change_times}
+
+#         uv run {input.script_change_times} {params.config_sections} \
+#             --fasta {input.sequences} \
+#             -o {params.output_sections} \
+#             --template {input.template_change_times}
+        
+#         uv run {input.script_change_times} {params.config_true_values} \
+#             --fasta {input.sequences} \
+#             -o {params.output_true_values} \
+#             --template {input.template_change_times}
+#         """
+
 rule run_beast:
     input:
         xml = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}.xml"
@@ -309,8 +396,8 @@ rule run_beast:
         state = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}/{{config_type}}_{{beast_seed}}.xml.state"
     threads: 4
     resources:
-        runtime = wildcards, attempt: 240 + attempt * 60,
-        mem_mb_per_cpu = wildcards, attempt: 4000 * attempt
+        runtime = lambda wildcards, attempt: 240 + attempt * 60,
+        mem_mb_per_cpu = lambda wildcards, attempt: 4000 * attempt
     shell:
         """
         beast \
@@ -329,7 +416,7 @@ rule combine_beast_logs:
     params:
         burnin = 10,
         inputs = lambda wc, input: " ".join(f"-log {file}" for file in input)
-    group: "param_log_post_processing"
+    group: "log_combining"
     threads: 1
     resources:
         runtime = 30,
@@ -348,10 +435,10 @@ rule combine_beast_trees:
         burnin = 10,
         inputs = lambda wc, input: " ".join(f"-log {f}" for f in input)
     threads: 1
-    group: "tree_log_post_processing"
+    group: "log_combining"
     resources:
-        runtime = wildcards, attempt: 30 * attempt,
-        mem_mb_per_cpu = wildcards, attempt: 5000 * attempt
+        runtime = lambda wildcards, attempt: 30 * attempt,
+        mem_mb_per_cpu = lambda wildcards, attempt: 5000 * attempt
     shell:
         "uv run logcombiner {params.inputs} -b {params.burnin} -o {output.combined_trees}"
 
@@ -365,10 +452,10 @@ rule annotate_trees:
         node_heights = "CA", # Common Ancestor heights
         target_type = "MCC" # Maximum clade credibility tree
     threads: 1
-    group: "tree_log_post_processing"
+    group: "log_combining"
     resources:
-        runtime = wildcards, attempt: 30 * attempt,
-        mem_mb_per_cpu = wildcards, attempt: 5000 * attempt
+        runtime = lambda wildcards, attempt: 30 * attempt,
+        mem_mb_per_cpu = lambda wildcards, attempt: 5000 * attempt
     shell:
         """
         uv run treeannotator \
@@ -388,7 +475,6 @@ rule calculate_tree_distances:
         output_dir = f"{data_dir}/results/tree_distances/tree_{{tree_id}}",
         prefix = tree_distance_prefix
     threads: 1
-    group: "tree_log_post_processing"
     resources:
         runtime = 10,
         mem_mb_per_cpu = 1000
@@ -409,7 +495,6 @@ rule plot_tree_distances:
         output_dir = f"{data_dir}/results/tree_distances/plots",
         prefix = tree_distance_prefix 
     threads: 1
-    group: "tree_log_post_processing"
     resources:
         runtime = 10,
         mem_mb_per_cpu = 1000
@@ -430,7 +515,6 @@ rule analyse_beast_logs:
         input_dir = f"{data_dir}/beast_reconstructions/tree_{{tree_id}}",
         pattern = r"^.+_combined\.log$",
         burnin = 0
-    group: "param_log_post_processing"
     threads: 1
     resources:
         runtime = 10,
@@ -458,8 +542,8 @@ rule compare_beast_logs:
             "clockRate=0.00112",
             f"originBDMMPrime={simulation_length}"
         ]),
-        burnin = 0
-    group: "param_log_post_processing"
+        burnin = 0,
+        min_ess = 200
     threads: 1
     resources:
         runtime = 10,
@@ -472,5 +556,6 @@ rule compare_beast_logs:
             --estimate {params.estimate} \
             --truth {params.truth} \
             --reference {params.reference} \
-            --burnin {params.burnin}
+            --burnin {params.burnin} \
+            --min-ess {params.min_ess}
         """

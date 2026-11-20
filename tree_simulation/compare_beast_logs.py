@@ -27,6 +27,14 @@ How results are combined
 4. Kinds are compared with each other: paired by tree (all kinds share every tree),
    with Wilcoxon / Friedman tests, tree-adjusted effects and, if the true simulated
    value is given (--truth), accuracy and 95% HPD coverage.
+5. Efficiency: ESS per million MCMC states (ESS / chain length * 1e6) is computed for every
+   run and parameter, so kinds can be compared even when the chains have different lengths.
+6. Reliability filter: a (run, parameter) estimate whose ESS is below --min-ess (default 200)
+   is treated as unreliable and left out of ALL comparisons of the posteriors (tree-level
+   values, summaries, tests, pooled posteriors, accuracy/coverage). The ESS plots
+   (ESS_overview.png, ESS_per_million_overview.png) and the ESS columns of
+   summary_by_kind.csv deliberately use ALL runs, otherwise kinds that mix badly would look
+   better than they are. Dropped entries are listed in excluded_low_ESS_runs.csv.
 
 Requires analyse_beast_logs.py (the first script) in the same folder.
 
@@ -105,6 +113,8 @@ def collect(root, args):
             kind = kind_of(f.stem)
             step = float(np.median(np.diff(df["Sample"])))
             post, _ = apply_burnin(df, args.burnin)
+            # chain length in MCMC states: all logged states, or only those after burn-in
+            n_states = (len(df) if args.ess_basis == "total" else len(post)) * step
             n_files += 1
             for label in args.params:
                 col = resolve_column([c for c in post.columns if c != "Sample"], label)
@@ -113,9 +123,12 @@ def collect(root, args):
                 x = post[col].values
                 st = compute_stats(x, step)
                 rows.append({"directory": d.name, "file": f.name, "kind": kind,
-                             "parameter": label, **st})
+                             "parameter": label, **st,
+                             "n_states": n_states,
+                             "ESS_per_million": st["ESS"] / (n_states / 1e6)})
                 idx = np.linspace(0, len(x) - 1, min(len(x), args.pool_samples)).astype(int)
-                pooled[(kind, label)].append(x[idx])
+                # keep run identity so the pooled samples can be filtered like the runs
+                pooled[(kind, label)].append((d.name, f.name, x[idx]))
         print(f"  {d.name}: {n_files} run(s)")
     if not rows:
         sys.exit("No estimates collected.")
@@ -141,25 +154,55 @@ def bootstrap_ci(values, n_boot=5000, level=0.95):
     return np.quantile(means, a), np.quantile(means, 1 - a)
 
 
-def summarise(runs, tl, pooled, truth, args):
+def reliable_mask(runs, min_ess):
+    """True for (run, parameter) entries with ESS >= min_ess (NaN ESS counts as unreliable).
+    min_ess <= 0 switches the filter off."""
+    if min_ess <= 0:
+        return pd.Series(True, index=runs.index)
+    return runs["ESS"] >= min_ess
+
+
+def select_pooled(pooled, runs):
+    """Keep only the pooled samples that belong to runs still present in `runs`."""
+    keep = set(zip(runs["kind"], runs["parameter"], runs["directory"], runs["file"]))
+    out = defaultdict(list)
+    for (kind, par), items in pooled.items():
+        for directory, fname, arr in items:
+            if (kind, par, directory, fname) in keep:
+                out[(kind, par)].append(arr)
+    return out
+
+
+def summarise(runs_all, tl, pooled, truth, args):
+    """`runs_all`: every run. Posterior summaries use only the runs with ESS >= --min-ess
+    (`tl` and `pooled` must already be filtered the same way); the ESS columns use all runs."""
     out = []
-    for (kind, par), g in runs.groupby(["kind", "parameter"]):
+    for (kind, par), g_all in runs_all.groupby(["kind", "parameter"]):
+        g = g_all[reliable_mask(g_all, args.min_ess)]
+        row = {
+            "kind": kind, "parameter": par,
+            "n_runs_total": len(g_all), "n_runs": len(g),
+            "n_runs_excluded_low_ESS": len(g_all) - len(g),
+            "median_ESS": g_all["ESS"].median(),
+            "median_ESS_per_million": g_all["ESS_per_million"].median(),
+            "frac_runs_ESS_below_min": float((g_all["ESS"] < args.min_ess).mean()),
+        }
+        if g.empty:   # every run of this kind is unreliable for this parameter
+            out.append(row)
+            continue
         t = tl[(tl["kind"] == kind) & (tl["parameter"] == par)]["value"]
         lo, hi = bootstrap_ci(t.values)
         p = np.concatenate(pooled[(kind, par)])
         plo, phi = hpd_interval(p)
         width = g["hpd95_upper"] - g["hpd95_lower"]
-        row = {
-            "kind": kind, "parameter": par,
-            "n_trees": t.size, "n_runs": len(g),
+        row.update({
+            "n_trees": t.size,
             "combined_estimate": t.mean(), "combined_CI95_lower": lo, "combined_CI95_upper": hi,
             "between_tree_sd": t.std(ddof=1),
             "pooled_posterior_median": np.median(p),
             "pooled_posterior_HPD95_lower": plo, "pooled_posterior_HPD95_upper": phi,
             "median_run_HPD_width": width.median(),
-            "median_ESS": g["ESS"].median(),
-            "frac_runs_ESS_below_200": float((g["ESS"] < 200).mean()),
-        }
+        })
         if par in truth:
             tv = truth[par]
             err = g[args.estimate] - tv
@@ -411,14 +454,20 @@ def plot_hpd_width(g, par, kinds, pal, tree_pal, path):
     _finish(fig, path)
 
 
-def plot_ess(runs, kinds, pal, path):
+def plot_ess(runs, kinds, pal, path, column="ESS", ylabel="ESS",
+             title="Effective sample sizes (all runs)", threshold=None):
+    """Boxplot of an ESS-type column per parameter and kind (log scale).
+    `threshold` draws a red dashed line (used for the ESS = 200 cut-off)."""
+    runs = runs[np.isfinite(runs[column]) & (runs[column] > 0)]   # log scale needs > 0
     fig, ax = plt.subplots(figsize=(max(8, 1.3 * runs["parameter"].nunique() + 3), 5))
-    sns.boxplot(data=runs, x="parameter", y="ESS", hue="kind", hue_order=kinds, palette=pal,
+    sns.boxplot(data=runs, x="parameter", y=column, hue="kind", hue_order=kinds, palette=pal,
                 ax=ax, showfliers=False)
     ax.set_yscale("log")
-    ax.axhline(200, color="red", ls="--", lw=1, label="ESS = 200")
+    if threshold:
+        ax.axhline(threshold, color="red", ls="--", lw=1, label=f"ESS = {threshold:g}")
+    ax.set_ylabel(ylabel)
     ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc="upper left")
-    ax.set_title("Effective sample sizes (all runs)")
+    ax.set_title(title)
     plt.setp(ax.get_xticklabels(), rotation=30, ha="right")
     _finish(fig, path)
 
@@ -452,9 +501,15 @@ def main():
     ap.add_argument("--burnin", type=float, default=0.1)
     ap.add_argument("--pool-samples", type=int, default=500,
                     help="samples taken (evenly spaced) from each run for the pooled posterior")
-    ap.add_argument("--min-ess", type=float, default=0.0,
-                    help="drop runs with ESS below this (default 0 = keep all; low-ESS runs "
-                         "are always reported)")
+    ap.add_argument("--min-ess", type=float, default=200.0,
+                    help="(run, parameter) estimates with ESS below this are unreliable and are "
+                         "left out of the comparisons (default 200; 0 = keep everything). "
+                         "ESS plots always show all runs; dropped entries are listed in "
+                         "excluded_low_ESS_runs.csv")
+    ap.add_argument("--ess-basis", choices=["total", "postburnin"], default="total",
+                    help="chain length used for ESS per million states: all logged states "
+                         "('total', default; burn-in counts as computational cost) or only the "
+                         "states kept after burn-in ('postburnin')")
     args = ap.parse_args()
 
     truth = {}
@@ -469,26 +524,38 @@ def main():
     runs_all, pooled = collect(args.root, args)
     runs_all.to_csv(args.output / "all_runs.csv", index=False)
 
-    runs = runs_all
-    if args.min_ess > 0:
-        keep = runs_all["ESS"] >= args.min_ess
-        print(f"Dropping {(~keep).sum()} of {len(runs_all)} (run, parameter) entries with "
-              f"ESS < {args.min_ess:g}")
-        runs = runs_all[keep]
-        # rebuild pooled samples is not possible per-entry; warn instead
-        print("  note: pooled-posterior plots still include all runs")
+    # ---- reliability filter: ESS < --min-ess => (run, parameter) is left out of comparisons
+    ok = reliable_mask(runs_all, args.min_ess)
+    runs = runs_all[ok]
+    dropped = runs_all[~ok]
+    dropped[["directory", "file", "kind", "parameter", "ESS", "ESS_per_million"]].to_csv(
+        args.output / "excluded_low_ESS_runs.csv", index=False)
+    if len(dropped):
+        print(f"\nExcluded {len(dropped)} of {len(runs_all)} (run, parameter) estimates with "
+              f"ESS < {args.min_ess:g} from the comparisons:")
+        print(dropped.groupby(["parameter", "kind"]).size().rename("n_excluded")
+              .to_string())
+        print(f"  (full list: {args.output / 'excluded_low_ESS_runs.csv'})\n")
+    else:
+        print(f"All {len(runs_all)} estimates have ESS >= {args.min_ess:g}.")
+    if runs.empty:
+        sys.exit(f"Every estimate has ESS < {args.min_ess:g}; nothing left to compare. "
+                 f"Run longer chains or lower --min-ess.")
+    pooled_kept = select_pooled(pooled, runs)
 
-    kinds = sorted(runs["kind"].unique())
+    # kinds / colours come from ALL runs so they are identical in every plot,
+    # even if a kind is completely excluded for some parameter
+    kinds = sorted(runs_all["kind"].unique())
     reference = args.reference or kinds[0]
     if reference not in kinds:
         sys.exit(f"Reference kind {reference!r} not found. Kinds: {kinds}")
     print(f"Kinds found: {kinds}  (reference: {reference})")
     pal = palette_for(kinds)
-    tree_pal = tree_palette(sorted(runs['directory'].unique()))
+    tree_pal = tree_palette(sorted(runs_all['directory'].unique()))
 
     tl = tree_level(runs, args.estimate)
     tl.to_csv(args.output / "tree_level_estimates.csv", index=False)
-    summary = summarise(runs, tl, pooled, truth, args)
+    summary = summarise(runs_all, tl, pooled_kept, truth, args)
     summary.to_csv(args.output / "summary_by_kind.csv", index=False)
     pairs, friedman = comparison_tests(tl, reference)
     pairs.to_csv(args.output / "paired_differences_vs_reference.csv", index=False)
@@ -499,7 +566,9 @@ def main():
     for i, par in enumerate(args.params):
         g = runs[runs["parameter"] == par]
         if g.empty:
-            print(f"  '{par}' not found in any file, skipped")
+            why = ("not found in any file" if par not in set(runs_all["parameter"])
+                   else f"all runs have ESS < {args.min_ess:g}")
+            print(f"  '{par}': {why}, skipped")
             continue
         sub = args.output / ("00_FOCUS_" + safe_name(par) if i == 0 else safe_name(par))
         sub.mkdir(exist_ok=True)
@@ -508,7 +577,7 @@ def main():
         summ_g = summary[summary["parameter"] == par]
         pk = [k for k in kinds if k in set(g["kind"])]
         plot_combined(tl_g, summ_g, par, pk, pal, tree_pal, t, args.estimate, sub / "combined_over_trees.png")
-        plot_pooled(pooled, par, pk, pal, t, sub / "pooled_posterior.png")
+        plot_pooled(pooled_kept, par, pk, pal, t, sub / "pooled_posterior.png")
         plot_runs(g, par, pk, pal, tree_pal, t, args.estimate, sub / "individual_runs.png")
         plot_hpd_width(g, par, pk, pal, tree_pal, sub / "hpd_width.png")
         if len(pk) > 1:
@@ -517,7 +586,12 @@ def main():
         if t is not None:
             plot_truth_metrics(g, par, pk, pal, tree_pal, t, args.estimate, sub / "accuracy_and_coverage.png")
 
-    plot_ess(runs, kinds, pal, args.output / "ESS_overview.png")
+    # ESS plots use ALL runs on purpose (see module docstring)
+    plot_ess(runs_all, kinds, pal, args.output / "ESS_overview.png",
+             threshold=args.min_ess if args.min_ess > 0 else 200)
+    plot_ess(runs_all, kinds, pal, args.output / "ESS_per_million_overview.png",
+             column="ESS_per_million", ylabel="ESS per million MCMC states",
+             title="Sampling efficiency: ESS per million states (all runs)")
 
     focus = args.params[0]
     pd.set_option("display.width", 220)

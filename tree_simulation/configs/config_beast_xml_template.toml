@@ -18,7 +18,7 @@ date_regex = '_(\d{4}(?:\.\d+)?)$'
 # dates_csv = "dates.csv"
 
 [mcmc]
-chain_length = 20_000_000
+chain_length = 3_000_000
 store_every  = 10_000
 log_every    = 2_000
 
